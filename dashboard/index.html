@@ -24,6 +24,22 @@
         --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
         --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      [data-theme="light"] {
+        --bg-primary: #f4f5f7;
+        --bg-secondary: #ffffff;
+        --bg-card: #ffffff;
+        --bg-card-hover: #f0f2f5;
+        --accent: #e94560;
+        --accent-soft: rgba(233, 69, 96, 0.1);
+        --text-primary: #1a1a2e;
+        --text-secondary: #4a5568;
+        --text-muted: #9aa5b4;
+        --border: rgba(0, 0, 0, 0.08);
+        --success: #00a86b;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      }
       * {
         margin: 0;
         padding: 0;
@@ -609,6 +625,17 @@
           <span class="status-dot" id="statusDot"></span>
           <span id="statusText">Checking engine...</span>
         </div>
+
+        <button
+          id="themeToggle"
+          onclick="toggleTheme()"
+          style="margin-top:12px;width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-secondary);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:var(--transition)"
+          onmouseover="this.style.background='var(--bg-card-hover)'"
+          onmouseout="this.style.background='var(--bg-card)'"
+        >
+          <span id="themeIcon">☀️</span>
+          <span id="themeLabel">Light Mode</span>
+        </button>
       </aside>
 
       <!-- Main Content -->
@@ -1374,7 +1401,28 @@
         await loadSchedulesPage();
       }
 
+      // ── Theme Toggle ─────────────────────────────────────────────────────
+      function toggleTheme() {
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        const newTheme = isLight ? "dark" : "light";
+        applyTheme(newTheme);
+        localStorage.setItem("hh-theme", newTheme);
+      }
+
+      function applyTheme(theme) {
+        if (theme === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+          document.getElementById("themeIcon").textContent = "🌙";
+          document.getElementById("themeLabel").textContent = "Dark Mode";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+          document.getElementById("themeIcon").textContent = "☀️";
+          document.getElementById("themeLabel").textContent = "Light Mode";
+        }
+      }
+
       // Init
+      applyTheme(localStorage.getItem("hh-theme") || "dark");
       loadDashboard();
       connectWs();
     </script>
