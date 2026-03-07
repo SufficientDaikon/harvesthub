@@ -44,6 +44,14 @@ export function createServer(port = 3000) {
   const dashboardPath = resolve(process.cwd(), "dashboard");
   app.use(express.static(dashboardPath));
 
+  // Clean URL routes: /docs → /docs.html, /dashboard → /index.html
+  app.get("/docs", (_req, res) => {
+    res.sendFile(resolve(dashboardPath, "docs.html"));
+  });
+  app.get("/dashboard", (_req, res) => {
+    res.sendFile(resolve(dashboardPath, "index.html"));
+  });
+
   // Load proxies from env on startup
   loadProxiesFromEnv();
 
