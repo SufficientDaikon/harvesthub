@@ -589,6 +589,20 @@
             </svg>
             Live Feed
           </button>
+          <button class="nav-item" onclick="showPage('schedules')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Schedules
+          </button>
         </nav>
 
         <div class="status-pill" id="engineStatus">
@@ -843,6 +857,63 @@
             </div>
           </div>
         </div>
+
+        <!-- Schedules Page -->
+        <div id="page-schedules" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Schedules</h2>
+              <p class="page-subtitle">Automate scraping with cron jobs</p>
+            </div>
+            <div class="filters">
+              <button class="btn btn-primary" onclick="showNewScheduleForm()">+ New Schedule</button>
+            </div>
+          </div>
+
+          <!-- New schedule form (hidden by default) -->
+          <div id="newScheduleForm" style="display:none;margin-bottom:24px" class="table-card">
+            <div class="table-header"><span class="table-title">New Schedule</span></div>
+            <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Name</label>
+                <input id="sName" type="text" placeholder="Daily books scrape" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Cron Expression</label>
+                <input id="sCron" type="text" placeholder="0 9 * * *  (daily at 9am)" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+              </div>
+              <div style="grid-column:1/-1">
+                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">URL Source (file path or comma-separated URLs)</label>
+                <input id="sSource" type="text" placeholder="test-urls.txt  or  https://example.com/product/1,https://..." style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+              </div>
+              <div style="grid-column:1/-1;display:flex;gap:12px;align-items:center">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);cursor:pointer">
+                  <input type="checkbox" id="sEnabled" checked style="accent-color:var(--accent)" /> Enabled immediately
+                </label>
+                <button class="btn btn-primary" onclick="createSchedule()" style="margin-left:auto">Create Schedule</button>
+                <button class="btn" onclick="document.getElementById('newScheduleForm').style.display='none'">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Cron</th>
+                  <th>URL Source</th>
+                  <th>Status</th>
+                  <th>Last Run</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="schedulesTable">
+                <tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -864,6 +935,7 @@
         event.currentTarget.classList.add("active");
 
         if (page === "products") loadProductsTable();
+        if (page === "schedules") loadSchedulesPage();
         if (page === "dashboard") loadDashboard();
       }
 
@@ -1205,6 +1277,91 @@
         document.getElementById("liveStatsRow").style.display = "none";
         document.getElementById("liveSubtitle").textContent =
           "Waiting for scrape jobs…";
+      }
+
+      // ── Schedules ────────────────────────────────────────────────────────
+      function showNewScheduleForm() {
+        document.getElementById("newScheduleForm").style.display = "block";
+      }
+
+      async function loadSchedulesPage() {
+        const tbody = document.getElementById("schedulesTable");
+        tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
+        try {
+          const data = await api("/api/schedules");
+          if (!data.schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><h3>No schedules yet</h3><p>Click "+ New Schedule" to create one</p></div></td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.schedules
+            .map((s) => {
+              const lastRun = s.lastRunAt
+                ? new Date(s.lastRunAt).toLocaleString()
+                : "Never";
+              const statusBadge = s.enabled
+                ? '<span class="badge badge-success">Enabled</span>'
+                : '<span class="badge badge-warning">Disabled</span>';
+              const runBadge = s.lastRunStatus === "completed"
+                ? '<span class="badge badge-success">OK</span>'
+                : s.lastRunStatus === "failed"
+                  ? '<span class="badge badge-danger">Failed</span>'
+                  : '<span class="badge" style="background:var(--bg-card);color:var(--text-muted)">—</span>';
+              return `<tr>
+                <td><strong>${esc(s.name)}</strong></td>
+                <td><code style="font-size:11px;color:var(--accent)">${esc(s.cronExpression)}</code></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(s.urlSource)}">${esc(s.urlSource)}</td>
+                <td>${statusBadge}</td>
+                <td>${lastRun} ${runBadge}</td>
+                <td style="white-space:nowrap">
+                  <button class="btn btn-sm" onclick="toggleSchedule('${s.id}', ${!s.enabled})">${s.enabled ? "Disable" : "Enable"}</button>
+                  <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteScheduleUI('${s.id}')">Delete</button>
+                </td>
+              </tr>`;
+            })
+            .join("");
+        } catch (err) {
+          tbody.innerHTML = '<tr><td colspan="6" style="color:var(--danger);padding:20px">Failed to load schedules</td></tr>';
+        }
+      }
+
+      async function createSchedule() {
+        const name = document.getElementById("sName").value.trim();
+        const cronExpression = document.getElementById("sCron").value.trim();
+        const urlSource = document.getElementById("sSource").value.trim();
+        const enabled = document.getElementById("sEnabled").checked;
+        if (!name || !cronExpression || !urlSource) {
+          alert("Name, cron expression and URL source are required.");
+          return;
+        }
+        try {
+          await fetch("/api/schedules", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, cronExpression, urlSource, enabled }),
+          });
+          document.getElementById("newScheduleForm").style.display = "none";
+          document.getElementById("sName").value = "";
+          document.getElementById("sCron").value = "";
+          document.getElementById("sSource").value = "";
+          await loadSchedulesPage();
+        } catch (err) {
+          alert("Failed to create schedule: " + err.message);
+        }
+      }
+
+      async function toggleSchedule(id, enabled) {
+        await fetch(`/api/schedules/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled }),
+        });
+        await loadSchedulesPage();
+      }
+
+      async function deleteScheduleUI(id) {
+        if (!confirm("Delete this schedule?")) return;
+        await fetch(`/api/schedules/${id}`, { method: "DELETE" });
+        await loadSchedulesPage();
       }
 
       // Init

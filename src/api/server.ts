@@ -16,6 +16,19 @@ import { checkEngineHealth } from "../core/scrape-bridge.js";
 import { getUserAgentCount } from "../core/ua-pool.js";
 import { createChildLogger } from "../lib/logger.js";
 import { wsBroadcast } from "../core/ws-broadcast.js";
+import {
+  loadSchedules,
+  saveSchedule,
+  deleteSchedule,
+} from "../store/local-store.js";
+import {
+  startAllSchedules,
+  syncSchedule,
+  stopScheduleJob,
+  getActiveScheduleIds,
+} from "../core/scheduler.js";
+import type { Schedule } from "../types/schedule.js";
+import { nanoid } from "nanoid";
 
 const log = createChildLogger("api");
 
@@ -207,6 +220,78 @@ export function createServer(port = 3000) {
     }
   });
 
+  // API: Schedules CRUD
+  app.get("/api/schedules", async (_req, res) => {
+    try {
+      const schedules = await loadSchedules();
+      const active = getActiveScheduleIds();
+      res.json({ schedules: schedules.map((s) => ({ ...s, running: active.includes(s.id) })) });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to load schedules" });
+    }
+  });
+
+  app.post("/api/schedules", async (req, res) => {
+    try {
+      const { name, cronExpression, urlSource, config = {}, enabled = true } = req.body as Partial<Schedule>;
+      if (!name || !cronExpression || !urlSource) {
+        res.status(400).json({ error: "name, cronExpression and urlSource are required" });
+        return;
+      }
+      const schedule: Schedule = {
+        id: nanoid(12),
+        name,
+        cronExpression,
+        urlSource,
+        config: {
+          maxRetries: 3,
+          retryBaseDelay: 2000,
+          retryMultiplier: 2,
+          rateLimit: 1,
+          concurrentDomains: 3,
+          proxyEnabled: false,
+          timeout: 30_000,
+          ...config,
+        },
+        enabled: enabled !== false,
+        lastRunAt: null,
+        lastRunStatus: null,
+        createdAt: new Date().toISOString(),
+      };
+      await saveSchedule(schedule);
+      await syncSchedule(schedule);
+      res.status(201).json({ schedule });
+    } catch (err) {
+      log.error({ err }, "Failed to create schedule");
+      res.status(500).json({ error: "Failed to create schedule" });
+    }
+  });
+
+  app.patch("/api/schedules/:id", async (req, res) => {
+    try {
+      const schedules = await loadSchedules();
+      const schedule = schedules.find((s) => s.id === req.params["id"]);
+      if (!schedule) { res.status(404).json({ error: "Schedule not found" }); return; }
+      const updated: Schedule = { ...schedule, ...req.body, id: schedule.id };
+      await saveSchedule(updated);
+      await syncSchedule(updated);
+      res.json({ schedule: updated });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update schedule" });
+    }
+  });
+
+  app.delete("/api/schedules/:id", async (req, res) => {
+    try {
+      stopScheduleJob(req.params["id"]!);
+      const deleted = await deleteSchedule(req.params["id"]!);
+      if (!deleted) { res.status(404).json({ error: "Schedule not found" }); return; }
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete schedule" });
+    }
+  });
+
   const httpServer = createHttpServer(app);
 
   // WebSocket server on same port (upgrade path: /ws)
@@ -223,6 +308,8 @@ export function createServer(port = 3000) {
     );
     console.log(`\n  🌾 HarvestHub Dashboard: http://localhost:${port}`);
     console.log(`  🔌 WebSocket: ws://localhost:${port}/ws\n`);
+    // Start all persisted schedules
+    startAllSchedules().catch((err) => log.error({ err }, "Failed to start schedules"));
   });
 
   return app;

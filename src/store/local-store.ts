@@ -2,6 +2,7 @@ import { readFile, writeFile, rename, mkdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { existsSync } from "node:fs";
 import type { Product, ScrapeJob } from "../types/index.js";
+import type { Schedule } from "../types/schedule.js";
 import { createChildLogger } from "../lib/logger.js";
 
 const log = createChildLogger("local-store");
@@ -11,6 +12,7 @@ const STORE_DIR = resolve(process.cwd(), "data", "store");
 interface StoreData {
   products: Product[];
   jobs: ScrapeJob[];
+  schedules: Schedule[];
   version: number;
 }
 
@@ -26,14 +28,17 @@ async function readStore(name: string): Promise<StoreData> {
   await ensureDir();
   const path = getPath(name);
   if (!existsSync(path)) {
-    return { products: [], jobs: [], version: 1 };
+    return { products: [], jobs: [], schedules: [], version: 1 };
   }
   try {
     const raw = await readFile(path, "utf-8");
-    return JSON.parse(raw) as StoreData;
+    const parsed = JSON.parse(raw) as StoreData;
+    // Back-compat: older stores may not have schedules
+    if (!parsed.schedules) parsed.schedules = [];
+    return parsed;
   } catch (err) {
     log.error({ err, path }, "Corrupted store file — resetting");
-    return { products: [], jobs: [], version: 1 };
+    return { products: [], jobs: [], schedules: [], version: 1 };
   }
 }
 
@@ -94,6 +99,39 @@ export async function getProductCount(storeName = "default"): Promise<number> {
 }
 
 export async function clearStore(storeName = "default"): Promise<void> {
-  await writeStore(storeName, { products: [], jobs: [], version: 1 });
+  await writeStore(storeName, { products: [], jobs: [], schedules: [], version: 1 });
   log.info({ store: storeName }, "Store cleared");
+}
+
+export async function loadSchedules(storeName = "default"): Promise<Schedule[]> {
+  const data = await readStore(storeName);
+  return data.schedules;
+}
+
+export async function saveSchedule(
+  schedule: Schedule,
+  storeName = "default",
+): Promise<void> {
+  const data = await readStore(storeName);
+  const idx = data.schedules.findIndex((s) => s.id === schedule.id);
+  if (idx >= 0) {
+    data.schedules[idx] = schedule;
+  } else {
+    data.schedules.push(schedule);
+  }
+  data.version++;
+  await writeStore(storeName, data);
+}
+
+export async function deleteSchedule(
+  scheduleId: string,
+  storeName = "default",
+): Promise<boolean> {
+  const data = await readStore(storeName);
+  const before = data.schedules.length;
+  data.schedules = data.schedules.filter((s) => s.id !== scheduleId);
+  if (data.schedules.length === before) return false;
+  data.version++;
+  await writeStore(storeName, data);
+  return true;
 }
