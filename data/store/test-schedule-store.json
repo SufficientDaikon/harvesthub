@@ -1,0 +1,26 @@
+{
+  "products": [],
+  "jobs": [],
+  "schedules": [
+    {
+      "id": "s1",
+      "name": "Test Schedule s1",
+      "cronExpression": "0 9 * * *",
+      "urlSource": "test-urls.txt",
+      "config": {
+        "maxRetries": 3,
+        "retryBaseDelay": 2000,
+        "retryMultiplier": 2,
+        "rateLimit": 1,
+        "concurrentDomains": 5,
+        "proxyEnabled": false,
+        "timeout": 30000
+      },
+      "enabled": false,
+      "lastRunAt": null,
+      "lastRunStatus": null,
+      "createdAt": "2026-03-07T22:37:50.236Z"
+    }
+  ],
+  "version": 3
+}
