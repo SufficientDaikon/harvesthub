@@ -1,5 +1,7 @@
 import express from "express";
+import { createServer as createHttpServer } from "node:http";
 import { resolve } from "node:path";
+import { WebSocketServer } from "ws";
 import {
   loadProducts,
   loadJobs,
@@ -13,6 +15,7 @@ import {
 import { checkEngineHealth } from "../core/scrape-bridge.js";
 import { getUserAgentCount } from "../core/ua-pool.js";
 import { createChildLogger } from "../lib/logger.js";
+import { wsBroadcast } from "../core/ws-broadcast.js";
 
 const log = createChildLogger("api");
 
@@ -155,11 +158,9 @@ export function createServer(port = 3000) {
     try {
       const format = req.params["format"] as ExportFormat;
       if (!SUPPORTED_FORMATS.includes(format)) {
-        res
-          .status(400)
-          .json({
-            error: `Unsupported format. Use: ${SUPPORTED_FORMATS.join(", ")}`,
-          });
+        res.status(400).json({
+          error: `Unsupported format. Use: ${SUPPORTED_FORMATS.join(", ")}`,
+        });
         return;
       }
 
@@ -206,12 +207,22 @@ export function createServer(port = 3000) {
     }
   });
 
-  app.listen(port, () => {
+  const httpServer = createHttpServer(app);
+
+  // WebSocket server on same port (upgrade path: /ws)
+  const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
+  wss.on("connection", (ws) => {
+    wsBroadcast.register(ws);
+    log.debug("WebSocket client connected");
+  });
+
+  httpServer.listen(port, () => {
     log.info(
       { port },
       `HarvestHub Dashboard running at http://localhost:${port}`,
     );
-    console.log(`\n  🌾 HarvestHub Dashboard: http://localhost:${port}\n`);
+    console.log(`\n  🌾 HarvestHub Dashboard: http://localhost:${port}`);
+    console.log(`  🔌 WebSocket: ws://localhost:${port}/ws\n`);
   });
 
   return app;

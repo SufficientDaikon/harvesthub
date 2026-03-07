@@ -575,6 +575,20 @@
             </svg>
             Exports
           </button>
+          <button class="nav-item" onclick="showPage('live')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
+              />
+            </svg>
+            Live Feed
+          </button>
         </nav>
 
         <div class="status-pill" id="engineStatus">
@@ -780,6 +794,52 @@
             >
               Click any format above to download. Exports include all stored
               products.
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Feed Page -->
+        <div id="page-live" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Live Scrape Feed</h2>
+              <p class="page-subtitle" id="liveSubtitle">Waiting for scrape jobs…</p>
+            </div>
+            <div class="filters">
+              <span id="wsStatus" style="font-size:12px;padding:6px 12px;border-radius:20px;background:var(--bg-card);color:var(--text-muted)">● Disconnected</span>
+              <button class="btn btn-primary" onclick="clearLiveFeed()">Clear</button>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div id="liveProgressWrap" style="display:none;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:8px">
+              <span id="liveProgressLabel">Scraping…</span>
+              <span id="liveProgressPct">0%</span>
+            </div>
+            <div style="background:var(--bg-card);border-radius:4px;height:6px;overflow:hidden">
+              <div id="liveProgressBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s ease;border-radius:4px"></div>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div id="liveStatsRow" style="display:none;gap:12px;margin-bottom:20px" class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Processed</div><div class="stat-value" id="liveDone">0</div></div>
+            <div class="stat-card"><div class="stat-label">Succeeded</div><div class="stat-value success" id="liveOk">0</div></div>
+            <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value danger" id="liveFail">0</div></div>
+            <div class="stat-card"><div class="stat-label">Skipped</div><div class="stat-value" id="liveSkip">0</div></div>
+          </div>
+
+          <!-- Event log -->
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-title">Event Log</span>
+            </div>
+            <div id="liveFeedLog" style="padding:16px;font-family:monospace;font-size:12px;max-height:500px;overflow-y:auto;color:var(--text-secondary)">
+              <div style="color:var(--text-muted);text-align:center;padding:40px 0">
+                Start a scrape job from the CLI to see live updates here.<br>
+                <code style="color:var(--accent);margin-top:8px;display:block">npx tsx src/cli/index.ts scrape --urls test-urls.txt</code>
+              </div>
             </div>
           </div>
         </div>
@@ -993,8 +1053,163 @@
         loadDashboard();
       }
 
+      // ── WebSocket Live Feed ──────────────────────────────────────────────
+      let ws = null;
+      let liveStats = { done: 0, ok: 0, fail: 0, skip: 0 };
+
+      function connectWs() {
+        if (ws && ws.readyState <= 1) return;
+        const proto = location.protocol === "https:" ? "wss:" : "ws:";
+        ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+        ws.onopen = () => {
+          setWsStatus(true);
+        };
+        ws.onclose = () => {
+          setWsStatus(false);
+          setTimeout(connectWs, 3000); // auto-reconnect
+        };
+        ws.onerror = () => ws.close();
+        ws.onmessage = (e) => {
+          try {
+            const ev = JSON.parse(e.data);
+            handleWsEvent(ev);
+          } catch {}
+        };
+      }
+
+      function setWsStatus(connected) {
+        const el = document.getElementById("wsStatus");
+        if (connected) {
+          el.textContent = "● Connected";
+          el.style.color = "var(--success)";
+        } else {
+          el.textContent = "● Disconnected";
+          el.style.color = "var(--text-muted)";
+        }
+      }
+
+      function handleWsEvent(ev) {
+        const time = new Date(ev.ts).toLocaleTimeString();
+
+        if (ev.type === "scrape:start") {
+          liveStats = { done: 0, ok: 0, fail: 0, skip: 0 };
+          document.getElementById("liveProgressWrap").style.display = "block";
+          document.getElementById("liveStatsRow").style.display = "grid";
+          document.getElementById("liveSubtitle").textContent =
+            `Scraping ${ev.data.total} URL${ev.data.total !== 1 ? "s" : ""}…`;
+          updateLiveStats(0, ev.data.total);
+          appendLiveLog(
+            time,
+            "start",
+            `🚀 Job started — ${ev.data.total} URLs`,
+          );
+        } else if (ev.type === "scrape:progress") {
+          liveStats.done++;
+          if (ev.data.status === "ok") liveStats.ok++;
+          else if (ev.data.status === "fail") liveStats.fail++;
+          else liveStats.skip++;
+          updateLiveStats(ev.data.index, ev.data.total);
+
+          if (ev.data.status === "ok") {
+            const conf = ev.data.confidence;
+            const color =
+              conf >= 80
+                ? "var(--success)"
+                : conf >= 50
+                  ? "var(--warning)"
+                  : "var(--danger)";
+            appendLiveLog(
+              time,
+              "ok",
+              `✅ [${ev.data.index}/${ev.data.total}] ${String(ev.data.title).slice(0, 60)} — ` +
+                `<span style="color:${color}">${conf}%</span> — ${ev.data.elapsedMs}ms`,
+            );
+          } else if (ev.data.status === "fail") {
+            appendLiveLog(
+              time,
+              "fail",
+              `❌ [${ev.data.index}/${ev.data.total}] ${ev.data.url} — ${ev.data.error}`,
+            );
+          } else {
+            appendLiveLog(
+              time,
+              "skip",
+              `⏭ [${ev.data.index}/${ev.data.total}] ${ev.data.url} — skipped (${ev.data.reason})`,
+            );
+          }
+        } else if (ev.type === "scrape:error") {
+          liveStats.done++;
+          liveStats.fail++;
+          updateLiveStats(ev.data.index, ev.data.total);
+          appendLiveLog(
+            time,
+            "fail",
+            `💥 [${ev.data.index}/${ev.data.total}] ${ev.data.url} — ${ev.data.error}`,
+          );
+        } else if (ev.type === "scrape:complete") {
+          document.getElementById("liveProgressBar").style.width = "100%";
+          document.getElementById("liveProgressLabel").textContent =
+            "Complete!";
+          document.getElementById("liveProgressPct").textContent = "100%";
+          document.getElementById("liveSubtitle").textContent =
+            `Last job: ${ev.data.succeeded}/${ev.data.total} succeeded in ${ev.data.elapsedSec}s`;
+          appendLiveLog(
+            time,
+            "complete",
+            `🏁 Job complete — ${ev.data.succeeded} scraped, ${ev.data.failed} failed, ${ev.data.elapsedSec}s`,
+          );
+          // Refresh dashboard data
+          setTimeout(loadDashboard, 500);
+        }
+      }
+
+      function updateLiveStats(done, total) {
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        document.getElementById("liveProgressBar").style.width = pct + "%";
+        document.getElementById("liveProgressPct").textContent = pct + "%";
+        document.getElementById("liveProgressLabel").textContent =
+          `${done} / ${total}`;
+        document.getElementById("liveDone").textContent = liveStats.done;
+        document.getElementById("liveOk").textContent = liveStats.ok;
+        document.getElementById("liveFail").textContent = liveStats.fail;
+        document.getElementById("liveSkip").textContent = liveStats.skip;
+      }
+
+      function appendLiveLog(time, type, html) {
+        const log = document.getElementById("liveFeedLog");
+        const colors = {
+          start: "var(--accent)",
+          ok: "var(--success)",
+          fail: "var(--danger)",
+          skip: "var(--text-muted)",
+          complete: "var(--warning)",
+        };
+        const entry = document.createElement("div");
+        entry.style.cssText =
+          "padding:4px 0;border-bottom:1px solid var(--border)";
+        entry.innerHTML = `<span style="color:var(--text-muted)">${time}</span> <span style="color:${colors[type] || "var(--text-secondary)"}"> ${html}</span>`;
+        // Remove placeholder if present
+        if (log.querySelector("[data-placeholder]")) log.innerHTML = "";
+        log.prepend(entry);
+        // Keep max 200 entries
+        while (log.children.length > 200) log.removeChild(log.lastChild);
+      }
+
+      function clearLiveFeed() {
+        const log = document.getElementById("liveFeedLog");
+        log.innerHTML =
+          '<div data-placeholder style="color:var(--text-muted);text-align:center;padding:40px 0">Feed cleared. Waiting for next scrape job…</div>';
+        liveStats = { done: 0, ok: 0, fail: 0, skip: 0 };
+        document.getElementById("liveProgressWrap").style.display = "none";
+        document.getElementById("liveStatsRow").style.display = "none";
+        document.getElementById("liveSubtitle").textContent =
+          "Waiting for scrape jobs…";
+      }
+
       // Init
       loadDashboard();
+      connectWs();
     </script>
   </body>
 </html>

@@ -14,6 +14,7 @@ import {
   SUPPORTED_FORMATS,
 } from "../../export/index.js";
 import { createChildLogger } from "../../lib/logger.js";
+import { wsBroadcast } from "../../core/ws-broadcast.js";
 import type { Product, ScrapeJob, ScrapeTask } from "../../types/index.js";
 import { DEFAULT_JOB_CONFIG } from "../../types/index.js";
 
@@ -118,6 +119,11 @@ export const scrapeCommand = new Command("scrape")
       ),
     );
 
+    wsBroadcast.emit("scrape:start", {
+      total: urls.length,
+      config: { maxRetries, timeout, useStealth },
+    });
+
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i]!;
       const prefix = chalk.dim(`  [${i + 1}/${urls.length}]`);
@@ -138,6 +144,13 @@ export const scrapeCommand = new Command("scrape")
             chalk.dim(`         ${lastErr} (${result.attempts} attempts)`),
           );
           errors.push({ url, error: lastErr });
+          wsBroadcast.emit("scrape:progress", {
+            index: i + 1,
+            total: urls.length,
+            url,
+            status: "fail",
+            error: lastErr,
+          });
           continue;
         }
 
@@ -145,11 +158,25 @@ export const scrapeCommand = new Command("scrape")
 
         if (!response.is_product_page) {
           spinner.warn(`${prefix} ${chalk.yellow("SKIP")} Not a product page`);
+          wsBroadcast.emit("scrape:progress", {
+            index: i + 1,
+            total: urls.length,
+            url,
+            status: "skip",
+            reason: "not_product_page",
+          });
           continue;
         }
 
         if (!response.product) {
           spinner.warn(`${prefix} ${chalk.yellow("SKIP")} No data extracted`);
+          wsBroadcast.emit("scrape:progress", {
+            index: i + 1,
+            total: urls.length,
+            url,
+            status: "skip",
+            reason: "no_data",
+          });
           continue;
         }
 
@@ -197,11 +224,28 @@ export const scrapeCommand = new Command("scrape")
         spinner.succeed(
           `${prefix} ${chalk.green("OK")} ${product.title.slice(0, 50)} — ${confStr} — ${response.elapsed_ms}ms`,
         );
+        wsBroadcast.emit("scrape:progress", {
+          index: i + 1,
+          total: urls.length,
+          url,
+          status: "ok",
+          title: product.title,
+          price: product.price,
+          currency: product.currency,
+          confidence: product.overallConfidence,
+          elapsedMs: response.elapsed_ms,
+        });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         spinner.fail(`${prefix} ${chalk.red("ERROR")} ${url}`);
         console.log(chalk.dim(`         ${msg}`));
         errors.push({ url, error: msg });
+        wsBroadcast.emit("scrape:error", {
+          index: i + 1,
+          total: urls.length,
+          url,
+          error: msg,
+        });
       }
     }
 
@@ -238,6 +282,13 @@ export const scrapeCommand = new Command("scrape")
     console.log(`  ${chalk.red("Failed:")}        ${errors.length}`);
     console.log(`  Time:           ${elapsed}s`);
     console.log(chalk.bold("  ───────────────────────────────\n"));
+
+    wsBroadcast.emit("scrape:complete", {
+      total: urls.length,
+      succeeded: products.length,
+      failed: errors.length,
+      elapsedSec: parseFloat(elapsed),
+    });
 
     if (errors.length > 0 && errors.length <= 10) {
       console.log(chalk.dim("  Failed URLs:"));
