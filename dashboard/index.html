@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HarvestHub — Product Intelligence Dashboard</title>
+    <style>
+      :root {
+        --bg-primary: #0f0f23;
+        --bg-secondary: #1a1a2e;
+        --bg-card: #16213e;
+        --bg-card-hover: #1a2744;
+        --accent: #e94560;
+        --accent-soft: rgba(233, 69, 96, 0.15);
+        --text-primary: #eee;
+        --text-secondary: #8892b0;
+        --text-muted: #5a6480;
+        --border: rgba(255, 255, 255, 0.06);
+        --success: #00d68f;
+        --warning: #ffaa00;
+        --danger: #ff3d71;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          system-ui,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--text-muted);
+        border-radius: 3px;
+      }
+
+      /* Layout */
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 260px;
+        background: var(--bg-secondary);
+        padding: 24px 16px;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+      }
+      .main {
+        flex: 1;
+        margin-left: 260px;
+        padding: 32px;
+      }
+
+      /* Logo */
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 8px;
+        margin-bottom: 32px;
+      }
+      .logo-icon {
+        font-size: 28px;
+      }
+      .logo h1 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      .logo span {
+        color: var(--accent);
+      }
+
+      /* Nav */
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        background: none;
+        width: 100%;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+      }
+      .nav-item.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .nav-item svg {
+        width: 18px;
+        height: 18px;
+        opacity: 0.7;
+      }
+
+      /* System status pill */
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(0, 214, 143, 0.08);
+        border-radius: var(--radius-sm);
+        margin-top: auto;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+      }
+      .status-dot.offline {
+        background: var(--danger);
+      }
+
+      /* Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-top: 4px;
+      }
+
+      /* Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        transition: var(--transition);
+      }
+      .stat-card:hover {
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .stat-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -1px;
+      }
+      .stat-value.success {
+        color: var(--success);
+      }
+      .stat-value.danger {
+        color: var(--danger);
+      }
+      .stat-value.accent {
+        color: var(--accent);
+      }
+      .stat-change {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      /* Tables */
+      .table-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 24px;
+      }
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .table-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .table-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        background: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 12px 16px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-primary);
+      }
+
+      /* Badges */
+      .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+      .badge-success {
+        background: rgba(0, 214, 143, 0.15);
+        color: var(--success);
+      }
+      .badge-danger {
+        background: rgba(255, 61, 113, 0.15);
+        color: var(--danger);
+      }
+      .badge-warning {
+        background: rgba(255, 170, 0, 0.15);
+        color: var(--warning);
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #d13a54;
+      }
+      .btn-sm {
+        padding: 5px 12px;
+        font-size: 12px;
+      }
+
+      /* Search */
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        flex: 1;
+        max-width: 400px;
+      }
+      .search-bar input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--text-primary);
+        font-size: 13px;
+        flex: 1;
+      }
+      .search-bar input::placeholder {
+        color: var(--text-muted);
+      }
+
+      /* Charts area */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+      }
+      .chart-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+      .bar-chart {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .bar-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        min-width: 100px;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .bar-track {
+        flex: 1;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        padding-left: 8px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .bar-count {
+        font-size: 12px;
+        color: var(--text-muted);
+        min-width: 30px;
+      }
+
+      /* Confidence meter */
+      .confidence {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .confidence-bar {
+        width: 50px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .confidence-fill {
+        height: 100%;
+        border-radius: 3px;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          margin-left: 0;
+          padding: 16px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Price column */
+      .price {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+      }
+      .empty-state h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: var(--text-secondary);
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .pagination-btns {
+        display: flex;
+        gap: 4px;
+      }
+
+      /* Filter row */
+      .filters {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      select {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        cursor: pointer;
+        outline: none;
+      }
+      select:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <span class="logo-icon">🌾</span>
+          <h1>Harvest<span>Hub</span></h1>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" onclick="showPage('dashboard')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Dashboard
+          </button>
+          <button class="nav-item" onclick="showPage('products')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              />
+            </svg>
+            Products
+          </button>
+          <button class="nav-item" onclick="showPage('exports')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+            </svg>
+            Exports
+          </button>
+        </nav>
+
+        <div class="status-pill" id="engineStatus">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking engine...</span>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main">
+        <!-- Dashboard Page -->
+        <div id="page-dashboard">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Dashboard</h2>
+              <p class="page-subtitle">Product intelligence overview</p>
+            </div>
+            <div class="filters">
+              <button class="btn btn-primary" onclick="refreshData()">
+                ↻ Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+              <div class="stat-label">Total Products</div>
+              <div class="stat-value" id="totalProducts">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">In Stock</div>
+              <div class="stat-value success" id="inStock">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Out of Stock</div>
+              <div class="stat-value danger" id="outOfStock">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Avg Price</div>
+              <div class="stat-value" id="avgPrice">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Avg Confidence</div>
+              <div class="stat-value accent" id="avgConfidence">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Price Range</div>
+              <div class="stat-value" id="priceRange">—</div>
+              <div class="stat-change" id="priceRangeDetail"></div>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-title">Top Brands</div>
+              <div class="bar-chart" id="brandsChart"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Top Categories</div>
+              <div class="bar-chart" id="categoriesChart"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Page -->
+        <div id="page-products" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Products</h2>
+              <p class="page-subtitle" id="productsCount">Loading...</p>
+            </div>
+            <div class="filters">
+              <div class="search-bar">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--text-muted)"
+                  stroke-width="2"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  id="searchInput"
+                  oninput="debounceSearch()"
+                />
+              </div>
+              <select id="brandFilter" onchange="loadProductsTable()">
+                <option value="">All Brands</option>
+              </select>
+              <select id="availFilter" onchange="loadProductsTable()">
+                <option value="">All Status</option>
+                <option value="in_stock">In Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Brand</th>
+                  <th>Status</th>
+                  <th>Category</th>
+                  <th>Confidence</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody id="productsTable">
+                <tr>
+                  <td colspan="7">
+                    <div class="loading"><div class="spinner"></div></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <span id="paginationInfo">—</span>
+              <div class="pagination-btns">
+                <button
+                  class="btn btn-sm"
+                  onclick="changePage(-1)"
+                  id="prevBtn"
+                >
+                  ← Prev
+                </button>
+                <button class="btn btn-sm" onclick="changePage(1)" id="nextBtn">
+                  Next →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exports Page -->
+        <div id="page-exports" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Export Center</h2>
+              <p class="page-subtitle">
+                Download your product data in any format
+              </p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div
+              class="stat-card"
+              style="cursor: pointer"
+              onclick="downloadExport('xlsx')"
+            >
+              <div class="stat-label">📊 Excel</div>
+              <div class="stat-value" style="font-size: 20px">XLSX</div>
+              <div class="stat-change">
+                Premium styled workbook with summary
+              </div>
+            </div>
+            <div
+              class="stat-card"
+              style="cursor: pointer"
+              onclick="downloadExport('csv')"
+            >
+              <div class="stat-label">📋 Spreadsheet</div>
+              <div class="stat-value" style="font-size: 20px">CSV</div>
+              <div class="stat-change">
+                UTF-8 with BOM for Excel compatibility
+              </div>
+            </div>
+            <div
+              class="stat-card"
+              style="cursor: pointer"
+              onclick="downloadExport('json')"
+            >
+              <div class="stat-label">🔧 Developer</div>
+              <div class="stat-value" style="font-size: 20px">JSON</div>
+              <div class="stat-change">Structured data with metadata</div>
+            </div>
+            <div
+              class="stat-card"
+              style="cursor: pointer"
+              onclick="downloadExport('gmc')"
+            >
+              <div class="stat-label">🛒 Google Merchant</div>
+              <div class="stat-value" style="font-size: 20px">GMC Feed</div>
+              <div class="stat-change">Tab-separated, GMC compliant</div>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-title">Export History</span>
+            </div>
+            <div
+              id="exportLog"
+              style="padding: 20px; color: var(--text-muted); font-size: 13px"
+            >
+              Click any format above to download. Exports include all stored
+              products.
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // State
+      let currentPage = 1;
+      let totalPages = 1;
+      let searchTimeout;
+
+      // Navigation
+      function showPage(page) {
+        document
+          .querySelectorAll('[id^="page-"]')
+          .forEach((el) => (el.style.display = "none"));
+        document.getElementById(`page-${page}`).style.display = "block";
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((el) => el.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+
+        if (page === "products") loadProductsTable();
+        if (page === "dashboard") loadDashboard();
+      }
+
+      // Fetch helpers
+      async function api(path) {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
+      }
+
+      // Dashboard
+      async function loadDashboard() {
+        try {
+          const [stats, status] = await Promise.all([
+            api("/api/stats"),
+            api("/api/status"),
+          ]);
+
+          document.getElementById("totalProducts").textContent =
+            stats.totalProducts.toLocaleString();
+          document.getElementById("inStock").textContent =
+            stats.inStock.toLocaleString();
+          document.getElementById("outOfStock").textContent =
+            stats.outOfStock.toLocaleString();
+          document.getElementById("avgPrice").textContent =
+            stats.avgPrice.toFixed(2);
+          document.getElementById("avgConfidence").textContent =
+            stats.avgConfidence + "%";
+          document.getElementById("priceRange").textContent =
+            `${stats.priceRange.min.toFixed(0)} – ${stats.priceRange.max.toFixed(0)}`;
+          document.getElementById("priceRangeDetail").textContent =
+            `${stats.totalProducts} products analyzed`;
+
+          // Engine status
+          const dot = document.getElementById("statusDot");
+          const text = document.getElementById("statusText");
+          if (status.engine === "ready") {
+            dot.classList.remove("offline");
+            text.textContent = `Engine ready · ${status.productCount} products`;
+          } else {
+            dot.classList.add("offline");
+            text.textContent = "Engine offline";
+          }
+
+          // Bar charts
+          renderBarChart("brandsChart", stats.topBrands, "#e94560");
+          renderBarChart("categoriesChart", stats.topCategories, "#00d68f");
+
+          // Populate brand filter
+          const brandSelect = document.getElementById("brandFilter");
+          const currentVal = brandSelect.value;
+          brandSelect.innerHTML = '<option value="">All Brands</option>';
+          stats.topBrands.forEach((b) => {
+            const opt = document.createElement("option");
+            opt.value = b.name;
+            opt.textContent = `${b.name} (${b.count})`;
+            brandSelect.appendChild(opt);
+          });
+          brandSelect.value = currentVal;
+        } catch (err) {
+          console.error("Dashboard load failed:", err);
+        }
+      }
+
+      function renderBarChart(containerId, items, color) {
+        const container = document.getElementById(containerId);
+        if (!items || items.length === 0) {
+          container.innerHTML =
+            '<div style="color:var(--text-muted);font-size:13px;padding:10px">No data</div>';
+          return;
+        }
+        const max = Math.max(...items.map((i) => i.count));
+        container.innerHTML = items
+          .map(
+            (item) => `
+        <div class="bar-row">
+          <span class="bar-label" title="${item.name}">${item.name}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${((item.count / max) * 100).toFixed(1)}%;background:${color}">${item.count}</div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      // Products Table
+      async function loadProductsTable() {
+        const search = document.getElementById("searchInput").value;
+        const brand = document.getElementById("brandFilter").value;
+        const availability = document.getElementById("availFilter").value;
+
+        const params = new URLSearchParams({ page: currentPage, limit: 25 });
+        if (search) params.set("search", search);
+        if (brand) params.set("brand", brand);
+        if (availability) params.set("availability", availability);
+
+        try {
+          const data = await api(`/api/products?${params}`);
+          totalPages = data.totalPages;
+
+          document.getElementById("productsCount").textContent =
+            `${data.total.toLocaleString()} products${search ? ` matching "${search}"` : ""}`;
+
+          const tbody = document.getElementById("productsTable");
+
+          if (data.products.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h3>No products found</h3><p>Try adjusting your filters</p></div></td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = data.products
+            .map(
+              (p) => `
+          <tr>
+            <td title="${esc(p.title)}">${esc(p.title.slice(0, 50))}</td>
+            <td class="price">${p.price.toFixed(2)} ${esc(p.currency)}</td>
+            <td>${esc(p.brand || "—")}</td>
+            <td>${availBadge(p.availability)}</td>
+            <td title="${esc(p.category || "")}">${esc((p.category || "—").slice(0, 30))}</td>
+            <td>${confBadge(p.overallConfidence)}</td>
+            <td>${p.sourceUrl ? `<a href="${esc(p.sourceUrl)}" target="_blank" class="btn btn-sm" style="font-size:11px">Visit ↗</a>` : "—"}</td>
+          </tr>
+        `,
+            )
+            .join("");
+
+          document.getElementById("paginationInfo").textContent =
+            `Page ${data.page} of ${data.totalPages} · ${data.total} total`;
+          document.getElementById("prevBtn").disabled = data.page <= 1;
+          document.getElementById("nextBtn").disabled =
+            data.page >= data.totalPages;
+        } catch (err) {
+          console.error("Products load failed:", err);
+        }
+      }
+
+      function changePage(delta) {
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        loadProductsTable();
+      }
+
+      function debounceSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          currentPage = 1;
+          loadProductsTable();
+        }, 300);
+      }
+
+      // Helpers
+      function esc(s) {
+        const d = document.createElement("div");
+        d.textContent = s || "";
+        return d.innerHTML;
+      }
+
+      function availBadge(a) {
+        if (a === "in_stock")
+          return '<span class="badge badge-success">In Stock</span>';
+        if (a === "out_of_stock")
+          return '<span class="badge badge-danger">Out of Stock</span>';
+        return '<span class="badge badge-warning">Unknown</span>';
+      }
+
+      function confBadge(c) {
+        const color =
+          c >= 80
+            ? "var(--success)"
+            : c >= 50
+              ? "var(--warning)"
+              : "var(--danger)";
+        return `<div class="confidence"><div class="confidence-bar"><div class="confidence-fill" style="width:${c}%;background:${color}"></div></div><span style="font-size:12px;color:${color}">${c}%</span></div>`;
+      }
+
+      // Exports
+      function downloadExport(format) {
+        const log = document.getElementById("exportLog");
+        const time = new Date().toLocaleTimeString();
+        window.open(`/api/export/${format}`, "_blank");
+        log.innerHTML =
+          `<div style="margin-bottom:8px">✓ ${time} — Downloaded <strong>${format.toUpperCase()}</strong> export</div>` +
+          log.innerHTML;
+      }
+
+      function refreshData() {
+        loadDashboard();
+      }
+
+      // Init
+      loadDashboard();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "name": "harvest-hub",
+  "version": "1.0.0",
+  "description": "Adaptive product scraping platform with premium dashboard and exports",
+  "type": "module",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "harvest": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/cli/index.ts",
+    "start": "node dist/cli/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "harvest": "tsx src/cli/index.ts",
+    "dashboard": "cd dashboard && npm run dev",
+    "setup": "npm install && pip install -r engine/requirements.txt",
+    "migrate": "tsx scripts/migrate-legacy.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-progress": "^3.12.0",
+    "commander": "^12.1.0",
+    "croner": "^8.0.0",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "nanoid": "^5.0.7",
+    "ora": "^8.0.1",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0",
+    "ws": "^8.16.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}

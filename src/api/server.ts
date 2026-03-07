@@ -1,0 +1,218 @@
+import express from "express";
+import { resolve } from "node:path";
+import {
+  loadProducts,
+  loadJobs,
+  getProductCount,
+} from "../store/local-store.js";
+import {
+  exportProducts,
+  SUPPORTED_FORMATS,
+  type ExportFormat,
+} from "../export/index.js";
+import { checkEngineHealth } from "../core/scrape-bridge.js";
+import { getUserAgentCount } from "../core/ua-pool.js";
+import { createChildLogger } from "../lib/logger.js";
+
+const log = createChildLogger("api");
+
+export function createServer(port = 3000) {
+  const app = express();
+  app.use(express.json());
+
+  // Serve dashboard
+  const dashboardPath = resolve(process.cwd(), "dashboard");
+  app.use(express.static(dashboardPath));
+
+  // API: System status
+  app.get("/api/status", async (_req, res) => {
+    try {
+      const engineOk = await checkEngineHealth();
+      const productCount = await getProductCount();
+      const jobs = await loadJobs();
+      const lastJob = jobs.at(-1) ?? null;
+
+      res.json({
+        engine: engineOk ? "ready" : "unavailable",
+        userAgents: getUserAgentCount(),
+        productCount,
+        totalJobs: jobs.length,
+        lastJob: lastJob
+          ? {
+              id: lastJob.id,
+              status: lastJob.status,
+              completedUrls: lastJob.completedUrls,
+              totalUrls: lastJob.totalUrls,
+              completedAt: lastJob.completedAt,
+            }
+          : null,
+        uptime: process.uptime(),
+      });
+    } catch (err) {
+      log.error({ err }, "Status check failed");
+      res.status(500).json({ error: "Status check failed" });
+    }
+  });
+
+  // API: Get all products
+  app.get("/api/products", async (req, res) => {
+    try {
+      const products = await loadProducts();
+      const page = parseInt(req.query["page"] as string) || 1;
+      const limit = Math.min(parseInt(req.query["limit"] as string) || 50, 200);
+      const search = ((req.query["search"] as string) || "").toLowerCase();
+      const brand = ((req.query["brand"] as string) || "").toLowerCase();
+      const availability = (req.query["availability"] as string) || "";
+
+      let filtered = products;
+
+      if (search) {
+        filtered = filtered.filter(
+          (p) =>
+            p.title.toLowerCase().includes(search) ||
+            (p.description ?? "").toLowerCase().includes(search) ||
+            (p.sku ?? "").toLowerCase().includes(search),
+        );
+      }
+      if (brand) {
+        filtered = filtered.filter((p) =>
+          (p.brand ?? "").toLowerCase().includes(brand),
+        );
+      }
+      if (availability) {
+        filtered = filtered.filter((p) => p.availability === availability);
+      }
+
+      const total = filtered.length;
+      const start = (page - 1) * limit;
+      const paginated = filtered.slice(start, start + limit);
+
+      res.json({
+        products: paginated,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      });
+    } catch (err) {
+      log.error({ err }, "Failed to load products");
+      res.status(500).json({ error: "Failed to load products" });
+    }
+  });
+
+  // API: Product stats
+  app.get("/api/stats", async (_req, res) => {
+    try {
+      const products = await loadProducts();
+      const brands = new Map<string, number>();
+      const categories = new Map<string, number>();
+      let totalPrice = 0;
+      let totalConfidence = 0;
+      let inStock = 0;
+      let outOfStock = 0;
+
+      for (const p of products) {
+        totalPrice += p.price;
+        totalConfidence += p.overallConfidence;
+        if (p.availability === "in_stock") inStock++;
+        if (p.availability === "out_of_stock") outOfStock++;
+        if (p.brand) brands.set(p.brand, (brands.get(p.brand) ?? 0) + 1);
+        if (p.category)
+          categories.set(p.category, (categories.get(p.category) ?? 0) + 1);
+      }
+
+      res.json({
+        totalProducts: products.length,
+        inStock,
+        outOfStock,
+        avgPrice: products.length
+          ? Math.round((totalPrice / products.length) * 100) / 100
+          : 0,
+        avgConfidence: products.length
+          ? Math.round(totalConfidence / products.length)
+          : 0,
+        priceRange: {
+          min: products.length ? Math.min(...products.map((p) => p.price)) : 0,
+          max: products.length ? Math.max(...products.map((p) => p.price)) : 0,
+        },
+        topBrands: [...brands.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, count]) => ({ name, count })),
+        topCategories: [...categories.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, count]) => ({ name, count })),
+      });
+    } catch (err) {
+      log.error({ err }, "Failed to compute stats");
+      res.status(500).json({ error: "Failed to compute stats" });
+    }
+  });
+
+  // API: Export
+  app.get("/api/export/:format", async (req, res) => {
+    try {
+      const format = req.params["format"] as ExportFormat;
+      if (!SUPPORTED_FORMATS.includes(format)) {
+        res
+          .status(400)
+          .json({
+            error: `Unsupported format. Use: ${SUPPORTED_FORMATS.join(", ")}`,
+          });
+        return;
+      }
+
+      const products = await loadProducts();
+      if (products.length === 0) {
+        res.status(404).json({ error: "No products to export" });
+        return;
+      }
+
+      const ext = format === "gmc" ? "tsv" : format;
+      const outputPath = resolve(
+        process.cwd(),
+        "data",
+        "exports",
+        `dashboard-export.${ext}`,
+      );
+      const path = await exportProducts(products, outputPath, format);
+
+      const mimeMap: Record<string, string> = {
+        xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        csv: "text/csv",
+        json: "application/json",
+        gmc: "text/tab-separated-values",
+      };
+
+      res.download(path, `harvesthub-products.${ext}`, {
+        headers: {
+          "Content-Type": mimeMap[format] ?? "application/octet-stream",
+        },
+      });
+    } catch (err) {
+      log.error({ err }, "Export failed");
+      res.status(500).json({ error: "Export failed" });
+    }
+  });
+
+  // API: Jobs history
+  app.get("/api/jobs", async (_req, res) => {
+    try {
+      const jobs = await loadJobs();
+      res.json({ jobs: jobs.slice(-20).reverse() });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to load jobs" });
+    }
+  });
+
+  app.listen(port, () => {
+    log.info(
+      { port },
+      `HarvestHub Dashboard running at http://localhost:${port}`,
+    );
+    console.log(`\n  🌾 HarvestHub Dashboard: http://localhost:${port}\n`);
+  });
+
+  return app;
+}

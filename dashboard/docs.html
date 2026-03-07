@@ -1,0 +1,1655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HarvestHub — Adaptive Web Scraping Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --void: #06060a;
+        --surface: #0c0c14;
+        --surface-2: #12121e;
+        --surface-3: #1a1a2e;
+        --border: #1e1e32;
+        --border-light: #2a2a44;
+        --text: #e8e6e1;
+        --text-dim: #8a8a9a;
+        --text-muted: #5a5a6e;
+        --wheat: #d4a853;
+        --wheat-dim: #a8843f;
+        --wheat-glow: #d4a85322;
+        --sage: #4ade80;
+        --coral: #e94560;
+        --purple: #a78bfa;
+        --font-serif: "Instrument Serif", Georgia, serif;
+        --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+        --font-mono: "JetBrains Mono", "Cascadia Code", monospace;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background: var(--void);
+      }
+
+      body {
+        font-family: var(--font-sans);
+        color: var(--text);
+        background: var(--void);
+        line-height: 1.7;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      ::selection {
+        background: var(--wheat);
+        color: var(--void);
+      }
+
+      /* grain overlay */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.022;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--void);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-light);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--wheat-dim);
+      }
+
+      /* ═══ NAV ═══ */
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 0 3rem;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(6, 6, 10, 0.82);
+        backdrop-filter: blur(24px) saturate(1.3);
+        border-bottom: 1px solid var(--border);
+        transition: all 0.4s ease;
+      }
+      .nav.scrolled {
+        border-color: var(--wheat-dim);
+        box-shadow: 0 1px 40px rgba(212, 168, 83, 0.05);
+      }
+      .nav-logo {
+        font-family: var(--font-serif);
+        font-size: 1.35rem;
+        color: var(--wheat);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+      }
+      .nav-links a {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        transition: color 0.2s;
+        position: relative;
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--wheat);
+        transition: width 0.3s ease;
+      }
+      .nav-links a:hover {
+        color: var(--wheat);
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+      .nav-cta {
+        padding: 0.45rem 1.3rem !important;
+        background: var(--wheat) !important;
+        color: var(--void) !important;
+        border-radius: 6px;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em !important;
+        transition: all 0.25s !important;
+      }
+      .nav-cta:hover {
+        background: #e0b96a !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(212, 168, 83, 0.3);
+      }
+      .nav-cta::after {
+        display: none !important;
+      }
+
+      /* ═══ HERO ═══ */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 8rem 3rem 6rem;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 140px,
+            rgba(212, 168, 83, 0.025) 140px,
+            rgba(212, 168, 83, 0.025) 141px
+          ),
+          radial-gradient(
+            ellipse 70% 55% at 50% 35%,
+            rgba(212, 168, 83, 0.07),
+            transparent 70%
+          );
+        pointer-events: none;
+      }
+      .hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(80px);
+        opacity: 0.12;
+      }
+      .hero-orb-1 {
+        width: 500px;
+        height: 500px;
+        top: 5%;
+        right: 5%;
+        background: radial-gradient(circle, var(--wheat), transparent 70%);
+        animation: orb-drift 12s ease-in-out infinite;
+      }
+      .hero-orb-2 {
+        width: 300px;
+        height: 300px;
+        bottom: 15%;
+        left: 8%;
+        background: radial-gradient(circle, var(--sage), transparent 70%);
+        animation: orb-drift 16s ease-in-out infinite reverse;
+        opacity: 0.06;
+      }
+      @keyframes orb-drift {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(-20px, 15px) scale(1.05);
+        }
+        66% {
+          transform: translate(15px, -10px) scale(0.97);
+        }
+      }
+
+      .hero-content {
+        max-width: 860px;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 1rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        letter-spacing: 0.04em;
+        margin-bottom: 2.8rem;
+        animation: fade-up 0.7s ease both;
+      }
+      .hero-badge .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--sage);
+        border-radius: 50%;
+        animation: pulse-dot 2s ease infinite;
+      }
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+        }
+      }
+
+      .hero h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(2.8rem, 6.5vw, 5.2rem);
+        font-weight: 400;
+        line-height: 1.06;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.8rem;
+        animation: fade-up 0.7s ease 0.08s both;
+      }
+      .hero h1 em {
+        font-style: italic;
+        color: var(--wheat);
+        position: relative;
+      }
+      .hero h1 em::after {
+        content: "";
+        position: absolute;
+        bottom: 0.06em;
+        left: -2%;
+        right: -2%;
+        height: 0.07em;
+        background: var(--wheat);
+        opacity: 0.35;
+        border-radius: 2px;
+      }
+      .hero-sub {
+        font-size: 1.1rem;
+        color: var(--text-dim);
+        max-width: 580px;
+        margin: 0 auto 3rem;
+        line-height: 1.85;
+        animation: fade-up 0.7s ease 0.16s both;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fade-up 0.7s ease 0.24s both;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 2rem;
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 0.88rem;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.25s ease;
+      }
+      .btn-primary {
+        background: var(--wheat);
+        color: var(--void);
+      }
+      .btn-primary:hover {
+        background: #e0b96a;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 35px rgba(212, 168, 83, 0.28);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border-light);
+      }
+      .btn-ghost:hover {
+        border-color: var(--wheat-dim);
+        color: var(--wheat);
+      }
+
+      .hero-metrics {
+        display: flex;
+        justify-content: center;
+        gap: 4rem;
+        margin-top: 4.5rem;
+        padding-top: 3rem;
+        border-top: 1px solid var(--border);
+        animation: fade-up 0.7s ease 0.32s both;
+      }
+      .metric {
+        text-align: center;
+      }
+      .metric-val {
+        font-family: var(--font-mono);
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--wheat);
+        letter-spacing: -0.03em;
+      }
+      .metric-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 0.25rem;
+      }
+
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ═══ SECTIONS ═══ */
+      section {
+        padding: 7rem 3rem;
+        position: relative;
+      }
+      .section-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--wheat-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        margin-bottom: 1rem;
+      }
+      .section-title {
+        font-family: var(--font-serif);
+        font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+        line-height: 1.15;
+      }
+      .section-desc {
+        color: var(--text-dim);
+        font-size: 1rem;
+        max-width: 540px;
+        line-height: 1.8;
+        margin-bottom: 3.5rem;
+      }
+      .glow-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--wheat-dim),
+          transparent
+        );
+        opacity: 0.25;
+      }
+
+      /* ═══ FEATURES ═══ */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .feature-card {
+        background: var(--surface);
+        padding: 2.4rem;
+        transition: all 0.35s ease;
+        position: relative;
+      }
+      .feature-card:hover {
+        background: var(--surface-2);
+      }
+      .feature-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        right: 2rem;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--wheat-dim),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.35s;
+      }
+      .feature-card:hover::after {
+        opacity: 0.4;
+      }
+      .feature-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 1.2rem;
+        margin-bottom: 1.3rem;
+      }
+      .feature-card h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .feature-card p {
+        color: var(--text-dim);
+        font-size: 0.84rem;
+        line-height: 1.65;
+      }
+
+      /* ═══ ARCHITECTURE ═══ */
+      .arch-section {
+        background: var(--surface);
+      }
+      .arch-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 3rem 0;
+        flex-wrap: wrap;
+      }
+      .arch-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .arch-box {
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        background: var(--surface-2);
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 110px;
+      }
+      .arch-box:hover {
+        border-color: var(--wheat-dim);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+      .arch-box .sub {
+        display: block;
+        font-weight: 400;
+        font-size: 0.66rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+        font-family: var(--font-mono);
+      }
+      .arch-box.py {
+        border-color: #2b5b84;
+      }
+      .arch-box.ts {
+        border-color: #2563a0;
+      }
+      .arch-box.gold {
+        border-color: var(--wheat-dim);
+      }
+      .arch-arrow {
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+        font-size: 1.3rem;
+        padding: 0 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.1rem;
+      }
+      .arch-arrow small {
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      /* ═══ CLI TERMINAL ═══ */
+      .terminal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 3rem;
+        align-items: start;
+      }
+      .terminal-info h3 {
+        font-family: var(--font-serif);
+        font-size: 1.7rem;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+      }
+      .terminal-info p {
+        color: var(--text-dim);
+        line-height: 1.75;
+        margin-bottom: 1.4rem;
+      }
+      .cmd-list {
+        list-style: none;
+      }
+      .cmd-list li {
+        padding: 0.55rem 0;
+        color: var(--text-dim);
+        font-size: 0.88rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .cmd-list li:last-child {
+        border-bottom: none;
+      }
+      .cmd-list .cmd-name {
+        font-family: var(--font-mono);
+        color: var(--wheat);
+        font-size: 0.82rem;
+        font-weight: 500;
+        min-width: 80px;
+      }
+      .terminal-window {
+        background: #0a0e16;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow:
+          0 24px 64px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      }
+      .terminal-chrome {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0.75rem 1rem;
+        background: #111620;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .terminal-chrome .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .terminal-chrome .dot.r {
+        background: #ff5f57;
+      }
+      .terminal-chrome .dot.y {
+        background: #febc2e;
+      }
+      .terminal-chrome .dot.g {
+        background: #28c840;
+      }
+      .terminal-chrome .title {
+        flex: 1;
+        text-align: center;
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+      .terminal-body {
+        padding: 1.3rem 1.4rem;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        line-height: 1.85;
+      }
+      .t-line {
+        white-space: nowrap;
+      }
+      .t-blank {
+        height: 0.6rem;
+      }
+      .t-prompt {
+        color: var(--sage);
+      }
+      .t-cmd {
+        color: var(--text);
+      }
+      .t-flag {
+        color: var(--purple);
+      }
+      .t-val {
+        color: var(--wheat);
+      }
+      .t-comment {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+      .t-out {
+        color: var(--text-dim);
+      }
+      .t-ok {
+        color: var(--sage);
+      }
+
+      /* ═══ EXPORTS ═══ */
+      .exports-section {
+        background: var(--surface);
+      }
+      .export-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+      }
+      .export-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .export-card:hover {
+        border-color: var(--wheat-dim);
+        transform: translateY(-5px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+      }
+      .export-icon {
+        font-size: 2.4rem;
+        margin-bottom: 0.8rem;
+      }
+      .export-ext {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--wheat);
+        background: var(--wheat-glow);
+        padding: 0.12rem 0.55rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 0.7rem;
+      }
+      .export-card h4 {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.35rem;
+      }
+      .export-card p {
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        line-height: 1.6;
+      }
+
+      /* ═══ TECH STACK ═══ */
+      .stack-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .stack-item {
+        background: var(--surface);
+        padding: 1.6rem 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+        transition: background 0.3s;
+      }
+      .stack-item:hover {
+        background: var(--surface-2);
+      }
+      .stack-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+      }
+      .stack-item h4 {
+        font-size: 0.88rem;
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+      }
+      .stack-item p {
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        line-height: 1.5;
+      }
+
+      /* ═══ QUICKSTART ═══ */
+      .quickstart-section {
+        background: var(--surface);
+      }
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 2.2rem;
+        max-width: 680px;
+      }
+      .step {
+        display: flex;
+        gap: 1.4rem;
+        align-items: flex-start;
+      }
+      .step-num {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--wheat);
+        color: var(--void);
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        font-weight: 700;
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+      .step-content h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .step-content p {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        line-height: 1.6;
+        margin-bottom: 0.7rem;
+      }
+      .step-code {
+        background: #0a0e16;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.7rem 1.1rem;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        color: var(--sage);
+        overflow-x: auto;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        position: relative;
+      }
+      .step-code:hover {
+        border-color: var(--wheat-dim);
+      }
+      .step-code::after {
+        content: "COPY";
+        position: absolute;
+        right: 0.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.58rem;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .step-code:hover::after {
+        opacity: 0.7;
+      }
+      .step-code.copied {
+        border-color: var(--sage);
+      }
+      .step-code.copied::after {
+        content: "COPIED ✓";
+        opacity: 1;
+        color: var(--sage);
+      }
+
+      /* ═══ DASHBOARD PREVIEW ═══ */
+      .preview-frame {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      }
+      .preview-chrome {
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 1rem;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+      }
+      .preview-chrome .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .preview-chrome .d {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .preview-chrome .d.r {
+        background: #ff5f57;
+      }
+      .preview-chrome .d.y {
+        background: #febc2e;
+      }
+      .preview-chrome .d.g {
+        background: #28c840;
+      }
+      .preview-chrome .url-bar {
+        flex: 1;
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        background: var(--surface-3);
+        padding: 0.25rem 1rem;
+        border-radius: 6px;
+        margin: 0 3rem;
+      }
+      .preview-iframe {
+        width: 100%;
+        height: 620px;
+        border: none;
+        background: var(--void);
+      }
+
+      /* ═══ FOOTER ═══ */
+      .footer {
+        padding: 4.5rem 3rem;
+        border-top: 1px solid var(--border);
+        text-align: center;
+      }
+      .footer-brand {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        color: var(--wheat);
+        margin-bottom: 0.5rem;
+      }
+      .footer p {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+        max-width: 460px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.7;
+      }
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+      .footer-links a {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-size: 0.78rem;
+        letter-spacing: 0.03em;
+        transition: color 0.2s;
+      }
+      .footer-links a:hover {
+        color: var(--wheat);
+      }
+      .footer-copy {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+
+      /* ═══ RESPONSIVE ═══ */
+      @media (max-width: 960px) {
+        .features-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .terminal-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-metrics {
+          gap: 2.5rem;
+        }
+        section {
+          padding: 5rem 2rem;
+        }
+        .nav {
+          padding: 0 1.5rem;
+        }
+      }
+      @media (max-width: 640px) {
+        .features-grid,
+        .stack-grid {
+          grid-template-columns: 1fr;
+        }
+        .export-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .hero-metrics {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        .nav-links a:not(.nav-cta) {
+          display: none;
+        }
+        .hero {
+          padding: 7rem 1.5rem 4rem;
+        }
+      }
+
+      /* ═══ SCROLL REVEAL ═══ */
+      .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 0.65s ease,
+          transform 0.65s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal-d1 {
+        transition-delay: 0.08s;
+      }
+      .reveal-d2 {
+        transition-delay: 0.16s;
+      }
+      .reveal-d3 {
+        transition-delay: 0.24s;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══ NAV ═══ -->
+    <nav class="nav" id="nav">
+      <a href="#" class="nav-logo"><span>🌾</span> HarvestHub</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#cli">CLI</a>
+        <a href="#exports">Exports</a>
+        <a href="#quickstart">Setup</a>
+        <a href="#dashboard" class="nav-cta">Live Dashboard →</a>
+      </div>
+    </nav>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span> v1.0 — TypeScript + Scrapling Engine
+        </div>
+        <h1>Stop copying data.<br />Start <em>harvesting</em> it.</h1>
+        <p class="hero-sub">
+          An adaptive scraping platform that extracts product data from any
+          e&#8209;commerce site — powered by AI&#8209;driven heuristics, premium
+          exports, and a dashboard that looks like a $200/mo SaaS.
+        </p>
+        <div class="hero-actions">
+          <a href="#quickstart" class="btn btn-primary">Get Started →</a>
+          <a href="#dashboard" class="btn btn-ghost">⬡ Live Dashboard</a>
+        </div>
+        <div class="hero-metrics" id="hero-metrics">
+          <div class="metric">
+            <div class="metric-val" data-target="104">0</div>
+            <div class="metric-label">Products Harvested</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" data-target="4">0</div>
+            <div class="metric-label">Export Formats</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" data-target="48">0</div>
+            <div class="metric-label">Tests Passing</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" data-target="0" data-fixed="true">0</div>
+            <div class="metric-label">TypeScript Errors</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ FEATURES ═══ -->
+    <section id="features">
+      <div class="section-inner">
+        <div class="section-label reveal">01 — Capabilities</div>
+        <h2 class="section-title reveal">
+          Everything you need.<br />Nothing you don't.
+        </h2>
+        <p class="section-desc reveal">
+          Six capabilities that turn any product URL into clean, structured,
+          export&#8209;ready data.
+        </p>
+        <div class="features-grid reveal">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Adaptive Extraction</h3>
+            <p>
+              Three&#8209;tier strategy: JSON&#8209;LD structured data →
+              microdata attributes → CSS heuristics. Every field gets a
+              confidence score.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Anti&#8209;Bot Bypass</h3>
+            <p>
+              Scrapling engine with TLS fingerprinting, user&#8209;agent
+              rotation, and stealth mode. Zero paid proxies required.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Smart Retry Engine</h3>
+            <p>
+              Exponential backoff with jitter. Three&#8209;tier error
+              classification: transient → retry, permanent → skip, blocked →
+              rotate.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Premium Exports</h3>
+            <p>
+              Styled XLSX with summary sheets, UTF&#8209;8 CSV, typed JSON, and
+              Google Merchant Center TSV feeds. Production&#8209;ready.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Rate&#8209;Aware Pipeline</h3>
+            <p>
+              Per&#8209;domain token&#8209;bucket rate limiting. Configurable
+              concurrency. Respects site boundaries automatically.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🖥️</div>
+            <h3>SaaS Dashboard</h3>
+            <p>
+              Real&#8209;time web UI with search, filters, charts, pagination,
+              and one&#8209;click exports. Looks premium. Costs nothing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ ARCHITECTURE ═══ -->
+    <section class="arch-section" id="architecture">
+      <div class="section-inner">
+        <div class="section-label reveal">02 — Architecture</div>
+        <h2 class="section-title reveal">
+          Hybrid engine.<br />Zero infrastructure.
+        </h2>
+        <p class="section-desc reveal">
+          Python scrapes. TypeScript orchestrates. They communicate via
+          subprocess JSON IPC — no servers, no Docker, no queues.
+        </p>
+        <div class="arch-flow reveal">
+          <div class="arch-node">
+            <div class="arch-box gold">
+              📋 URLs<span class="sub">.txt input</span>
+            </div>
+          </div>
+          <div class="arch-arrow">→<small>parse</small></div>
+          <div class="arch-node">
+            <div class="arch-box ts">
+              ⚙️ CLI<span class="sub">TypeScript</span>
+            </div>
+          </div>
+          <div class="arch-arrow">→<small>stdin</small></div>
+          <div class="arch-node">
+            <div class="arch-box py">
+              🐍 Scrapling<span class="sub">Python 3.13</span>
+            </div>
+          </div>
+          <div class="arch-arrow">→<small>stdout</small></div>
+          <div class="arch-node">
+            <div class="arch-box ts">
+              🔧 Normalize<span class="sub">TypeScript</span>
+            </div>
+          </div>
+          <div class="arch-arrow">→<small>store</small></div>
+          <div class="arch-node">
+            <div class="arch-box gold">
+              📦 Export<span class="sub">4 formats</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ CLI ═══ -->
+    <section id="cli">
+      <div class="section-inner">
+        <div class="section-label reveal">03 — Command Line</div>
+        <div class="terminal-grid">
+          <div class="terminal-info reveal">
+            <h3>Five commands.<br />Full control.</h3>
+            <p>
+              Every operation is one CLI command. No config files. No YAML. No
+              ceremony.
+            </p>
+            <ul class="cmd-list">
+              <li>
+                <span class="cmd-name">scrape</span> Harvest product data from
+                any URL list
+              </li>
+              <li>
+                <span class="cmd-name">export</span> Generate XLSX, CSV, JSON,
+                or GMC feeds
+              </li>
+              <li>
+                <span class="cmd-name">status</span> Health check on engine +
+                data store
+              </li>
+              <li>
+                <span class="cmd-name">migrate</span> Import data from legacy
+                sources
+              </li>
+              <li>
+                <span class="cmd-name">dashboard</span> Launch the premium web
+                UI
+              </li>
+            </ul>
+          </div>
+          <div class="terminal-window reveal reveal-d1">
+            <div class="terminal-chrome">
+              <span class="dot r"></span><span class="dot y"></span
+              ><span class="dot g"></span>
+              <span class="title">PowerShell — HarvestHub</span>
+            </div>
+            <div class="terminal-body" id="terminal">
+              <div class="t-line">
+                <span class="t-comment"># Scrape product URLs</span>
+              </div>
+              <div class="t-line">
+                <span class="t-prompt">❯ </span
+                ><span class="t-cmd">npx tsx src/cli/index.ts </span
+                ><span class="t-flag">scrape</span>
+                <span class="t-flag">--urls</span>
+                <span class="t-val">urls.txt</span>
+              </div>
+              <div class="t-blank"></div>
+              <div class="t-line">
+                <span class="t-out"> 🌾 HarvestHub Scraper v1.0.0</span>
+              </div>
+              <div class="t-line">
+                <span class="t-ok"> ✔ Python engine ready</span>
+              </div>
+              <div class="t-line">
+                <span class="t-ok"> ✔ 3 URLs to scrape</span>
+              </div>
+              <div class="t-blank"></div>
+              <div class="t-line">
+                <span class="t-ok"> ✔ [1/3]</span><span class="t-cmd"> OK </span
+                ><span class="t-val">A Light in the Attic</span
+                ><span class="t-out"> — 55% — 1168ms</span>
+              </div>
+              <div class="t-line">
+                <span class="t-ok"> ✔ [2/3]</span><span class="t-cmd"> OK </span
+                ><span class="t-val">Tipping the Velvet</span
+                ><span class="t-out"> — 55% — 2217ms</span>
+              </div>
+              <div class="t-line">
+                <span class="t-ok"> ✔ [3/3]</span><span class="t-cmd"> OK </span
+                ><span class="t-val">Soumission</span
+                ><span class="t-out"> — 55% — 1888ms</span>
+              </div>
+              <div class="t-blank"></div>
+              <div class="t-line">
+                <span class="t-out"> ────────────────────────────────</span>
+              </div>
+              <div class="t-line">
+                <span class="t-out"> 📊 </span
+                ><span class="t-cmd">Scrape Summary</span>
+              </div>
+              <div class="t-line">
+                <span class="t-out"> Total: </span><span class="t-val">3</span
+                ><span class="t-out"> Success: </span><span class="t-ok">3</span
+                ><span class="t-out"> Failed: </span
+                ><span class="t-val">0</span>
+              </div>
+              <div class="t-line">
+                <span class="t-out"> Time: </span
+                ><span class="t-val">7.0s</span>
+              </div>
+              <div class="t-blank"></div>
+              <div class="t-line">
+                <span class="t-comment"># Export to premium Excel</span>
+              </div>
+              <div class="t-line">
+                <span class="t-prompt">❯ </span
+                ><span class="t-cmd">npx tsx src/cli/index.ts </span
+                ><span class="t-flag">export</span>
+                <span class="t-flag">--format</span>
+                <span class="t-val">xlsx</span>
+              </div>
+              <div class="t-line">
+                <span class="t-ok">
+                  ✔ Exported 104 products → products.xlsx</span
+                >
+              </div>
+              <div class="t-blank"></div>
+              <div class="t-line">
+                <span class="t-comment"># Launch dashboard</span>
+              </div>
+              <div class="t-line">
+                <span class="t-prompt">❯ </span
+                ><span class="t-cmd">npx tsx src/cli/index.ts </span
+                ><span class="t-flag">dashboard</span>
+              </div>
+              <div class="t-line">
+                <span class="t-out"> 🌾 Dashboard: </span
+                ><span class="t-val">http://localhost:4000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ EXPORTS ═══ -->
+    <section class="exports-section" id="exports">
+      <div class="section-inner">
+        <div class="section-label reveal">04 — Export Formats</div>
+        <h2 class="section-title reveal">
+          Four formats.<br />Every workflow covered.
+        </h2>
+        <p class="section-desc reveal">
+          From the board&#8209;room spreadsheet to the Google Merchant feed —
+          one command, any format.
+        </p>
+        <div class="export-grid">
+          <div class="export-card reveal">
+            <div class="export-icon">📗</div>
+            <div class="export-ext">.xlsx</div>
+            <h4>Excel Workbook</h4>
+            <p>
+              Summary dashboard sheet, conditional formatting,
+              auto&#8209;filters, hyperlinks, alternating rows.
+              Boss&#8209;ready.
+            </p>
+          </div>
+          <div class="export-card reveal reveal-d1">
+            <div class="export-icon">📄</div>
+            <div class="export-ext">.csv</div>
+            <h4>CSV</h4>
+            <p>
+              UTF&#8209;8 BOM encoded. Opens perfectly in Excel, Google Sheets,
+              Numbers, and any data tool.
+            </p>
+          </div>
+          <div class="export-card reveal reveal-d2">
+            <div class="export-icon">🔷</div>
+            <div class="export-ext">.json</div>
+            <h4>Typed JSON</h4>
+            <p>
+              Metadata envelope with product count, timestamp, schema version.
+              API&#8209;ready.
+            </p>
+          </div>
+          <div class="export-card reveal reveal-d3">
+            <div class="export-icon">🛒</div>
+            <div class="export-ext">.tsv</div>
+            <h4>Google Merchant</h4>
+            <p>
+              GMC&#8209;compliant feed: id, title, price, availability, GTIN,
+              brand, category. Upload&#8209;ready.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ TECH STACK ═══ -->
+    <section id="stack">
+      <div class="section-inner">
+        <div class="section-label reveal">05 — Tech Stack</div>
+        <h2 class="section-title reveal">
+          Built with precision.<br />Runs on your machine.
+        </h2>
+        <p class="section-desc reveal">
+          Zero cloud costs. Zero monthly fees. Production&#8209;grade tooling,
+          all local.
+        </p>
+        <div class="stack-grid reveal">
+          <div class="stack-item">
+            <div class="stack-icon">🔷</div>
+            <div>
+              <h4>TypeScript 5.4</h4>
+              <p>Strict mode, zero errors. Types from CLI to export.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">🐍</div>
+            <div>
+              <h4>Scrapling + Python 3.13</h4>
+              <p>Anti&#8209;bot engine with TLS fingerprinting.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">⚡</div>
+            <div>
+              <h4>Vitest</h4>
+              <p>48 unit tests — validators, normalizers, store, errors.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">📊</div>
+            <div>
+              <h4>ExcelJS</h4>
+              <p>Premium exports with formatting and summary sheets.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">🖥️</div>
+            <div>
+              <h4>Express.js</h4>
+              <p>REST API with search, filter, and pagination.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">🪵</div>
+            <div>
+              <h4>Pino Logger</h4>
+              <p>Structured JSON logging with module tags.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">🛡️</div>
+            <div>
+              <h4>Error Taxonomy</h4>
+              <p>Three&#8209;tier: transient, permanent, blocked.</p>
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-icon">💾</div>
+            <div>
+              <h4>Write&#8209;Ahead Store</h4>
+              <p>Atomic JSON persistence — crash&#8209;safe by design.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ QUICKSTART ═══ -->
+    <section class="quickstart-section" id="quickstart">
+      <div class="section-inner">
+        <div class="section-label reveal">06 — Quick Start</div>
+        <h2 class="section-title reveal">
+          Three minutes to<br />first harvest.
+        </h2>
+        <p class="section-desc reveal">
+          No accounts. No API keys. No credit cards.
+        </p>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Install Dependencies</h4>
+              <p>Node.js 18+ and Python 3.10+ required.</p>
+              <div class="step-code" onclick="copyCode(this)">
+                npm install &amp;&amp; pip install scrapling orjson browserforge
+                curl_cffi
+              </div>
+            </div>
+          </div>
+          <div class="step reveal reveal-d1">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Add Your URLs</h4>
+              <p>One product URL per line. Any e&#8209;commerce site.</p>
+              <div class="step-code" onclick="copyCode(this)">
+                echo
+                https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html
+                &gt; urls.txt
+              </div>
+            </div>
+          </div>
+          <div class="step reveal reveal-d2">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Harvest</h4>
+              <p>Run the scraper. Watch it work. Get your data.</p>
+              <div class="step-code" onclick="copyCode(this)">
+                npx tsx src/cli/index.ts scrape --urls urls.txt --output
+                products.xlsx
+              </div>
+            </div>
+          </div>
+          <div class="step reveal reveal-d3">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Launch Dashboard</h4>
+              <p>Explore, search, filter, and export from the web UI.</p>
+              <div class="step-code" onclick="copyCode(this)">
+                npx tsx src/cli/index.ts dashboard --port 4000
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ DASHBOARD PREVIEW ═══ -->
+    <section id="dashboard">
+      <div class="section-inner">
+        <div class="section-label reveal">07 — Dashboard</div>
+        <h2 class="section-title reveal">The $0 SaaS.</h2>
+        <p class="section-desc reveal">
+          Real&#8209;time product intelligence that looks like it cost six
+          figures. It didn't.
+        </p>
+        <div class="preview-frame reveal">
+          <div class="preview-chrome">
+            <div class="dots">
+              <span class="d r"></span><span class="d y"></span
+              ><span class="d g"></span>
+            </div>
+            <div class="url-bar">localhost:4000</div>
+          </div>
+          <iframe
+            src="/index.html"
+            class="preview-iframe"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+      <div class="footer-brand">🌾 HarvestHub</div>
+      <p>
+        Adaptive web scraping platform — built with TypeScript, Scrapling, and
+        an unhealthy attention to detail.
+      </p>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#cli">CLI</a>
+        <a href="#exports">Exports</a>
+        <a href="#quickstart">Setup</a>
+        <a href="#dashboard">Dashboard</a>
+      </div>
+      <div class="footer-copy">© 2026 HarvestHub — MIT License</div>
+    </footer>
+
+    <!-- ═══ SCRIPTS ═══ -->
+    <script>
+      /* Nav scroll */
+      const nav = document.getElementById("nav");
+      let ticking = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(() => {
+              nav.classList.toggle("scrolled", window.scrollY > 40);
+              ticking = false;
+            });
+            ticking = true;
+          }
+        },
+        { passive: true },
+      );
+
+      /* Scroll reveal */
+      const revealObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("visible");
+          });
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -30px 0px" },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => revealObs.observe(el));
+
+      /* Counter animation */
+      let countersFired = false;
+      function animateCounters() {
+        if (countersFired) return;
+        countersFired = true;
+        document.querySelectorAll("[data-target]").forEach((el) => {
+          const target = parseInt(el.dataset.target);
+          if (el.dataset.fixed) {
+            el.textContent = "0";
+            return;
+          }
+          const dur = 1600,
+            start = performance.now();
+          (function tick(now) {
+            const t = Math.min((now - start) / dur, 1);
+            el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
+            if (t < 1) requestAnimationFrame(tick);
+          })(performance.now());
+        });
+      }
+      const metricsObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              animateCounters();
+              metricsObs.disconnect();
+            }
+          });
+        },
+        { threshold: 0.4 },
+      );
+      const mEl = document.getElementById("hero-metrics");
+      if (mEl) metricsObs.observe(mEl);
+
+      /* Live stats from API */
+      (async () => {
+        try {
+          const r = await fetch("/api/stats");
+          if (!r.ok) return;
+          const d = await r.json();
+          const els = document.querySelectorAll("[data-target]");
+          if (els[0] && d.totalProducts)
+            els[0].dataset.target = d.totalProducts;
+        } catch {}
+      })();
+
+      /* Terminal line-by-line animation */
+      (function () {
+        const term = document.getElementById("terminal");
+        if (!term) return;
+        const lines = term.children;
+        for (let i = 0; i < lines.length; i++) {
+          lines[i].style.cssText =
+            `opacity:0;transform:translateX(-6px);transition:opacity .25s ease ${i * 0.06}s,transform .25s ease ${i * 0.06}s`;
+        }
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                for (const l of term.children) {
+                  l.style.opacity = "1";
+                  l.style.transform = "none";
+                }
+              }
+            });
+          },
+          { threshold: 0.25 },
+        ).observe(term);
+      })();
+
+      /* Copy code blocks */
+      function copyCode(el) {
+        const text = el.textContent.replace(/COPY(ED ✓)?/g, "").trim();
+        navigator.clipboard.writeText(text).then(() => {
+          el.classList.add("copied");
+          setTimeout(() => el.classList.remove("copied"), 1500);
+        });
+      }
+
+      /* Smooth scroll */
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          const t = document.querySelector(a.getAttribute("href"));
+          if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    </script>
+  </body>
+</html>

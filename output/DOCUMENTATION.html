@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZKTeco KSA — Campaign & Product Feed Documentation | NahamTech</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#ffffff; --bg-alt:#f7f8fa; --bg-dark:#0B1426; --bg-dark-2:#0F1C36;
+  --navy:#0B1426; --navy-mid:#1A2D4A;
+  --blue:#1B6EC2; --blue-soft:#EBF3FC;
+  --gold:#B8860B; --gold-light:#D4A843; --gold-wash:#FBF5E6;
+  --green:#1A7A4C; --green-soft:#E8F5EE;
+  --red:#C53030;
+  --text:#1A1A2E; --text-2:#4A5568; --text-3:#718096;
+  --text-inv:#E2E8F0; --text-inv-2:#8B9AB5;
+  --border:#E2E8F0; --border-2:#EDF2F7;
+  --shadow-s:0 1px 3px rgba(10,22,40,.06);
+  --shadow-m:0 4px 14px rgba(10,22,40,.07);
+  --shadow-l:0 8px 24px rgba(10,22,40,.09);
+  --radius:10px; --radius-s:6px; --radius-l:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Outfit',system-ui,sans-serif;
+  font-size:.9375rem;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+body.ar{
+  direction:rtl;
+  font-family:'IBM Plex Sans Arabic','Outfit',sans-serif;
+  font-size:1rem;line-height:1.9;
+}
+h1,h2,h3,h4{
+  font-family:'Space Grotesk','Outfit',sans-serif;
+  font-weight:700;color:var(--navy);letter-spacing:-.01em;line-height:1.25;
+}
+body.ar h1,body.ar h2,body.ar h3,body.ar h4{
+  font-family:'IBM Plex Sans Arabic',sans-serif;
+  font-weight:700;letter-spacing:0;line-height:1.5;
+}
+a{color:var(--blue);text-decoration:none}
+strong{font-weight:600}
+
+/* ── Language ── */
+body.en .lang-ar{display:none}
+body.ar .lang-en{display:none}
+
+/* ── Header ── */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+}
+body.ar .site-header{flex-direction:row-reverse}
+.header-brand{display:flex;align-items:center;gap:14px}
+body.ar .header-brand{flex-direction:row-reverse}
+.header-brand-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.8125rem;font-weight:600;color:var(--text-3);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.header-brand-name.accent{color:var(--blue)}
+.header-divider{width:1px;height:22px;background:var(--border)}
+.header-right{display:flex;align-items:center;gap:20px}
+body.ar .header-right{flex-direction:row-reverse}
+.lang-switch{
+  display:flex;gap:2px;background:var(--bg-alt);
+  border-radius:var(--radius-s);padding:3px;border:1px solid var(--border-2);
+}
+.lang-btn{
+  padding:4px 14px;border-radius:4px;border:none;background:transparent;
+  color:var(--text-3);font-family:'Outfit',sans-serif;font-size:.6875rem;
+  font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.04em;
+}
+.lang-btn.active{background:var(--bg);color:var(--navy);box-shadow:var(--shadow-s)}
+.lang-btn.ar-btn{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:.75rem}
+
+/* ── Hero ── */
+.hero{
+  background:var(--bg-dark);
+  padding:72px 32px 64px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(27,110,194,.06),transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 10%,var(--gold) 50%,transparent 90%);
+}
+.hero-eyebrow{
+  font-size:.6875rem;letter-spacing:.2em;color:var(--gold-light);
+  text-transform:uppercase;margin-bottom:28px;font-weight:600;
+  opacity:0;animation:fade-in .6s .1s ease forwards;
+}
+.hero h1{
+  font-size:clamp(1.6rem,3.8vw,2.5rem);font-weight:700;line-height:1.25;
+  color:var(--text-inv);margin:0 auto 20px;max-width:700px;
+  opacity:0;animation:fade-in .6s .2s ease forwards;
+}
+body.ar .hero h1{line-height:1.5}
+.hero h1 em{font-style:normal;color:var(--gold-light)}
+.hero-sub{
+  font-size:.9375rem;color:var(--text-inv-2);max-width:540px;
+  margin:0 auto 40px;line-height:1.8;
+  opacity:0;animation:fade-in .6s .35s ease forwards;
+}
+.hero-meta{
+  display:flex;justify-content:center;gap:40px;flex-wrap:wrap;
+  padding-top:28px;border-top:1px solid rgba(255,255,255,.07);
+  opacity:0;animation:fade-in .6s .5s ease forwards;
+}
+body.ar .hero-meta{flex-direction:row-reverse}
+.hero-meta-item{text-align:center}
+.hero-meta-label{
+  font-size:.5625rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-inv-2);display:block;margin-bottom:3px;font-weight:500;
+}
+.hero-meta-value{font-size:.8125rem;font-weight:600;color:var(--text-inv)}
+@keyframes fade-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Sections ── */
+section{padding:72px 32px;max-width:920px;margin:0 auto}
+.section-alt{background:var(--bg-alt);max-width:100%}
+.section-alt>*{max-width:920px;margin-left:auto;margin-right:auto}
+.section-num{
+  font-family:'IBM Plex Mono',monospace;font-size:.6875rem;
+  font-weight:500;color:var(--text-3);letter-spacing:.08em;margin-bottom:6px;
+}
+.section-eyebrow{
+  font-size:.6875rem;letter-spacing:.16em;color:var(--blue);
+  text-transform:uppercase;margin-bottom:6px;font-weight:600;
+}
+section h2{
+  font-size:clamp(1.35rem,3vw,1.875rem);margin-bottom:12px;
+}
+section h2 em{font-style:normal;color:var(--blue)}
+.section-lead{
+  font-size:1rem;color:var(--text-2);max-width:580px;
+  margin-bottom:40px;line-height:1.8;
+}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.06s}
+.reveal-d2{transition-delay:.12s}
+.reveal-d3{transition-delay:.2s}
+.reveal-d4{transition-delay:.28s}
+
+/* ── Overview Cards ── */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.ov-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px 24px;transition:box-shadow .2s,border-color .2s;
+  border-top:3px solid var(--blue);
+}
+.ov-card:nth-child(2){border-top-color:var(--gold)}
+.ov-card:hover{box-shadow:var(--shadow-m);border-color:#cbd5e0}
+.ov-card h3{font-size:1.125rem;margin-bottom:8px}
+.ov-card p{font-size:.8125rem;color:var(--text-2);line-height:1.7}
+
+/* ── Problem / Source Data ── */
+.problem-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:32px;align-items:start}
+.challenge-list{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:8px}
+.challenge-list li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:.8125rem;color:var(--text-2);line-height:1.6;
+}
+.challenge-list li::before{
+  content:'';display:block;width:6px;height:6px;border-radius:50%;
+  background:var(--red);margin-top:8px;flex-shrink:0;
+}
+body.ar .challenge-list li{flex-direction:row-reverse;text-align:right}
+.dq-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;
+}
+.dq-header{
+  font-size:.625rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:14px;
+}
+.dq-bar{height:6px;background:var(--border-2);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.dq-fill{height:100%;border-radius:3px;width:97%;background:linear-gradient(90deg,var(--green),var(--gold),var(--red))}
+.dq-labels{display:flex;justify-content:space-between;font-size:.5625rem;color:var(--text-3);font-weight:500}
+body.ar .dq-labels{flex-direction:row-reverse}
+.dq-note{
+  font-size:.8125rem;color:var(--red);font-weight:600;margin-top:14px;
+  display:flex;align-items:center;gap:8px;
+}
+body.ar .dq-note{flex-direction:row-reverse}
+
+/* ── Ad Group Grid ── */
+.ag-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;margin-top:8px;
+}
+.ag-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:20px;transition:box-shadow .2s;
+}
+.ag-card:hover{box-shadow:var(--shadow-m)}
+.ag-num{
+  font-family:'IBM Plex Mono',monospace;font-size:.625rem;
+  color:var(--text-3);letter-spacing:.08em;margin-bottom:4px;
+}
+.ag-name{
+  font-family:'Space Grotesk',sans-serif;font-size:.9375rem;
+  font-weight:600;color:var(--navy);margin-bottom:4px;
+}
+body.ar .ag-name{font-family:'IBM Plex Sans Arabic',sans-serif}
+.ag-desc{font-size:.75rem;color:var(--text-2);line-height:1.5;margin-bottom:8px}
+.ag-kw{font-size:.6875rem;color:var(--blue);font-weight:600}
+.ag-card.span-full{grid-column:1/-1;max-width:360px}
+
+/* ── Pipeline ── */
+.pipeline{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;margin:32px 0;flex-wrap:wrap;row-gap:12px;
+}
+body.ar .pipeline{flex-direction:row-reverse}
+.pipe-node{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:14px 18px;text-align:center;min-width:100px;
+}
+.pipe-node.hl{border-color:var(--blue);background:var(--blue-soft)}
+.pipe-node-val{font-family:'Space Grotesk',sans-serif;font-size:1.125rem;font-weight:700;color:var(--navy);display:block}
+body.ar .pipe-node-val{font-family:'IBM Plex Sans Arabic',sans-serif}
+.pipe-node-lbl{font-size:.625rem;font-weight:500;color:var(--text-3);margin-top:2px}
+.pipe-conn{padding:0 8px;color:var(--text-3);font-size:.875rem;font-weight:500}
+body.ar .pipe-conn{transform:scaleX(-1)}
+
+/* ── Terminal ── */
+.terminal{
+  margin-top:32px;background:var(--bg-dark);border-radius:var(--radius);
+  padding:24px 28px;font-family:'IBM Plex Mono',monospace;
+  font-size:.75rem;color:var(--text-inv-2);line-height:2.1;
+  border:1px solid rgba(255,255,255,.05);
+}
+.terminal .p{color:var(--text-3)}
+.terminal .ok{color:#68D391}
+.terminal .out{color:var(--text-inv)}
+
+/* ── Rule Grid ── */
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.rule-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:20px 22px;transition:box-shadow .2s;
+}
+.rule-card:hover{box-shadow:var(--shadow-m)}
+.rule-num{
+  font-family:'IBM Plex Mono',monospace;font-size:.5625rem;
+  color:var(--text-3);font-weight:500;letter-spacing:.06em;margin-bottom:6px;
+  text-transform:uppercase;
+}
+.rule-title{
+  font-family:'Space Grotesk',sans-serif;font-size:.875rem;
+  font-weight:600;color:var(--navy);margin-bottom:6px;
+}
+body.ar .rule-title{font-family:'IBM Plex Sans Arabic',sans-serif}
+.rule-desc{font-size:.75rem;color:var(--text-2);line-height:1.65}
+.rule-card.span-full{grid-column:1/-1;max-width:440px}
+
+/* ── File Grid ── */
+.file-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.file-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:20px;transition:box-shadow .2s;
+}
+body.ar .file-card{text-align:right}
+.file-card:hover{box-shadow:var(--shadow-m)}
+.file-badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;
+  font-size:.5625rem;font-weight:600;letter-spacing:.06em;
+  padding:3px 8px;border-radius:3px;margin-bottom:12px;text-transform:uppercase;
+}
+.file-badge.xlsx{background:var(--green-soft);color:var(--green)}
+.file-badge.csv{background:var(--blue-soft);color:var(--blue)}
+.file-badge.json{background:var(--gold-wash);color:var(--gold)}
+.file-name{
+  font-family:'IBM Plex Mono',monospace;font-size:.8125rem;
+  color:var(--navy);margin-bottom:6px;font-weight:500;
+}
+.file-desc{font-size:.6875rem;color:var(--text-2);line-height:1.6}
+.file-size{font-size:.5625rem;color:var(--text-3);font-weight:600;margin-top:10px;letter-spacing:.04em}
+
+/* ── Steps ── */
+.steps{margin-top:32px}
+.step{display:flex;gap:20px;align-items:flex-start;position:relative}
+body.ar .step{flex-direction:row-reverse}
+.step-indicator{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.step-num{
+  width:36px;height:36px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:.8125rem;
+  font-weight:700;color:#fff;background:var(--navy);z-index:1;
+}
+body.ar .step-num{font-family:'IBM Plex Sans Arabic',sans-serif}
+.step-line{width:1px;flex:1;min-height:24px;background:var(--border);margin:6px 0}
+.step-content{padding:2px 0 36px;flex:1}
+.step-content h3{font-size:1rem;margin-bottom:6px}
+.step-content p{font-size:.8125rem;color:var(--text-2);line-height:1.75;max-width:500px}
+.step:last-child .step-line{display:none}
+.step:last-child .step-content{padding-bottom:0}
+
+/* ── Summary Stats ── */
+.summary-card{
+  background:var(--bg-dark);border-radius:var(--radius-l);
+  padding:56px 32px;text-align:center;margin-top:8px;
+  position:relative;border:1px solid rgba(184,134,11,.15);
+}
+.summary-card h3{
+  font-size:1.375rem;color:var(--text-inv);margin-bottom:32px;
+}
+.summary-card h3 em{font-style:normal;color:var(--gold-light)}
+body.ar .summary-card h3{font-family:'IBM Plex Sans Arabic',sans-serif;line-height:1.5}
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:24px 0;
+}
+.stat{text-align:center;padding:8px 0}
+.stat-num{
+  font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;
+  color:var(--text-inv);display:block;line-height:1;margin-bottom:6px;
+}
+body.ar .stat-num{font-family:'IBM Plex Sans Arabic',sans-serif}
+.stat-num.gold{color:var(--gold-light)}
+.stat-label{
+  font-size:.5625rem;color:var(--text-inv-2);letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;
+}
+.summary-note{
+  color:var(--text-inv-2);max-width:480px;margin:20px auto 0;
+  font-size:.8125rem;line-height:1.75;
+}
+.summary-note strong{color:var(--gold-light)}
+
+/* ── Footer ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:32px;text-align:center;
+  color:var(--text-3);font-size:.6875rem;
+  letter-spacing:.04em;line-height:1.8;
+}
+.footer-accent{font-weight:600;color:var(--text-2)}
+.footer-dot{
+  display:inline-block;width:3px;height:3px;border-radius:50%;
+  background:var(--border);margin:0 12px;vertical-align:middle;
+}
+
+/* ── Responsive ── */
+@media(max-width:700px){
+  .site-header{padding:0 16px;height:50px}
+  .hero{padding:56px 20px 48px}
+  .hero-meta{gap:20px}
+  section{padding:48px 20px}
+  .overview-grid{grid-template-columns:1fr}
+  .problem-layout{grid-template-columns:1fr}
+  .ag-grid{grid-template-columns:1fr 1fr}
+  .rule-grid{grid-template-columns:1fr}
+  .file-grid{grid-template-columns:1fr}
+  .pipeline{flex-direction:column}
+  body.ar .pipeline{flex-direction:column}
+  .pipe-conn{transform:rotate(90deg)}
+  body.ar .pipe-conn{transform:rotate(90deg)}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .step{gap:14px}
+}
+@media(max-width:480px){
+  .ag-grid{grid-template-columns:1fr}
+  .header-brand-name.secondary{display:none}
+}
+
+/* ── Print ── */
+@media print{
+  .site-header,.lang-switch{display:none}
+  body{background:#fff;color:#000;font-size:10pt}
+  section{page-break-inside:avoid;padding:20pt 0}
+  .hero{background:#fff;color:#000;padding:20pt 0}
+  .hero h1,.hero-eyebrow{color:#000}
+  .hero-sub,.hero-meta-label{color:#444}
+  .hero-meta-value{color:#000}
+  .hero::after{display:none}
+  .ov-card,.ag-card,.file-card,.rule-card,.pipe-node,.dq-card{
+    break-inside:avoid;border:1px solid #ccc;box-shadow:none;
+  }
+  .summary-card{background:#f5f5f5;color:#000;border-color:#ccc}
+  .stat-num,.summary-card h3{color:#000}
+  .stat-num.gold,.summary-card h3 em{color:var(--gold)}
+  .terminal{background:#f0f0f0;color:#333;border-color:#ccc}
+  .terminal .ok{color:#1A7A4C}
+  .terminal .out{color:#000}
+  .reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body class="en">
+
+<!-- Header -->
+<header class="site-header">
+  <div class="header-brand">
+    <span class="header-brand-name">NahamTech</span>
+    <div class="header-divider"></div>
+    <span class="header-brand-name accent secondary">ZKTeco</span>
+  </div>
+  <div class="header-right">
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn ar-btn" onclick="setLang('ar')">عربي</button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow lang-en">Project Documentation — March 2026</div>
+  <div class="hero-eyebrow lang-ar">توثيق المشروع — مارس ٢٠٢٦</div>
+
+  <h1 class="lang-en">ZKTeco Saudi Arabia —<br>Google Ads &amp; <em>GMC Product Feed</em></h1>
+  <h1 class="lang-ar">زد كي تيكو المملكة العربية السعودية —<br>حملة إعلانات جوجل <em>وخلاصة منتجات مركز التجّار</em></h1>
+
+  <p class="hero-sub lang-en">A complete AI-powered digital marketing pipeline — from raw spreadsheets to production-ready Google Ads campaigns and Merchant Center feeds, built for the Saudi market.</p>
+  <p class="hero-sub lang-ar">خط إنتاج تسويق رقمي متكامل مدعوم بالذكاء الاصطناعي — من جداول بيانات خام إلى حملات إعلانات جوجل وخلاصات مركز التجّار الجاهزة للنشر، مُصمَّم خصيصاً للسوق السعودي.</p>
+
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span class="hero-meta-label lang-en">Client</span>
+      <span class="hero-meta-label lang-ar">العميل</span>
+      <span class="hero-meta-value">ZKTeco KSA</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label lang-en">Agency</span>
+      <span class="hero-meta-label lang-ar">الوكالة</span>
+      <span class="hero-meta-value">NahamTech</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label lang-en">Market</span>
+      <span class="hero-meta-label lang-ar">السوق</span>
+      <span class="hero-meta-value lang-en">Saudi Arabia</span>
+      <span class="hero-meta-value lang-ar">المملكة العربية السعودية</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label lang-en">Date</span>
+      <span class="hero-meta-label lang-ar">التاريخ</span>
+      <span class="hero-meta-value lang-en">March 2026</span>
+      <span class="hero-meta-value lang-ar">مارس ٢٠٢٦</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: PROJECT OVERVIEW -->
+<section>
+  <div class="reveal">
+    <div class="section-num">01</div>
+    <div class="section-eyebrow lang-en">Project Overview</div>
+    <div class="section-eyebrow lang-ar">نظرة عامة على المشروع</div>
+    <h2 class="lang-en">Two connected marketing <em>assets</em></h2>
+    <h2 class="lang-ar">أصلان تسويقيان <em>مترابطان</em></h2>
+    <p class="section-lead lang-en">Delivering a complete digital marketing package for NahamTech — a Saudi e-commerce store selling ZKTeco biometric and POS products, with prices in SAR and bilingual Arabic + English coverage.</p>
+    <p class="section-lead lang-ar">حزمة تسويق رقمي متكاملة لمتجر نهام تك — متجر إلكتروني سعودي متخصص في منتجات القياسات الحيوية وأنظمة نقاط البيع من ZKTeco، بأسعار بالريال السعودي وتغطية ثنائية اللغة بالعربية والإنجليزية.</p>
+  </div>
+  <div class="overview-grid">
+    <div class="ov-card reveal reveal-d1">
+      <h3 class="lang-en">Google Search Campaign</h3>
+      <h3 class="lang-ar">حملة بحث جوجل</h3>
+      <p class="lang-en">11 tightly themed ad groups with 65 exact-match keywords and bilingual ad copy targeting high-intent ZKTeco buyers in Saudi Arabia.</p>
+      <p class="lang-ar">١١ مجموعة إعلانية مُحكمة التصنيف تضم ٦٥ كلمة مفتاحية بالمطابقة التامة ونصوص إعلانية ثنائية اللغة تستهدف المشترين الجادين لمنتجات ZKTeco في السعودية.</p>
+    </div>
+    <div class="ov-card reveal reveal-d2">
+      <h3 class="lang-en">GMC Product Feed</h3>
+      <h3 class="lang-ar">خلاصة منتجات مركز التجّار</h3>
+      <p class="lang-en">102 clean, GMC-compliant products with matched images, SAR pricing, and proper categorization — built by merging two chaotic source files.</p>
+      <p class="lang-ar">١٠٢ منتج نظيف ومتوافق مع مركز التجّار بصور مُطابَقة وأسعار بالريال وتصنيف سليم — أُنشئ بدمج ملفَّين مصدريَّين فوضويَّين.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: SOURCE DATA -->
+<section class="section-alt">
+  <div class="problem-layout">
+    <div class="reveal">
+      <div class="section-num">02</div>
+      <div class="section-eyebrow lang-en">Source Data</div>
+      <div class="section-eyebrow lang-ar">البيانات المصدرية</div>
+      <h2 class="lang-en">Two source files. <em>Zero</em> shared keys.</h2>
+      <h2 class="lang-ar">ملفّان مصدريان. <em>بلا</em> مفتاح ربط مشترك.</h2>
+
+      <p class="lang-en"><strong>processed-products.xlsx</strong> — 147 rows of Arabic titles, categories, prices, and MPNs. Semi-structured with HTML tags in descriptions and service rows mixed with physical products.</p>
+      <p class="lang-ar"><strong>processed-products.xlsx</strong> — ١٤٧ صفاً من العناوين العربية والفئات والأسعار وأرقام المصنّعين. شبه منظّم مع وسوم HTML في الأوصاف وصفوف خدمات مختلطة بالمنتجات الفعلية.</p>
+
+      <p style="margin-top:12px" class="lang-en"><strong>urls.txt</strong> — Raw image URLs with no mapping to products. Model numbers buried in URL slugs were the <em>only matching signal</em>.</p>
+      <p style="margin-top:12px" class="lang-ar"><strong>urls.txt</strong> — روابط صور خام بدون أي ربط بالمنتجات. أرقام الطُّرز المدفونة في مسارات الروابط كانت <em>إشارة المطابقة الوحيدة</em>.</p>
+
+      <ul class="challenge-list lang-en">
+        <li><span>No shared key between product data and image URLs</span></li>
+        <li><span>Duplicated products at different price tiers</span></li>
+        <li><span>Service rows mixed with physical products</span></li>
+        <li><span>Raw HTML tags embedded in descriptions</span></li>
+        <li><span>Inconsistent Arabic/English hybrid titles</span></li>
+      </ul>
+      <ul class="challenge-list lang-ar">
+        <li><span>لا يوجد مفتاح مشترك بين بيانات المنتجات وروابط الصور</span></li>
+        <li><span>منتجات مكرّرة بمستويات أسعار مختلفة</span></li>
+        <li><span>صفوف خدمات مختلطة مع المنتجات الفعلية</span></li>
+        <li><span>وسوم HTML خام مضمّنة في الأوصاف</span></li>
+        <li><span>عناوين هجينة عربية-إنجليزية غير متّسقة</span></li>
+      </ul>
+    </div>
+
+    <div class="dq-card reveal reveal-d2">
+      <div class="dq-header lang-en">Data Quality Assessment</div>
+      <div class="dq-header lang-ar">تقييم جودة البيانات</div>
+      <div class="dq-bar"><div class="dq-fill"></div></div>
+      <div class="dq-labels">
+        <span class="lang-en">Clean</span><span class="lang-en">Critical</span>
+        <span class="lang-ar">نظيف</span><span class="lang-ar">حرج</span>
+      </div>
+      <div class="dq-note">
+        <span>&#9888;</span>
+        <span class="lang-en">5 critical data issues identified</span>
+        <span class="lang-ar">تم اكتشاف ٥ مشاكل حرجة في البيانات</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: GOOGLE SEARCH CAMPAIGN -->
+<section>
+  <div class="reveal">
+    <div class="section-num">03</div>
+    <div class="section-eyebrow lang-en">Phase 1 — Search Campaign</div>
+    <div class="section-eyebrow lang-ar">المرحلة الأولى — حملة البحث</div>
+    <h2 class="lang-en">11 ad groups. 65 keywords. <em>Zero</em> wasted spend.</h2>
+    <h2 class="lang-ar">١١ مجموعة إعلانية. ٦٥ كلمة مفتاحية. <em>صفر</em> هدر في الميزانية.</h2>
+    <p class="section-lead lang-en">A SKAG-hybrid structure with exact-match-only keywords in both Arabic and English — targeting high-intent ZKTeco buyers across Saudi Arabia.</p>
+    <p class="section-lead lang-ar">هيكل هجين من مجموعات الكلمة المفتاحية الواحدة (SKAG) بمطابقة تامة حصراً بالعربية والإنجليزية — يستهدف المشترين الجادين لمنتجات ZKTeco في أنحاء السعودية.</p>
+  </div>
+  <div class="ag-grid">
+    <div class="ag-card reveal reveal-d1">
+      <div class="ag-num">#01</div>
+      <div class="ag-name">Time Attendance - General</div>
+      <div class="ag-desc lang-en">Category-level ZKTeco attendance queries</div>
+      <div class="ag-desc lang-ar">استعلامات الحضور والانصراف العامة من ZKTeco</div>
+      <div class="ag-kw">8 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d1">
+      <div class="ag-num">#02</div>
+      <div class="ag-name">MB2000</div>
+      <div class="ag-desc lang-en">Face + fingerprint terminal</div>
+      <div class="ag-desc lang-ar">جهاز بصمة الوجه والإصبع</div>
+      <div class="ag-kw">5 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d2">
+      <div class="ag-num">#03</div>
+      <div class="ag-name">UFace800</div>
+      <div class="ag-desc lang-en">Multi-biometric with touchscreen</div>
+      <div class="ag-desc lang-ar">نظام بيومتري متعدد بشاشة لمس</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d2">
+      <div class="ag-num">#04</div>
+      <div class="ag-name">SpeedFace V5L WiFi</div>
+      <div class="ag-desc lang-en">Palm + face recognition</div>
+      <div class="ag-desc lang-ar">التعرّف على الكف والوجه</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d3">
+      <div class="ag-num">#05</div>
+      <div class="ag-name">MB10</div>
+      <div class="ag-desc lang-en">Budget face + fingerprint terminal</div>
+      <div class="ag-desc lang-ar">جهاز بصمة وجه وإصبع اقتصادي</div>
+      <div class="ag-kw">5 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d3">
+      <div class="ag-num">#06</div>
+      <div class="ag-name">F18 Access Control</div>
+      <div class="ag-desc lang-en">Fingerprint access control</div>
+      <div class="ag-desc lang-ar">التحكم في الدخول ببصمة الإصبع</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d4">
+      <div class="ag-num">#07</div>
+      <div class="ag-name">F22 Access Control WiFi</div>
+      <div class="ag-desc lang-en">WiFi-enabled access control</div>
+      <div class="ag-desc lang-ar">تحكم في الدخول بتقنية الواي فاي</div>
+      <div class="ag-kw">5 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d4">
+      <div class="ag-num">#08</div>
+      <div class="ag-name">BioTime Software</div>
+      <div class="ag-desc lang-en">Web-based attendance software</div>
+      <div class="ag-desc lang-ar">نظام حضور وانصراف عبر الإنترنت</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d4">
+      <div class="ag-num">#09</div>
+      <div class="ag-name">Access Control Systems</div>
+      <div class="ag-desc lang-en">Locks, brackets, readers</div>
+      <div class="ag-desc lang-ar">أقفال وحوامل وقارئات</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d4">
+      <div class="ag-num">#10</div>
+      <div class="ag-name">USB Fingerprint Readers</div>
+      <div class="ag-desc lang-en">ZK4500, ZK9500, SLK20R scanners</div>
+      <div class="ag-desc lang-ar">ماسحات ZK4500 و ZK9500 و SLK20R</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+    <div class="ag-card reveal reveal-d4 span-full">
+      <div class="ag-num">#11</div>
+      <div class="ag-name">Smart Locks &amp; Biosecurity</div>
+      <div class="ag-desc lang-en">GL300 glass lock, TLEB101 exit button</div>
+      <div class="ag-desc lang-ar">قفل زجاجي GL300 وزر خروج TLEB101</div>
+      <div class="ag-kw">6 keywords</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: GMC FEED PROCESSING -->
+<section class="section-alt">
+  <div class="reveal">
+    <div class="section-num">04</div>
+    <div class="section-eyebrow lang-en">Phase 2 — Product Feed</div>
+    <div class="section-eyebrow lang-ar">المرحلة الثانية — خلاصة المنتجات</div>
+    <h2 class="lang-en">From raw data to a <em>GMC-compliant</em> feed</h2>
+    <h2 class="lang-ar">من البيانات الخام إلى خلاصة <em>متوافقة مع مركز التجّار</em></h2>
+    <p class="section-lead lang-en">147 raw rows went through a six-step pipeline: extract, filter, deduplicate, translate, clean, and format — producing 102 polished products ready for Google Shopping.</p>
+    <p class="section-lead lang-ar">١٤٧ صفاً خاماً مرّ عبر خط معالجة من ست مراحل: استخراج، تصفية، إزالة التكرار، ترجمة، تنظيف، وتنسيق — لينتج ١٠٢ منتجاً مصقولاً جاهزاً لـ Google Shopping.</p>
+  </div>
+
+  <div class="pipeline reveal">
+    <div class="pipe-node hl">
+      <span class="pipe-node-val">147</span>
+      <span class="pipe-node-lbl lang-en">raw rows</span>
+      <span class="pipe-node-lbl lang-ar">صف خام</span>
+    </div>
+    <div class="pipe-conn">&rarr;</div>
+    <div class="pipe-node">
+      <span class="pipe-node-val lang-en">Clean</span>
+      <span class="pipe-node-val lang-ar">تنظيف</span>
+      <span class="pipe-node-lbl lang-en">strip HTML, translate</span>
+      <span class="pipe-node-lbl lang-ar">إزالة HTML، ترجمة</span>
+    </div>
+    <div class="pipe-conn">&rarr;</div>
+    <div class="pipe-node">
+      <span class="pipe-node-val lang-en">Match</span>
+      <span class="pipe-node-val lang-ar">مطابقة</span>
+      <span class="pipe-node-lbl lang-en">MPN &rarr; URL slug</span>
+      <span class="pipe-node-lbl lang-ar">MPN &larr; مسار الرابط</span>
+    </div>
+    <div class="pipe-conn">&rarr;</div>
+    <div class="pipe-node hl">
+      <span class="pipe-node-val">102</span>
+      <span class="pipe-node-lbl lang-en">GMC products</span>
+      <span class="pipe-node-lbl lang-ar">منتج GMC</span>
+    </div>
+  </div>
+
+  <div class="terminal reveal">
+    <div class="lang-en">
+      <span class="p">$</span> extract 147 rows from XLSX<br>
+      <span class="ok">&#10003;</span> <span class="out">filtered out 8 service rows</span><br>
+      <span class="p">$</span> deduplicate + translate availability<br>
+      <span class="ok">&#10003;</span> <span class="out">متاح &rarr; in_stock | غير متاح &rarr; out_of_stock</span><br>
+      <span class="p">$</span> match images via MPN &rarr; URL slug<br>
+      <span class="ok">&#10003;</span> <span class="out">101/102 products matched (99%)</span><br>
+      <span class="p">$</span> format prices as SAR (VAT-inclusive)<br>
+      <span class="ok">&#10003;</span> <span class="out">Feed ready — 14 columns, GMC-compliant</span>
+    </div>
+    <div class="lang-ar">
+      <span class="p">$</span> استخراج ١٤٧ صفاً من XLSX<br>
+      <span class="ok">&#10003;</span> <span class="out">تمت تصفية ٨ صفوف خدمات</span><br>
+      <span class="p">$</span> إزالة التكرار + ترجمة الإتاحة<br>
+      <span class="ok">&#10003;</span> <span class="out">متاح ← in_stock | غير متاح ← out_of_stock</span><br>
+      <span class="p">$</span> مطابقة الصور عبر MPN ← مسار الرابط<br>
+      <span class="ok">&#10003;</span> <span class="out">١٠١/١٠٢ منتج تمت مطابقته (٩٩٪)</span><br>
+      <span class="p">$</span> تنسيق الأسعار بالريال (شاملة الضريبة)<br>
+      <span class="ok">&#10003;</span> <span class="out">الخلاصة جاهزة — ١٤ عموداً، متوافقة مع GMC</span>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: DATA RULES -->
+<section>
+  <div class="reveal">
+    <div class="section-num">05</div>
+    <div class="section-eyebrow lang-en">Data Rules</div>
+    <div class="section-eyebrow lang-ar">قواعد البيانات</div>
+    <h2 class="lang-en">Seven rules that shaped <em>every row</em></h2>
+    <h2 class="lang-ar">سبع قواعد صاغت <em>كل صف</em></h2>
+  </div>
+  <div class="rule-grid">
+    <div class="rule-card reveal reveal-d1">
+      <div class="rule-num lang-en">Rule 01</div>
+      <div class="rule-num lang-ar">القاعدة ٠١</div>
+      <div class="rule-title lang-en">Strict column order</div>
+      <div class="rule-title lang-ar">ترتيب أعمدة صارم</div>
+      <div class="rule-desc lang-en">All output files follow the exact 14-column order specified by Google's Product Data Specification.</div>
+      <div class="rule-desc lang-ar">جميع ملفات الإخراج تتبع ترتيب الأعمدة الأربعة عشر المحدد في مواصفات بيانات منتجات جوجل بالضبط.</div>
+    </div>
+    <div class="rule-card reveal reveal-d1">
+      <div class="rule-num lang-en">Rule 02</div>
+      <div class="rule-num lang-ar">القاعدة ٠٢</div>
+      <div class="rule-title lang-en">One image per product</div>
+      <div class="rule-title lang-ar">صورة واحدة لكل منتج</div>
+      <div class="rule-desc lang-en">Only the single best-matching URL is kept in image_link. Extras discarded to avoid GMC errors.</div>
+      <div class="rule-desc lang-ar">يُحتفظ فقط بالرابط الأفضل مطابقةً في حقل image_link. تُرفض الروابط الزائدة تجنباً لأخطاء مركز التجّار.</div>
+    </div>
+    <div class="rule-card reveal reveal-d2">
+      <div class="rule-num lang-en">Rule 03</div>
+      <div class="rule-num lang-ar">القاعدة ٠٣</div>
+      <div class="rule-title lang-en">VAT-inclusive SAR pricing</div>
+      <div class="rule-title lang-ar">أسعار بالريال شاملة الضريبة</div>
+      <div class="rule-desc lang-en">All prices formatted as XXXX.XX SAR. Saudi 15% VAT is already baked into source prices.</div>
+      <div class="rule-desc lang-ar">جميع الأسعار بصيغة XXXX.XX ريال سعودي. ضريبة القيمة المضافة ١٥٪ مضمّنة أصلاً في أسعار المصدر.</div>
+    </div>
+    <div class="rule-card reveal reveal-d2">
+      <div class="rule-num lang-en">Rule 04</div>
+      <div class="rule-num lang-ar">القاعدة ٠٤</div>
+      <div class="rule-title lang-en">Availability mapping</div>
+      <div class="rule-title lang-ar">ربط حالة الإتاحة</div>
+      <div class="rule-desc lang-en">Arabic متاح / غير متاح converted to GMC-standard in_stock / out_of_stock values.</div>
+      <div class="rule-desc lang-ar">تحويل القيم العربية «متاح» و«غير متاح» إلى القيم القياسية in_stock و out_of_stock.</div>
+    </div>
+    <div class="rule-card reveal reveal-d3">
+      <div class="rule-num lang-en">Rule 05</div>
+      <div class="rule-num lang-ar">القاعدة ٠٥</div>
+      <div class="rule-title lang-en">Brand normalization</div>
+      <div class="rule-title lang-ar">توحيد العلامات التجارية</div>
+      <div class="rule-desc lang-en">Arabic + English brand names like "ZKTeco - زد كي تيكو" simplified to English-only for GMC compliance.</div>
+      <div class="rule-desc lang-ar">أسماء العلامات التجارية المزدوجة مثل «ZKTeco - زد كي تيكو» تم تبسيطها إلى الإنجليزية فقط لتوافق مركز التجّار.</div>
+    </div>
+    <div class="rule-card reveal reveal-d3">
+      <div class="rule-num lang-en">Rule 06</div>
+      <div class="rule-num lang-ar">القاعدة ٠٦</div>
+      <div class="rule-title lang-en">Services excluded</div>
+      <div class="rule-title lang-ar">استبعاد الخدمات</div>
+      <div class="rule-desc lang-en">8 service/consultation rows removed — GMC requires physical or digital goods, not service inquiries.</div>
+      <div class="rule-desc lang-ar">حُذفت ٨ صفوف خدمات واستشارات — يشترط مركز التجّار منتجات مادية أو رقمية وليس طلبات خدمة.</div>
+    </div>
+    <div class="rule-card reveal reveal-d4 span-full">
+      <div class="rule-num lang-en">Rule 07</div>
+      <div class="rule-num lang-ar">القاعدة ٠٧</div>
+      <div class="rule-title lang-en">No GTIN, MPN used</div>
+      <div class="rule-title lang-ar">بدون GTIN، استُخدم MPN</div>
+      <div class="rule-desc lang-en">Products lack universal barcodes, so gtin is empty and identifier_exists is set to "yes" when an MPN is present.</div>
+      <div class="rule-desc lang-ar">لا تحمل المنتجات باركودات عالمية، لذا حقل gtin فارغ وidentifier_exists مضبوط على «yes» عند وجود رقم المصنّع.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: OUTPUT FILES -->
+<section class="section-alt">
+  <div class="reveal">
+    <div class="section-num">06</div>
+    <div class="section-eyebrow lang-en">Deliverables</div>
+    <div class="section-eyebrow lang-ar">المُخرجات</div>
+    <h2 class="lang-en">Six files, three formats, <em>production-ready</em></h2>
+    <h2 class="lang-ar">ستة ملفات، ثلاث صيغ، <em>جاهزة للإنتاج</em></h2>
+  </div>
+  <div class="file-grid">
+    <div class="file-card reveal reveal-d1">
+      <div class="file-badge xlsx">XLSX</div>
+      <div class="file-name">gmc_product_feed.xlsx</div>
+      <div class="file-desc lang-en">GMC feed with color-coded availability, frozen header, auto-filter</div>
+      <div class="file-desc lang-ar">خلاصة GMC بإتاحة ملوّنة وعنوان مثبّت وفلتر تلقائي</div>
+      <div class="file-size">~17 KB</div>
+    </div>
+    <div class="file-card reveal reveal-d1">
+      <div class="file-badge csv">CSV</div>
+      <div class="file-name">gmc_product_feed.csv</div>
+      <div class="file-desc lang-en">UTF-8 BOM CSV for direct GMC upload or Sheets import</div>
+      <div class="file-desc lang-ar">ملف CSV بترميز UTF-8 للرفع المباشر على مركز التجّار</div>
+      <div class="file-size">~34 KB</div>
+    </div>
+    <div class="file-card reveal reveal-d2">
+      <div class="file-badge json">JSON</div>
+      <div class="file-name">gmc_product_feed.json</div>
+      <div class="file-desc lang-en">Structured JSON array for API / programmatic use</div>
+      <div class="file-desc lang-ar">مصفوفة JSON منظّمة للاستخدام البرمجي</div>
+      <div class="file-size">~63 KB</div>
+    </div>
+    <div class="file-card reveal reveal-d2">
+      <div class="file-badge xlsx">XLSX</div>
+      <div class="file-name">google_ads_campaign.xlsx</div>
+      <div class="file-desc lang-en">Campaign strategy with color-coded ad groups, frozen header</div>
+      <div class="file-desc lang-ar">استراتيجية الحملة بمجموعات إعلانية ملوّنة وعنوان مثبّت</div>
+      <div class="file-size">~9 KB</div>
+    </div>
+    <div class="file-card reveal reveal-d3">
+      <div class="file-badge csv">CSV</div>
+      <div class="file-name">google_ads_campaign.csv</div>
+      <div class="file-desc lang-en">CSV for Google Ads Editor bulk import</div>
+      <div class="file-desc lang-ar">ملف CSV للاستيراد الجماعي في محرر إعلانات جوجل</div>
+      <div class="file-size">~6 KB</div>
+    </div>
+    <div class="file-card reveal reveal-d3">
+      <div class="file-badge json">JSON</div>
+      <div class="file-name">google_ads_campaign.json</div>
+      <div class="file-desc lang-en">Structured JSON for API integration</div>
+      <div class="file-desc lang-ar">ملف JSON منظّم للتكامل مع الواجهات البرمجية</div>
+      <div class="file-size">~19 KB</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: HOW TO USE -->
+<section>
+  <div class="reveal">
+    <div class="section-num">07</div>
+    <div class="section-eyebrow lang-en">Implementation</div>
+    <div class="section-eyebrow lang-ar">التنفيذ</div>
+    <h2 class="lang-en">How to <em>use</em> each file</h2>
+    <h2 class="lang-ar">كيف <em>تستخدم</em> كل ملف</h2>
+  </div>
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-indicator">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3 class="lang-en">Upload GMC Feed</h3>
+        <h3 class="lang-ar">رفع خلاصة مركز التجّار</h3>
+        <p class="lang-en">Open <strong>gmc_product_feed.csv</strong> or <strong>.xlsx</strong>. Upload via Merchant Center &rarr; Products &rarr; Feeds &rarr; Add feed. Select Saudi Arabia as target country and SAR as currency.</p>
+        <p class="lang-ar">افتح <strong>gmc_product_feed.csv</strong> أو <strong>.xlsx</strong>. ارفعه عبر مركز التجّار ← المنتجات ← الخلاصات ← إضافة خلاصة. اختر المملكة العربية السعودية كبلد مستهدف والريال السعودي كعملة.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-indicator">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3 class="lang-en">Verify Image URLs</h3>
+        <h3 class="lang-ar">تحقق من روابط الصور</h3>
+        <p class="lang-en">Confirm image URLs resolve to <strong>img.nahamtech.org</strong>. Only 1 product (Zebra USB cable) has no matched image.</p>
+        <p class="lang-ar">تأكد أن روابط الصور تشير إلى <strong>img.nahamtech.org</strong>. منتج واحد فقط (كابل Zebra USB) بدون صورة مطابقة.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-indicator">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h3 class="lang-en">Import Ads via Google Ads Editor</h3>
+        <h3 class="lang-ar">استيراد الإعلانات عبر محرّر إعلانات جوجل</h3>
+        <p class="lang-en">Open Google Ads Editor &rarr; Account &rarr; Import &rarr; From CSV. Select <strong>google_ads_campaign.csv</strong>. Map columns: Ad Group, Keyword, Match Type, Headlines, Descriptions.</p>
+        <p class="lang-ar">افتح محرر إعلانات جوجل ← الحساب ← استيراد ← من CSV. اختر <strong>google_ads_campaign.csv</strong>. اربط الأعمدة: المجموعة الإعلانية، الكلمة المفتاحية، نوع المطابقة، العناوين، الأوصاف.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-indicator">
+        <div class="step-num">4</div>
+      </div>
+      <div class="step-content" style="padding-bottom:0">
+        <h3 class="lang-en">Use JSON for API Integration</h3>
+        <h3 class="lang-ar">استخدم JSON للتكامل البرمجي</h3>
+        <p class="lang-en">Use the <strong>.json</strong> files for integration with custom dashboards, automation scripts, or feed management platforms. Structure is a flat array of objects keyed by column name.</p>
+        <p class="lang-ar">استخدم ملفات <strong>.json</strong> للتكامل مع لوحات المعلومات أو نصوص الأتمتة أو منصات إدارة الخلاصات. البنية مصفوفة مسطّحة من الكائنات مفهرسة بأسماء الأعمدة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: STATS SUMMARY -->
+<section class="section-alt">
+  <div class="reveal">
+    <div class="section-num">08</div>
+    <div class="section-eyebrow lang-en">Summary</div>
+    <div class="section-eyebrow lang-ar">الملخص</div>
+    <h2 class="lang-en">What we <em>delivered</em></h2>
+    <h2 class="lang-ar">ما <em>أنجزناه</em></h2>
+  </div>
+  <div class="summary-card reveal">
+    <h3 class="lang-en">A complete marketing pipeline, <em>AI-powered</em></h3>
+    <h3 class="lang-ar">خط تسويق متكامل <em>مدعوم بالذكاء الاصطناعي</em></h3>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="stat-num">102</span>
+        <span class="stat-label lang-en">GMC Products</span>
+        <span class="stat-label lang-ar">منتج GMC</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num gold">99%</span>
+        <span class="stat-label lang-en">Image Match</span>
+        <span class="stat-label lang-ar">نسبة مطابقة الصور</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">11</span>
+        <span class="stat-label lang-en">Ad Groups</span>
+        <span class="stat-label lang-ar">مجموعة إعلانية</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">65</span>
+        <span class="stat-label lang-en">Keywords</span>
+        <span class="stat-label lang-ar">كلمة مفتاحية</span>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-top:4px">
+      <div class="stat">
+        <span class="stat-num">15</span>
+        <span class="stat-label lang-en">Brands</span>
+        <span class="stat-label lang-ar">علامة تجارية</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num gold">79</span>
+        <span class="stat-label lang-en">In Stock</span>
+        <span class="stat-label lang-ar">متاح</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">~22</span>
+        <span class="stat-label lang-en">Arabic Keywords</span>
+        <span class="stat-label lang-ar">كلمة مفتاحية عربية</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">6</span>
+        <span class="stat-label lang-en">Output Files</span>
+        <span class="stat-label lang-ar">ملف إخراج</span>
+      </div>
+    </div>
+
+    <p class="summary-note lang-en">Price range: <strong>15.00 — 7,500.00 SAR</strong>. Target market: Saudi Arabia (KSA). All files generated by Claude AI — from raw data to production-ready outputs.</p>
+    <p class="summary-note lang-ar">النطاق السعري: <strong>١٥٫٠٠ — ٧٬٥٠٠٫٠٠ ريال سعودي</strong>. السوق المستهدف: المملكة العربية السعودية. جميع الملفات أُنشئت بواسطة Claude AI — من البيانات الخام إلى مخرجات جاهزة للإنتاج.</p>
+  </div>
+</section>
+
+<footer>
+  <span class="lang-en">Prepared by <span class="footer-accent">NahamTech</span> using Claude AI<span class="footer-dot"></span>ZKTeco KSA<span class="footer-dot"></span>March 2026</span>
+  <span class="lang-ar">أعدّه <span class="footer-accent">نهام تك</span> باستخدام Claude AI<span class="footer-dot"></span>ZKTeco KSA<span class="footer-dot"></span>مارس ٢٠٢٦</span>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    const l=b.getAttribute('onclick').match(/'(\w+)'/)[1];
+    b.classList.toggle('active',l===lang);
+  });
+  document.documentElement.lang=lang==='ar'?'ar':'en';
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+}
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

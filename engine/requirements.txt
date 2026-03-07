@@ -1,0 +1,2 @@
+scrapling>=0.2
+orjson>=3.9

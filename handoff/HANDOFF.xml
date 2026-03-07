@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HarvestHub — Agent Handoff Document
+  Generated: 2026-03-07
+  Purpose: Complete context for a fresh Claude Opus session to continue work
+-->
+<handoff>
+
+  <!-- ================================================================== -->
+  <!-- 1. PROJECT IDENTITY                                                -->
+  <!-- ================================================================== -->
+  <project>
+    <name>HarvestHub</name>
+    <version>1.0.0</version>
+    <tagline>Adaptive product scraping platform with premium exports</tagline>
+    <location>h:\scraper</location>
+    <git>Not initialized (not a git repo yet)</git>
+    <runtime>
+      <node>v23.7.0</node>
+      <python>3.13</python>
+      <typescript>5.4+</typescript>
+      <os>Windows 11</os>
+    </runtime>
+  </project>
+
+  <!-- ================================================================== -->
+  <!-- 2. WHAT THIS PROJECT IS                                            -->
+  <!-- ================================================================== -->
+  <description>
+    A TypeScript-first web scraping platform that uses Python's Scrapling library
+    for adaptive, anti-bot product data extraction from ANY e-commerce site.
+
+    Architecture: Hybrid TypeScript + Python
+    - TypeScript handles: CLI, rate limiting, retries, normalization, storage, export, API, dashboard
+    - Python handles: actual HTTP fetching + HTML parsing via Scrapling (subprocess JSON IPC)
+
+    The platform extracts product data (title, price, description, images, availability,
+    brand, SKU, MPN, GTIN, category, rating, reviews, specifications) using a 3-tier
+    extraction strategy: JSON-LD → Microdata → CSS heuristics, each with confidence scoring.
+
+    Exports to: XLSX (premium styled), CSV, JSON, Google Merchant Center TSV feed.
+
+    Includes a premium SaaS-style dashboard (dark theme, charts, search, filters, pagination)
+    and a premium editorial documentation/landing page.
+  </description>
+
+  <!-- ================================================================== -->
+  <!-- 3. WHAT HAS BEEN COMPLETED                                        -->
+  <!-- ================================================================== -->
+  <completed>
+    <item status="done">Full TypeScript project structure (30+ files)</item>
+    <item status="done">Python Scrapling engine with 3-tier adaptive extraction</item>
+    <item status="done">CLI with 5 commands: scrape, export, status, migrate, dashboard</item>
+    <item status="done">4 export formats: XLSX, CSV, JSON, GMC</item>
+    <item status="done">Rate limiter (per-domain token bucket)</item>
+    <item status="done">Retry engine (exponential backoff + jitter + error classification)</item>
+    <item status="done">User agent rotation (20 real browser UAs)</item>
+    <item status="done">Legacy migration from export_all.py (101 products imported)</item>
+    <item status="done">Live scraping tested and working (3/3 books.toscrape.com URLs)</item>
+    <item status="done">104 products in data store (101 migrated + 3 live scraped)</item>
+    <item status="done">48/48 unit tests passing (vitest)</item>
+    <item status="done">0 TypeScript errors</item>
+    <item status="done">Express.js API server (5 endpoints) at port 4000</item>
+    <item status="done">Premium SaaS dashboard (dashboard/index.html)</item>
+    <item status="done">Premium editorial documentation page (dashboard/docs.html)</item>
+    <item status="done">npm dependencies installed (319 packages)</item>
+    <item status="done">Python dependencies installed (scrapling, curl_cffi, orjson, browserforge)</item>
+  </completed>
+
+  <!-- ================================================================== -->
+  <!-- 4. WHAT COULD STILL BE DONE (potential improvements)               -->
+  <!-- ================================================================== -->
+  <potential_improvements>
+    <item priority="high">Git init + initial commit</item>
+    <item priority="high">Delete AI-Training-Story-EN-DE.html (user said to discard it)</item>
+    <item priority="medium">WebSocket real-time updates during scraping</item>
+    <item priority="medium">Job scheduling with cron (croner package already installed)</item>
+    <item priority="medium">More comprehensive integration tests</item>
+    <item priority="medium">Vercel deployment configuration</item>
+    <item priority="low">Proxy rotation support</item>
+    <item priority="low">Result diffing (detect price changes over time)</item>
+    <item priority="low">Dashboard route for /docs without .html extension</item>
+    <item priority="low">Dark/light theme toggle on dashboard</item>
+  </potential_improvements>
+
+  <!-- ================================================================== -->
+  <!-- 5. CRITICAL TECHNICAL KNOWLEDGE                                    -->
+  <!-- ================================================================== -->
+  <technical_knowledge>
+
+    <critical_bug_fix title="Scrapling API Compatibility">
+      Scrapling v0.4.1's Response object has css(selector) which returns a LIST, not a single element.
+      There is NO css_first() method on the Response object.
+      We created a helper function in engine/scraper.py:
+
+        def css_first(page, selector):
+            results = page.css(selector)
+            return results[0] if results else None
+
+      This is used in ALL 14+ places where we query the DOM.
+      Elements have .text (string) and .attrib (dict) for attribute access.
+      Response also has .status, .headers, .cookies, .url, .html_content.
+    </critical_bug_fix>
+
+    <critical_bug_fix title="Scrapling Logging Pollution">
+      Scrapling prints deprecation warnings and INFO logs to stderr/stdout.
+      These corrupt the JSON IPC protocol (TypeScript reads stdout expecting pure JSON).
+      Fix at top of engine/scraper.py:
+        import warnings
+        import logging
+        warnings.filterwarnings("ignore")
+        logging.disable(logging.CRITICAL)
+    </critical_bug_fix>
+
+    <critical_bug_fix title="browserforge Dependency">
+      Scrapling's Fetcher class requires the 'browserforge' package at runtime.
+      Without it, scraping fails with ImportError.
+      Install: pip install browserforge
+      (This is NOT listed in Scrapling's requirements, discovered empirically)
+    </critical_bug_fix>
+
+    <known_issue title="Port 3000 Occupied">
+      Port 3000 is already in use on the user's machine.
+      Dashboard server runs on port 4000 instead.
+      Command: npx tsx src/cli/index.ts dashboard -p 4000
+    </known_issue>
+
+    <known_issue title="Playwright + Google Fonts">
+      When taking screenshots with Playwright, wait_until='networkidle' hangs
+      indefinitely because Google Fonts connections never fully resolve.
+      Use wait_until='commit' + wait_for_timeout(2500) instead.
+    </known_issue>
+
+  </technical_knowledge>
+
+  <!-- ================================================================== -->
+  <!-- 6. FILE TREE (excluding node_modules, data/store, data/exports)    -->
+  <!-- ================================================================== -->
+  <file_tree>
+    h:\scraper\
+    ├── .gitignore
+    ├── package.json
+    ├── package-lock.json
+    ├── tsconfig.json
+    ├── setup.ps1
+    ├── README.md
+    ├── export_all.py              (legacy, preserved)
+    ├── AI-Training-Story-EN-DE.html  (TO BE DELETED)
+    ├── sample-urls.txt
+    ├── test-urls.txt
+    ├── engine/
+    │   ├── scraper.py             (Python Scrapling engine, 380 lines)
+    │   └── requirements.txt       (scrapling>=0.2, orjson>=3.9)
+    ├── src/
+    │   ├── types/
+    │   │   ├── index.ts           (re-exports)
+    │   │   ├── product.ts         (Product, ConfidenceScores, Availability)
+    │   │   ├── job.ts             (ScrapeJob, ScrapeTask, JobConfig)
+    │   │   └── schedule.ts        (Schedule)
+    │   ├── lib/
+    │   │   ├── errors.ts          (HarvestError hierarchy)
+    │   │   ├── logger.ts          (Pino logger)
+    │   │   ├── url-parser.ts      (parse URL files/strings)
+    │   │   └── url-validator.ts   (validate + deduplicate)
+    │   ├── core/
+    │   │   ├── scrape-bridge.ts   (TypeScript↔Python subprocess IPC)
+    │   │   ├── rate-limiter.ts    (per-domain token bucket)
+    │   │   ├── retry-engine.ts    (exponential backoff + jitter)
+    │   │   └── ua-pool.ts         (20 user agents, round-robin)
+    │   ├── pipeline/
+    │   │   └── normalizer.ts      (price, currency, availability normalization)
+    │   ├── store/
+    │   │   └── local-store.ts     (JSON file persistence, atomic writes)
+    │   ├── export/
+    │   │   ├── index.ts           (format router)
+    │   │   ├── xlsx-exporter.ts   (ExcelJS, premium styling)
+    │   │   ├── csv-exporter.ts    (UTF-8 BOM)
+    │   │   ├── json-exporter.ts   (structured with metadata)
+    │   │   └── gmc-exporter.ts    (Google Merchant Center TSV)
+    │   ├── api/
+    │   │   ├── server.ts          (Express.js, 5 endpoints + static)
+    │   │   └── start.ts           (standalone entry)
+    │   ├── cli/
+    │   │   ├── index.ts           (Commander.js entry, 5 commands)
+    │   │   └── commands/
+    │   │       ├── scrape.ts      (main scrape orchestrator)
+    │   │       ├── export.ts      (export stored products)
+    │   │       ├── status.ts      (system status)
+    │   │       ├── migrate.ts     (legacy data import)
+    │   │       └── dashboard.ts   (start web dashboard)
+    │   └── __tests__/
+    │       ├── errors.test.ts
+    │       ├── local-store.test.ts
+    │       ├── normalizer.test.ts
+    │       ├── ua-pool.test.ts
+    │       └── url-validator.test.ts
+    ├── dashboard/
+    │   ├── index.html             (SaaS dashboard, 30KB)
+    │   └── docs.html              (documentation landing page, 51KB)
+    └── data/
+        ├── store/
+        │   └── default.json       (104 products)
+        ├── exports/               (generated files)
+        └── logs/
+  </file_tree>
+
+  <!-- ================================================================== -->
+  <!-- 7. KEY COMMANDS                                                    -->
+  <!-- ================================================================== -->
+  <commands>
+    <command purpose="Bootstrap">.\setup.ps1</command>
+    <command purpose="Check status">npx tsx src/cli/index.ts status</command>
+    <command purpose="Scrape URLs">npx tsx src/cli/index.ts scrape --urls test-urls.txt</command>
+    <command purpose="Scrape single URL">npx tsx src/cli/index.ts scrape --input "https://example.com/product/foo"</command>
+    <command purpose="Export XLSX">npx tsx src/cli/index.ts export -f xlsx -o data/exports/products.xlsx</command>
+    <command purpose="Export GMC feed">npx tsx src/cli/index.ts export -f gmc -o data/exports/feed.tsv</command>
+    <command purpose="Start dashboard">npx tsx src/cli/index.ts dashboard -p 4000</command>
+    <command purpose="Run tests">npx vitest run</command>
+    <command purpose="Type check">npx tsc --noEmit</command>
+    <command purpose="Build">npx tsc</command>
+    <command purpose="Migrate legacy data">npx tsx src/cli/index.ts migrate</command>
+  </commands>
+
+  <!-- ================================================================== -->
+  <!-- 8. NPM DEPENDENCIES                                               -->
+  <!-- ================================================================== -->
+  <dependencies>
+    <production>
+      chalk@^5.3.0, cli-progress@^3.12.0, commander@^12.1.0,
+      croner@^8.0.0, exceljs@^4.4.0, express@^4.18.2,
+      nanoid@^5.0.7, ora@^8.0.1, pino@^9.0.0,
+      pino-pretty@^11.0.0, ws@^8.16.0, zod@^3.23.0
+    </production>
+    <dev>
+      @types/express@^4.17.21, @types/node@^20.11.0,
+      @types/ws@^8.5.10, tsx@^4.7.0, typescript@^5.4.0, vitest@^1.6.0
+    </dev>
+    <python>
+      scrapling>=0.2, orjson>=3.9
+      (also installed: curl_cffi, browserforge — runtime deps of scrapling)
+    </python>
+  </dependencies>
+
+  <!-- ================================================================== -->
+  <!-- 9. API ENDPOINTS                                                   -->
+  <!-- ================================================================== -->
+  <api base="http://localhost:4000">
+    <endpoint method="GET" path="/api/status">System status, engine health, product count</endpoint>
+    <endpoint method="GET" path="/api/products">Paginated products with search/filter (query: page, limit, search, brand, availability)</endpoint>
+    <endpoint method="GET" path="/api/stats">Aggregated stats: totals, averages, top brands/categories</endpoint>
+    <endpoint method="GET" path="/api/export/:format">Download export file (format: xlsx, csv, json, gmc)</endpoint>
+    <endpoint method="GET" path="/api/jobs">Last 20 scrape jobs</endpoint>
+    <endpoint method="GET" path="/">Dashboard (index.html)</endpoint>
+    <endpoint method="GET" path="/docs.html">Documentation page</endpoint>
+  </api>
+
+  <!-- ================================================================== -->
+  <!-- 10. USER CONTEXT                                                   -->
+  <!-- ================================================================== -->
+  <user_context>
+    <goal>Make the scraping project so impressive the user's boss doesn't fire them</goal>
+    <budget>Zero — no paid APIs, proxies, or services</budget>
+    <audience>The user's boss — expects a clean, premium, SaaS-quality product</audience>
+    <language_preference>TypeScript for everything, Python only for Scrapling engine</language_preference>
+    <scraping_library>Scrapling (https://scrapling.readthedocs.io/en/latest/)</scraping_library>
+    <deployment>Local first, maybe Vercel later</deployment>
+    <discarded_file>AI-Training-Story-EN-DE.html — user said to discard entirely</discarded_file>
+  </user_context>
+
+  <!-- ================================================================== -->
+  <!-- 11. INSTRUCTIONS FOR CONTINUING AGENT                              -->
+  <!-- ================================================================== -->
+  <instructions>
+    You are picking up an in-progress project called HarvestHub at h:\scraper.
+    The project is a TypeScript+Python hybrid web scraping platform.
+    Everything described in the "completed" section above is already built and working.
+
+    BEFORE making any changes:
+    1. Run "npx vitest run" to confirm 48/48 tests still pass
+    2. Run "npx tsc --noEmit" to confirm 0 TypeScript errors
+    3. Check the dashboard works: "npx tsx src/cli/index.ts dashboard -p 4000"
+
+    CRITICAL REMINDERS:
+    - Scrapling has NO css_first() method. Always use the css_first() helper in engine/scraper.py
+    - Scrapling warnings MUST be suppressed or they corrupt JSON IPC
+    - browserforge is a required but undocumented Scrapling dependency
+    - Port 3000 is occupied; use port 4000
+    - Working directory is h:\scraper on Windows
+    - All file paths use backslashes on this system
+
+    The user wants this to be AMAZING — premium quality, SaaS-grade.
+    Ask the user what they'd like to improve or add next.
+  </instructions>
+
+</handoff>

@@ -1,0 +1,16 @@
+# HarvestHub Sample URLs
+# One URL per line. Lines starting with # are ignored.
+
+# Amazon test products
+https://www.amazon.com/dp/B0BSHF7WHW
+https://www.amazon.com/dp/B09V3KXJPB
+
+# eBay listings
+https://www.ebay.com/itm/256147498032
+
+# Best Buy
+https://www.bestbuy.com/site/apple-airpods-pro-2nd-generation/6447382.p
+
+# NahamTech (original source)
+https://nahamtech.org/product/zebra-zc300-single
+https://nahamtech.org/product/zkteco-uface800
