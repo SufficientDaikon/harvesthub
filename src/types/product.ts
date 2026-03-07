@@ -50,6 +50,7 @@ export interface Product {
   overallConfidence: number;
   extractionMethod: ExtractionMethod;
   metadata: Record<string, unknown>;
+  priceHistory?: Array<{ price: number; currency: string; recordedAt: string }>;
 }
 
 export interface ProductChangeRecord {

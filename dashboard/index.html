@@ -1052,7 +1052,7 @@
               (p) => `
           <tr>
             <td title="${esc(p.title)}">${esc(p.title.slice(0, 50))}</td>
-            <td class="price">${p.price.toFixed(2)} ${esc(p.currency)}</td>
+            <td class="price">${priceTrendBadge(p)} ${p.price.toFixed(2)} ${esc(p.currency)}</td>
             <td>${esc(p.brand || "—")}</td>
             <td>${availBadge(p.availability)}</td>
             <td title="${esc(p.category || "")}">${esc((p.category || "—").slice(0, 30))}</td>
@@ -1109,6 +1109,16 @@
               ? "var(--warning)"
               : "var(--danger)";
         return `<div class="confidence"><div class="confidence-bar"><div class="confidence-fill" style="width:${c}%;background:${color}"></div></div><span style="font-size:12px;color:${color}">${c}%</span></div>`;
+      }
+
+      function priceTrendBadge(p) {
+        const h = p.priceHistory;
+        if (!h || h.length === 0) return "";
+        const last = h[h.length - 1];
+        if (!last) return "";
+        if (p.price > last.price) return '<span title="Price increased" style="color:var(--danger);font-size:14px">↑</span>';
+        if (p.price < last.price) return '<span title="Price decreased" style="color:var(--success);font-size:14px">↓</span>';
+        return '<span title="Price stable" style="color:var(--text-muted);font-size:14px">→</span>';
       }
 
       // Exports

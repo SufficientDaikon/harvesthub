@@ -3,6 +3,7 @@ import { resolve, dirname } from "node:path";
 import { existsSync } from "node:fs";
 import type { Product, ScrapeJob } from "../types/index.js";
 import type { Schedule } from "../types/schedule.js";
+import { diffAndMerge } from "../core/price-differ.js";
 import { createChildLogger } from "../lib/logger.js";
 
 const log = createChildLogger("local-store");
@@ -64,7 +65,13 @@ export async function saveProducts(
   const existingMap = new Map(data.products.map((p) => [p.id, p]));
 
   for (const p of products) {
-    existingMap.set(p.id, p);
+    const existing = existingMap.get(p.id);
+    if (existing) {
+      const { merged } = diffAndMerge(existing, p);
+      existingMap.set(p.id, merged);
+    } else {
+      existingMap.set(p.id, p);
+    }
   }
 
   data.products = Array.from(existingMap.values());

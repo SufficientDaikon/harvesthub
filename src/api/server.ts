@@ -124,6 +124,24 @@ export function createServer(port = 3000) {
     }
   });
 
+  // API: Price history for a product
+  app.get("/api/products/:id/history", async (req, res) => {
+    try {
+      const products = await loadProducts();
+      const product = products.find((p) => p.id === req.params["id"]);
+      if (!product) { res.status(404).json({ error: "Product not found" }); return; }
+      res.json({
+        id: product.id,
+        title: product.title,
+        currentPrice: product.price,
+        currency: product.currency,
+        priceHistory: product.priceHistory ?? [],
+      });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to load price history" });
+    }
+  });
+
   // API: Product stats
   app.get("/api/stats", async (_req, res) => {
     try {
