@@ -17,6 +17,10 @@ import { getUserAgentCount } from "../core/ua-pool.js";
 import { createChildLogger } from "../lib/logger.js";
 import { wsBroadcast } from "../core/ws-broadcast.js";
 import {
+  loadProxiesFromEnv,
+  getProxyCount,
+} from "../core/proxy-pool.js";
+import {
   loadSchedules,
   saveSchedule,
   deleteSchedule,
@@ -40,6 +44,9 @@ export function createServer(port = 3000) {
   const dashboardPath = resolve(process.cwd(), "dashboard");
   app.use(express.static(dashboardPath));
 
+  // Load proxies from env on startup
+  loadProxiesFromEnv();
+
   // API: System status
   app.get("/api/status", async (_req, res) => {
     try {
@@ -51,6 +58,7 @@ export function createServer(port = 3000) {
       res.json({
         engine: engineOk ? "ready" : "unavailable",
         userAgents: getUserAgentCount(),
+        proxies: getProxyCount(),
         productCount,
         totalJobs: jobs.length,
         lastJob: lastJob

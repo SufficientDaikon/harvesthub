@@ -15,6 +15,11 @@ import {
 } from "../../export/index.js";
 import { createChildLogger } from "../../lib/logger.js";
 import { wsBroadcast } from "../../core/ws-broadcast.js";
+import {
+  loadProxiesFromFile,
+  loadProxiesFromEnv,
+  getProxyCount,
+} from "../../core/proxy-pool.js";
 import type { Product, ScrapeJob, ScrapeTask } from "../../types/index.js";
 import { DEFAULT_JOB_CONFIG } from "../../types/index.js";
 
@@ -44,6 +49,7 @@ export const scrapeCommand = new Command("scrape")
   )
   .option("--no-export", "Skip export, just scrape and store")
   .option("--dry-run", "Validate URLs without scraping")
+  .option("--proxies <file>", "Path to proxy list file (one proxy per line)")
   .action(async (opts) => {
     const startTime = Date.now();
     console.log(
@@ -61,6 +67,19 @@ export const scrapeCommand = new Command("scrape")
       process.exit(1);
     }
     healthSpinner.succeed("Python engine ready");
+
+    // 1b. Load proxies (optional)
+    loadProxiesFromEnv();
+    if (opts.proxies) {
+      try {
+        await loadProxiesFromFile(opts.proxies);
+      } catch {
+        console.log(chalk.yellow(`  ⚠ Could not load proxy file: ${opts.proxies}`));
+      }
+    }
+    if (getProxyCount() > 0) {
+      console.log(chalk.dim(`  Proxies: ${getProxyCount()} loaded (round-robin)`));
+    }
 
     // 2. Parse URLs
     let urls: string[];

@@ -278,16 +278,21 @@ def scrape(request):
     timeout = request.get("timeout", 30)
     user_agent = request.get("user_agent", "")
     use_stealth = request.get("use_stealth", False)
+    proxy = request.get("proxy", None)
 
     start = time.time()
 
     try:
+        fetcher_kwargs = {}
+        if proxy:
+            fetcher_kwargs["proxy"] = proxy
+
         if use_stealth:
             from scrapling import StealthyFetcher
-            fetcher = StealthyFetcher()
+            fetcher = StealthyFetcher(**fetcher_kwargs)
         else:
             from scrapling import Fetcher
-            fetcher = Fetcher()
+            fetcher = Fetcher(**fetcher_kwargs)
 
         page = fetcher.get(url, timeout=timeout)
 

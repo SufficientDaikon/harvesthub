@@ -4,6 +4,7 @@ import type { Product } from "../types/index.js";
 import { TransientError, PermanentError, BlockedError } from "../lib/errors.js";
 import { createChildLogger } from "../lib/logger.js";
 import { getNextUserAgent } from "./ua-pool.js";
+import { getNextProxy } from "./proxy-pool.js";
 
 const log = createChildLogger("scrape-bridge");
 
@@ -14,6 +15,7 @@ export interface ScrapeRequest {
   timeout?: number;
   user_agent?: string;
   use_stealth?: boolean;
+  proxy?: string;
 }
 
 export interface ScrapeResponse {
@@ -32,12 +34,14 @@ export async function scrapeUrl(
 ): Promise<ScrapeResponse> {
   const timeout = options.timeout ?? 30000;
   const ua = getNextUserAgent();
+  const proxy = getNextProxy();
 
   const request: ScrapeRequest = {
     url,
     timeout: Math.round(timeout / 1000),
     user_agent: ua,
     use_stealth: options.useStealth ?? false,
+    ...(proxy ? { proxy } : {}),
   };
 
   return new Promise((resolve, reject) => {
