@@ -26,7 +26,9 @@ export async function sendAlertEmail(
   const smtp = getSmtpConfig();
 
   if (!smtp.host || !smtp.user || !smtp.pass) {
-    log.warn("SMTP not configured (missing SMTP_HOST, SMTP_USER, or SMTP_PASS). Skipping email.");
+    log.warn(
+      "SMTP not configured (missing SMTP_HOST, SMTP_USER, or SMTP_PASS). Skipping email.",
+    );
     return false;
   }
 

@@ -104,9 +104,8 @@ describe("Alert Checker", () => {
   });
 
   it("should trigger webhook when price drops beyond threshold", async () => {
-    const { loadAlerts, appendAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, appendAlertHistory } =
+      await import("../alerts/alert-manager.js");
     const { sendWebhook } = await import("../alerts/webhook-sender.js");
     const { checkAlerts } = await import("../alerts/alert-checker.js");
 
@@ -149,9 +148,8 @@ describe("Alert Checker", () => {
   });
 
   it("should match domain-based alerts", async () => {
-    const { loadAlerts, appendAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, appendAlertHistory } =
+      await import("../alerts/alert-manager.js");
     const { sendWebhook } = await import("../alerts/webhook-sender.js");
     const { checkAlerts } = await import("../alerts/alert-checker.js");
 
@@ -198,9 +196,8 @@ describe("Alert Checker", () => {
   });
 
   it("should record failed delivery in history", async () => {
-    const { loadAlerts, appendAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, appendAlertHistory } =
+      await import("../alerts/alert-manager.js");
     const { sendWebhook } = await import("../alerts/webhook-sender.js");
     const { checkAlerts } = await import("../alerts/alert-checker.js");
 
@@ -231,9 +228,8 @@ describe("Alert Checker", () => {
   });
 
   it("should handle both webhook and email delivery", async () => {
-    const { loadAlerts, appendAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, appendAlertHistory } =
+      await import("../alerts/alert-manager.js");
     const { sendWebhook } = await import("../alerts/webhook-sender.js");
     const { sendAlertEmail } = await import("../alerts/email-sender.js");
     const { checkAlerts } = await import("../alerts/alert-checker.js");

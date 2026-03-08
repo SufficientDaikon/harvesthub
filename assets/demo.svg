@@ -1,0 +1,279 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" width="800" height="520">
+  <title>HarvestHub CLI Demo — showing scrape, status, and export commands</title>
+  <defs>
+    <style>
+      /* Terminal chrome */
+      .term-bg { fill: #0D1117; rx: 10; }
+      .title-bar { fill: #161B22; }
+      .dot-r { fill: #FF5F56; }
+      .dot-y { fill: #FFBD2E; }
+      .dot-g { fill: #27C93F; }
+      .title-text { fill: #8B949E; font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 12px; text-anchor: middle; }
+
+      /* Text styles */
+      .t { font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 13px; }
+      .prompt { fill: #10B981; }
+      .cmd { fill: #E2E8F0; font-weight: 600; }
+      .flag { fill: #7DD3FC; }
+      .val { fill: #FDE68A; }
+      .txt { fill: #C9D1D9; }
+      .dim { fill: #6E7681; }
+      .success { fill: #10B981; }
+      .num { fill: #7DD3FC; }
+      .brand { fill: #10B981; font-weight: 600; }
+      .header { fill: #E2E8F0; font-weight: 600; }
+      .file { fill: #FDE68A; }
+      .conf { fill: #34D399; }
+      .product { fill: #E2E8F0; }
+      .border-c { fill: #30363D; }
+      .tbl-h { fill: #10B981; font-weight: 600; }
+      .tbl-sep { fill: #30363D; }
+
+      /* Cursor */
+      .cursor { fill: #10B981; }
+      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+      .cursor { animation: blink 1s step-end infinite; }
+
+      /* Line reveal animation — each line fades in sequentially */
+      .line { opacity: 0; }
+
+      /* === SCENE 1: harvest scrape (lines 1-13) — 0s to 6s === */
+      .l1  { animation: show 0.05s 0.3s forwards; }
+      .l2  { animation: show 0.05s 0.9s forwards; }
+      .l3  { animation: show 0.05s 1.2s forwards; }
+      .l4  { animation: show 0.05s 1.5s forwards; }
+      .l5  { animation: show 0.05s 1.9s forwards; }
+      .l6  { animation: show 0.05s 2.3s forwards; }
+      .l7  { animation: show 0.05s 2.7s forwards; }
+      .l8  { animation: show 0.05s 3.1s forwards; }
+      .l9  { animation: show 0.05s 3.5s forwards; }
+      .l10 { animation: show 0.05s 4.0s forwards; }
+      .l11 { animation: show 0.05s 4.4s forwards; }
+      .l12 { animation: show 0.05s 4.8s forwards; }
+      .l13 { animation: show 0.05s 5.2s forwards; }
+
+      /* === SCENE 2: harvest status (lines 14-22) — 6s to 10s === */
+      .l14 { animation: show 0.05s 6.0s forwards; }
+      .l15 { animation: show 0.05s 6.5s forwards; }
+      .l16 { animation: show 0.05s 6.8s forwards; }
+      .l17 { animation: show 0.05s 7.0s forwards; }
+      .l18 { animation: show 0.05s 7.3s forwards; }
+      .l19 { animation: show 0.05s 7.6s forwards; }
+      .l20 { animation: show 0.05s 7.9s forwards; }
+      .l21 { animation: show 0.05s 8.2s forwards; }
+      .l22 { animation: show 0.05s 8.5s forwards; }
+
+      /* === SCENE 3: harvest export (lines 23-27) — 9.5s to 12s === */
+      .l23 { animation: show 0.05s 9.5s forwards; }
+      .l24 { animation: show 0.05s 10.0s forwards; }
+      .l25 { animation: show 0.05s 10.4s forwards; }
+      .l26 { animation: show 0.05s 10.8s forwards; }
+      .l27 { animation: show 0.05s 11.2s forwards; }
+
+      /* Blinking cursor at end */
+      .l28 { animation: show 0.05s 11.8s forwards; }
+
+      /* Restart entire animation every 16s */
+      .scene { animation: loop 16s infinite; }
+      @keyframes loop {
+        0%, 2% { opacity: 1; }
+        95% { opacity: 1; }
+        97% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes show {
+        to { opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <!-- Terminal background -->
+  <rect class="term-bg" width="800" height="520" rx="10"/>
+
+  <!-- Title bar -->
+  <rect class="title-bar" width="800" height="36" rx="10"/>
+  <rect class="title-bar" y="10" width="800" height="26"/>
+  <circle class="dot-r" cx="20" cy="18" r="6"/>
+  <circle class="dot-y" cx="40" cy="18" r="6"/>
+  <circle class="dot-g" cx="60" cy="18" r="6"/>
+  <text class="title-text" x="400" y="22">HarvestHub — Terminal</text>
+
+  <g class="scene">
+    <!-- === SCENE 1: harvest scrape === -->
+    <g class="line l1">
+      <text class="t prompt" x="16" y="60">$</text>
+      <text class="t cmd" x="30" y="60">harvest scrape</text>
+      <text class="t flag" x="160" y="60">--urls</text>
+      <text class="t val" x="212" y="60">books.txt</text>
+    </g>
+
+    <g class="line l2">
+      <text class="t brand" x="28" y="80">🌾 HarvestHub Scraper v1.0.0</text>
+    </g>
+
+    <g class="line l3">
+      <text class="t success" x="28" y="100">✓</text>
+      <text class="t dim" x="46" y="100">Python engine ready (Scrapling + StealthyFetcher)</text>
+    </g>
+
+    <g class="line l4">
+      <text class="t success" x="28" y="118">✓</text>
+      <text class="t num" x="46" y="118">5</text>
+      <text class="t dim" x="58" y="118">URLs loaded, scraping with concurrency</text>
+      <text class="t num" x="352" y="118">3</text>
+    </g>
+
+    <g class="line l5">
+      <text class="t dim" x="28" y="142">[1/5]</text>
+      <text class="t success" x="70" y="142">✓</text>
+      <text class="t product" x="86" y="142">A Light in the Attic</text>
+      <text class="t dim" x="270" y="142">—</text>
+      <text class="t conf" x="286" y="142">JSON-LD 95%</text>
+      <text class="t dim" x="382" y="142">—</text>
+      <text class="t num" x="398" y="142">1.2s</text>
+    </g>
+
+    <g class="line l6">
+      <text class="t dim" x="28" y="160">[2/5]</text>
+      <text class="t success" x="70" y="160">✓</text>
+      <text class="t product" x="86" y="160">Tipping the Velvet</text>
+      <text class="t dim" x="262" y="160">—</text>
+      <text class="t conf" x="278" y="160">Microdata 82%</text>
+      <text class="t dim" x="390" y="160">—</text>
+      <text class="t num" x="406" y="160">0.9s</text>
+    </g>
+
+    <g class="line l7">
+      <text class="t dim" x="28" y="178">[3/5]</text>
+      <text class="t success" x="70" y="178">✓</text>
+      <text class="t product" x="86" y="178">Soumission</text>
+      <text class="t dim" x="196" y="178">—</text>
+      <text class="t conf" x="212" y="178">JSON-LD 91%</text>
+      <text class="t dim" x="310" y="178">—</text>
+      <text class="t num" x="326" y="178">1.4s</text>
+    </g>
+
+    <g class="line l8">
+      <text class="t dim" x="28" y="196">[4/5]</text>
+      <text class="t success" x="70" y="196">✓</text>
+      <text class="t product" x="86" y="196">Sharp Objects</text>
+      <text class="t dim" x="218" y="196">—</text>
+      <text class="t conf" x="234" y="196">CSS Heuristic 68%</text>
+      <text class="t dim" x="376" y="196">—</text>
+      <text class="t num" x="392" y="196">2.1s</text>
+    </g>
+
+    <g class="line l9">
+      <text class="t dim" x="28" y="214">[5/5]</text>
+      <text class="t success" x="70" y="214">✓</text>
+      <text class="t product" x="86" y="214">Sapiens</text>
+      <text class="t dim" x="168" y="214">—</text>
+      <text class="t conf" x="184" y="214">JSON-LD 97%</text>
+      <text class="t dim" x="284" y="214">—</text>
+      <text class="t num" x="300" y="214">0.8s</text>
+    </g>
+
+    <g class="line l10">
+      <text class="t header" x="28" y="240">📊 Scrape Complete</text>
+    </g>
+
+    <g class="line l11">
+      <text class="t txt" x="28" y="258">  Succeeded:</text>
+      <text class="t success" x="132" y="258">5</text>
+      <text class="t txt" x="158" y="258">Failed:</text>
+      <text class="t success" x="220" y="258">0</text>
+      <text class="t txt" x="246" y="258">Avg confidence:</text>
+      <text class="t conf" x="382" y="258">87%</text>
+    </g>
+
+    <g class="line l12">
+      <text class="t success" x="28" y="278">✓</text>
+      <text class="t txt" x="46" y="278">Exported →</text>
+      <text class="t file" x="130" y="278">data/exports/products.xlsx</text>
+      <text class="t dim" x="366" y="278">(5 products, 42 KB)</text>
+    </g>
+
+    <g class="line l13">
+      <text class="t dim" x="28" y="296">  Total time: 6.4s</text>
+    </g>
+
+    <!-- === SCENE 2: harvest status === -->
+    <g class="line l14">
+      <text class="t prompt" x="16" y="322">$</text>
+      <text class="t cmd" x="30" y="322">harvest status</text>
+    </g>
+
+    <g class="line l15">
+      <text class="t brand" x="28" y="342">🌾 HarvestHub Status</text>
+    </g>
+
+    <g class="line l16">
+      <text class="t tbl-sep" x="28" y="360">┌──────────────────┬────────────┐</text>
+    </g>
+    <g class="line l17">
+      <text class="t tbl-h" x="28" y="376">│</text>
+      <text class="t tbl-h" x="42" y="376">Property</text>
+      <text class="t tbl-h" x="186" y="376">│</text>
+      <text class="t tbl-h" x="200" y="376">Value</text>
+      <text class="t tbl-h" x="298" y="376">│</text>
+    </g>
+    <g class="line l18">
+      <text class="t tbl-sep" x="28" y="392">├──────────────────┼────────────┤</text>
+    </g>
+    <g class="line l19">
+      <text class="t dim" x="28" y="408">│</text>
+      <text class="t txt" x="42" y="408">Products stored</text>
+      <text class="t dim" x="186" y="408">│</text>
+      <text class="t num" x="200" y="408">5</text>
+      <text class="t dim" x="298" y="408">│</text>
+    </g>
+    <g class="line l20">
+      <text class="t dim" x="28" y="424">│</text>
+      <text class="t txt" x="42" y="424">Python engine</text>
+      <text class="t dim" x="186" y="424">│</text>
+      <text class="t success" x="200" y="424">● ready</text>
+      <text class="t dim" x="298" y="424">│</text>
+    </g>
+    <g class="line l21">
+      <text class="t dim" x="28" y="440">│</text>
+      <text class="t txt" x="42" y="440">Last scrape</text>
+      <text class="t dim" x="186" y="440">│</text>
+      <text class="t txt" x="200" y="440">just now</text>
+      <text class="t dim" x="298" y="440">│</text>
+    </g>
+    <g class="line l22">
+      <text class="t tbl-sep" x="28" y="456">└──────────────────┴────────────┘</text>
+    </g>
+
+    <!-- === SCENE 3: harvest export === -->
+    <g class="line l23">
+      <text class="t prompt" x="16" y="478">$</text>
+      <text class="t cmd" x="30" y="478">harvest export</text>
+      <text class="t flag" x="160" y="478">--format</text>
+      <text class="t val" x="228" y="478">xlsx</text>
+    </g>
+
+    <g class="line l24">
+      <text class="t success" x="28" y="496">✓</text>
+      <text class="t txt" x="46" y="496">Exported</text>
+      <text class="t num" x="114" y="496">5</text>
+      <text class="t txt" x="126" y="496">products to</text>
+      <text class="t file" x="222" y="496">products.xlsx</text>
+    </g>
+
+    <g class="line l25">
+      <text class="t dim" x="28" y="512">  Dark-themed headers · Auto-filters · Summary sheet · 42 KB</text>
+    </g>
+
+    <!-- Final cursor blink -->
+    <g class="line l28">
+      <text class="t prompt" x="16" y="512">  </text>
+    </g>
+  </g>
+
+  <!-- Blinking cursor (always at bottom) -->
+  <rect class="cursor" x="16" y="502" width="8" height="16" rx="1" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.72;0.73;1" dur="16s" repeatCount="indefinite"/>
+  </rect>
+</svg>

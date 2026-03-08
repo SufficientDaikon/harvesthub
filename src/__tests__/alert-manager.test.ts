@@ -34,9 +34,8 @@ describe("Alert Manager", () => {
   it("should handle empty alerts store gracefully", async () => {
     // The alert-manager uses data/store/alerts.json
     // We test the functions through the actual module
-    const { loadAlerts, loadAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, loadAlertHistory } =
+      await import("../alerts/alert-manager.js");
 
     // On first load, there should be empty arrays
     const alerts = await loadAlerts();
@@ -47,9 +46,8 @@ describe("Alert Manager", () => {
   });
 
   it("should save and load an alert", async () => {
-    const { loadAlerts, saveAlert, deleteAlert } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, saveAlert, deleteAlert } =
+      await import("../alerts/alert-manager.js");
 
     const alert = {
       id: "test-alert-1",
@@ -75,9 +73,8 @@ describe("Alert Manager", () => {
   });
 
   it("should delete an alert", async () => {
-    const { loadAlerts, saveAlert, deleteAlert } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { loadAlerts, saveAlert, deleteAlert } =
+      await import("../alerts/alert-manager.js");
 
     const alert = {
       id: "test-alert-delete",
@@ -104,9 +101,8 @@ describe("Alert Manager", () => {
   });
 
   it("should append and load alert history", async () => {
-    const { appendAlertHistory, loadAlertHistory } = await import(
-      "../alerts/alert-manager.js"
-    );
+    const { appendAlertHistory, loadAlertHistory } =
+      await import("../alerts/alert-manager.js");
 
     const entry = {
       id: "test-history-1",

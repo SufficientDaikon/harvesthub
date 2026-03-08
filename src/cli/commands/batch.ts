@@ -16,9 +16,7 @@ export const batchCommand = new Command("batch")
   .option("-t, --timeout <ms>", "Request timeout in ms", "30000")
   .action(async (file: string, opts: { retries: string; timeout: string }) => {
     const startTime = Date.now();
-    console.log(
-      chalk.bold.hex("#1A1A2E")("\n  🌾 HarvestHub Batch Import\n"),
-    );
+    console.log(chalk.bold.hex("#1A1A2E")("\n  🌾 HarvestHub Batch Import\n"));
 
     // 1. Validate engine
     const healthSpinner = ora("Checking Python engine...").start();

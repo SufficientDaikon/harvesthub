@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/SufficientDaikon/harvesthub#readme
+    about: Check the README for setup guides, CLI reference, and API documentation.
+  - name: 💬 Discussions
+    url: https://github.com/SufficientDaikon/harvesthub/discussions
+    about: Ask questions and share ideas with the community.

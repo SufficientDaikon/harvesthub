@@ -14,3 +14,5 @@ dashboard/node_modules/
 harvest.config.local.ts
 e2e/screenshots/
 e2e/test-results/
+coverage/
+playwright-report/

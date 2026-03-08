@@ -71,7 +71,10 @@ export async function deleteAlert(id: string): Promise<boolean> {
 export async function loadAlertHistory(): Promise<AlertHistoryEntry[]> {
   const store = await readAlertStore();
   return store.history
-    .sort((a, b) => new Date(b.triggeredAt).getTime() - new Date(a.triggeredAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.triggeredAt).getTime() - new Date(a.triggeredAt).getTime(),
+    )
     .slice(0, 100);
 }
 
@@ -83,7 +86,10 @@ export async function appendAlertHistory(
   // Keep max 500 history entries
   if (store.history.length > 500) {
     store.history = store.history
-      .sort((a, b) => new Date(b.triggeredAt).getTime() - new Date(a.triggeredAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.triggeredAt).getTime() - new Date(a.triggeredAt).getTime(),
+      )
       .slice(0, 500);
   }
   await writeAlertStore(store);

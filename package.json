@@ -3,22 +3,55 @@
   "version": "1.0.0",
   "description": "Adaptive product scraping platform with premium dashboard and exports",
   "type": "module",
-  "main": "dist/cli/index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "license": "MIT",
   "bin": {
-    "harvest": "dist/cli/index.js"
+    "harvest": "./dist/src/cli/index.js",
+    "harvesthub": "./dist/src/cli/index.js"
+  },
+  "files": [
+    "dist/",
+    "engine/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "scraper",
+    "web-scraping",
+    "e-commerce",
+    "price-tracking",
+    "product-data",
+    "price-monitoring",
+    "xlsx-export",
+    "anti-bot",
+    "scrapling"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SufficientDaikon/harvesthub"
+  },
+  "homepage": "https://sufficientdaikon.github.io/harvesthub/",
+  "bugs": {
+    "url": "https://github.com/SufficientDaikon/harvesthub/issues"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/cli/index.ts",
-    "start": "node dist/cli/index.js",
+    "start": "node dist/src/cli/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lint": "tsc --noEmit",
     "harvest": "tsx src/cli/index.ts",
     "dashboard": "cd dashboard && npm run dev",
     "setup": "npm install && pip install -r engine/requirements.txt",
-    "migrate": "tsx scripts/migrate-legacy.ts"
+    "migrate": "tsx scripts/migrate-legacy.ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "dependencies": {
     "chalk": "^5.3.0",
@@ -47,6 +80,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/ws": "^8.5.10",
+    "@vitest/coverage-v8": "^1.6.1",
     "tsx": "^4.7.0",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"

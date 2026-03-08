@@ -22,9 +22,7 @@ describe("Batch URL Processing", () => {
       expect(result.valid).toHaveLength(3);
       expect(result.invalid).toHaveLength(1);
       expect(result.duplicatesRemoved).toBe(1);
-      expect(result.invalid[0]?.reason).toBe(
-        "Malformed URL — could not parse",
-      );
+      expect(result.invalid[0]?.reason).toBe("Malformed URL — could not parse");
     });
 
     it("should return empty valid array for all invalid URLs", () => {

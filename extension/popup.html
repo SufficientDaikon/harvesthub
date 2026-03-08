@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HarvestHub Scraper</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 360px;
+        min-height: 200px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #0d1117;
+        color: #e6edf3;
+        padding: 16px;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #21262d;
+      }
+      .header-icon {
+        width: 28px;
+        height: 28px;
+        background: #10b981;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: #0d1117;
+      }
+      .header h1 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #e6edf3;
+      }
+      .header small {
+        font-size: 11px;
+        color: #7d8590;
+        display: block;
+      }
+
+      /* URL display */
+      .url-bar {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        font-size: 12px;
+        color: #7d8590;
+        word-break: break-all;
+        line-height: 1.4;
+        max-height: 52px;
+        overflow: hidden;
+      }
+
+      /* Scrape button */
+      .btn-scrape {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #10b981;
+        color: #0d1117;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn-scrape:hover {
+        background: #34d399;
+      }
+      .btn-scrape:disabled {
+        background: #21262d;
+        color: #7d8590;
+        cursor: not-allowed;
+      }
+
+      /* Spinner */
+      .spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #0d1117;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+      .spinner.active {
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Results */
+      .results {
+        display: none;
+        margin-top: 14px;
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .results.visible {
+        display: block;
+      }
+
+      .result-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #21262d;
+        font-size: 13px;
+      }
+      .result-row:last-child {
+        border-bottom: none;
+      }
+      .result-label {
+        color: #7d8590;
+      }
+      .result-value {
+        color: #e6edf3;
+        font-weight: 500;
+        text-align: right;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .result-value.price {
+        color: #10b981;
+        font-size: 16px;
+      }
+      .result-value.confidence {
+        color: #f59e0b;
+      }
+
+      /* Save button */
+      .btn-save {
+        width: 100%;
+        margin-top: 12px;
+        padding: 8px;
+        border: 1px solid #10b981;
+        border-radius: 8px;
+        background: transparent;
+        color: #10b981;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-save:hover {
+        background: #10b981;
+        color: #0d1117;
+      }
+
+      /* Action buttons row */
+      .btn-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .btn-action {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        background: transparent;
+        color: #7d8590;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-decoration: none;
+        text-align: center;
+      }
+      .btn-action:hover {
+        border-color: #7d8590;
+        color: #e6edf3;
+      }
+
+      /* Image thumbnail */
+      .result-thumb {
+        display: none;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .result-thumb.visible {
+        display: block;
+      }
+      .result-thumb img {
+        max-width: 100%;
+        max-height: 120px;
+        border-radius: 6px;
+        border: 1px solid #21262d;
+        object-fit: contain;
+      }
+
+      /* Error */
+      .error {
+        display: none;
+        margin-top: 14px;
+        background: #3d1f28;
+        border: 1px solid #f85149;
+        border-radius: 8px;
+        padding: 12px;
+        color: #f85149;
+        font-size: 13px;
+      }
+      .error.visible {
+        display: block;
+      }
+
+      /* Status message */
+      .status {
+        display: none;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 12px;
+        color: #10b981;
+      }
+      .status.visible {
+        display: block;
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 14px;
+        text-align: center;
+        font-size: 11px;
+        color: #484f58;
+      }
+      .footer a {
+        color: #7d8590;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        color: #e6edf3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-icon">H</div>
+      <div>
+        <h1>HarvestHub</h1>
+        <small>Product Data Extraction</small>
+      </div>
+    </div>
+
+    <div class="url-bar" id="current-url">Loading...</div>
+
+    <button class="btn-scrape" id="btn-scrape">
+      <span class="spinner" id="spinner"></span>
+      <span id="btn-text">🌾 Scrape This Page</span>
+    </button>
+
+    <div class="results" id="results">
+      <div class="result-thumb" id="res-thumb">
+        <img id="res-thumb-img" src="" alt="Product image" />
+      </div>
+      <div class="result-row">
+        <span class="result-label">Title</span>
+        <span class="result-value" id="res-title">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Price</span>
+        <span class="result-value price" id="res-price">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Availability</span>
+        <span class="result-value" id="res-availability">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Confidence</span>
+        <span class="result-value confidence" id="res-confidence">—</span>
+      </div>
+      <button class="btn-save" id="btn-save">💾 Save to HarvestHub</button>
+      <div class="btn-actions">
+        <button class="btn-action" id="btn-copy-json">📋 Copy JSON</button>
+        <a class="btn-action" id="btn-dashboard" href="#" target="_blank">📊 View in Dashboard</a>
+      </div>
+    </div>
+
+    <div class="error" id="error"></div>
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      <a href="options.html" target="_blank">⚙️ Settings</a>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
