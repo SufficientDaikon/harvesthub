@@ -328,6 +328,19 @@
         width: 16px;
         height: 16px;
       }
+      .nav-active {
+        color: var(--emerald) !important;
+      }
+      .nav-lang {
+        font-size: 0.75rem !important;
+        padding: 4px 14px !important;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .nav-lang:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+      }
 
       /* Mobile nav */
       .nav-toggle {
@@ -1264,7 +1277,7 @@
         display: flex;
         align-items: center;
         padding: 12px 18px;
-        background: #1a1a2e;
+        background: #1e293b;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         gap: 10px;
       }
@@ -1304,14 +1317,14 @@
       }
 
       .dashboard-mockup {
-        background: #0f0f23;
+        background: #0f172a;
         display: flex;
         min-height: 520px;
       }
       /* Sidebar mockup */
       .mock-sidebar {
         width: 220px;
-        background: #16213e;
+        background: #1a2539;
         border-left: 1px solid rgba(255, 255, 255, 0.06);
         padding: 20px 0;
         flex-shrink: 0;
@@ -1338,8 +1351,8 @@
         border-radius: 8px;
       }
       .mock-nav-item.active {
-        background: rgba(233, 69, 96, 0.12);
-        color: #e94560;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
       }
       /* Main content mockup */
       .mock-main {
@@ -1355,7 +1368,7 @@
       }
       .mock-stat {
         padding: 16px;
-        background: #16213e;
+        background: #1a2539;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 10px;
       }
@@ -1373,18 +1386,18 @@
         font-variant-numeric: tabular-nums;
       }
       .mock-stat-value.green {
-        color: #00d68f;
+        color: #10b981;
       }
       .mock-stat-value.red {
-        color: #e94560;
+        color: #ef4444;
       }
       .mock-stat-value.yellow {
-        color: #ffaa00;
+        color: #f59e0b;
       }
 
       .mock-table {
         width: 100%;
-        background: #16213e;
+        background: #1a2539;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         overflow: hidden;
@@ -2059,36 +2072,19 @@
           <span></span><span></span><span></span>
         </button>
         <ul class="nav-links" id="navLinks" role="menubar">
+          <li role="none"><a href="#hero" role="menuitem" class="nav-active">الرئيسية</a></li>
+          <li role="none"><a href="docs-ar.html" role="menuitem">التوثيق</a></li>
+          <li role="none"><a href="index-ar.html" role="menuitem">لوحة التحكم</a></li>
           <li role="none"><a href="#features" role="menuitem">المميزات</a></li>
-          <li role="none">
-            <a href="#how-it-works" role="menuitem">آلية العمل</a>
-          </li>
+          <li role="none"><a href="#how-it-works" role="menuitem">آلية العمل</a></li>
           <li role="none"><a href="#exports" role="menuitem">التصدير</a></li>
           <li role="none">
-            <a href="#dashboard" role="menuitem">لوحة التحكم</a>
-          </li>
-          <li role="none"><a href="#tech" role="menuitem">التقنيات</a></li>
-          <li role="none">
-            <a href="marketing.html" role="menuitem" class="lang-switch"
-              >🌐 EN</a
-            >
-          </li>
-          <li role="none">
-            <a
-              href="https://github.com/SufficientDaikon/harvesthub"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="nav-cta"
-              role="menuitem"
-            >
-              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-                />
-              </svg>
+            <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" rel="noopener noreferrer" class="nav-cta" role="menuitem">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
               نجمة على GitHub
             </a>
           </li>
+          <li role="none"><a href="marketing.html" role="menuitem" class="nav-lang">🌐 EN</a></li>
         </ul>
       </div>
     </nav>
@@ -3021,63 +3017,18 @@
           <div class="footer-col">
             <h4>المنتج</h4>
             <ul>
-              <li><a href="#features">المميزات</a></li>
-              <li><a href="#exports">التصدير</a></li>
-              <li><a href="#dashboard">لوحة التحكم</a></li>
-              <li><a href="#quickstart">البداية السريعة</a></li>
+              <li><a href="marketing-ar.html">الرئيسية</a></li>
+              <li><a href="docs-ar.html">التوثيق</a></li>
+              <li><a href="index-ar.html">لوحة التحكم</a></li>
+              <li><a href="/api-docs" target="_blank">API Docs</a></li>
             </ul>
           </div>
           <div class="footer-col">
             <h4>الموارد</h4>
             <ul>
-              <li><a href="docs-ar.html">التوثيق</a></li>
-              <li><a href="index-ar.html">لوحة التحكم المباشرة</a></li>
-              <li>
-                <a
-                  href="https://github.com/SufficientDaikon/harvesthub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >GitHub</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >رخصة MIT</a
-                >
-              </li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>التقنيات</h4>
-            <ul>
-              <li><a href="#tech">حزمة التقنيات</a></li>
-              <li>
-                <a
-                  href="https://github.com/nichochar/scrapling"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Scrapling</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://vitest.dev"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Vitest</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://www.typescriptlang.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >TypeScript</a
-                >
-              </li>
+              <li><a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li><a href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">رخصة MIT</a></li>
+              <li><a href="marketing.html">English</a></li>
             </ul>
           </div>
         </div>

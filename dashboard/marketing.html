@@ -328,6 +328,19 @@
         width: 16px;
         height: 16px;
       }
+      .nav-active {
+        color: var(--emerald) !important;
+      }
+      .nav-lang {
+        font-size: 0.75rem !important;
+        padding: 4px 14px !important;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .nav-lang:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+      }
 
       /* Mobile nav */
       .nav-toggle {
@@ -1263,7 +1276,7 @@
         display: flex;
         align-items: center;
         padding: 12px 18px;
-        background: #1a1a2e;
+        background: #1e293b;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         gap: 10px;
       }
@@ -1303,14 +1316,14 @@
       }
 
       .dashboard-mockup {
-        background: #0f0f23;
+        background: #0f172a;
         display: flex;
         min-height: 520px;
       }
       /* Sidebar mockup */
       .mock-sidebar {
         width: 220px;
-        background: #16213e;
+        background: #1a2539;
         border-right: 1px solid rgba(255, 255, 255, 0.06);
         padding: 20px 0;
         flex-shrink: 0;
@@ -1337,8 +1350,8 @@
         border-radius: 8px;
       }
       .mock-nav-item.active {
-        background: rgba(233, 69, 96, 0.12);
-        color: #e94560;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
       }
       /* Main content mockup */
       .mock-main {
@@ -1354,7 +1367,7 @@
       }
       .mock-stat {
         padding: 16px;
-        background: #16213e;
+        background: #1a2539;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 10px;
       }
@@ -1372,18 +1385,18 @@
         font-variant-numeric: tabular-nums;
       }
       .mock-stat-value.green {
-        color: #00d68f;
+        color: #10b981;
       }
       .mock-stat-value.red {
-        color: #e94560;
+        color: #ef4444;
       }
       .mock-stat-value.yellow {
-        color: #ffaa00;
+        color: #f59e0b;
       }
 
       .mock-table {
         width: 100%;
-        background: #16213e;
+        background: #1a2539;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         overflow: hidden;
@@ -1956,62 +1969,29 @@
     <!-- ============================================================
          NAVIGATION
          ============================================================ -->
-    <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+        <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
       <div class="nav-inner">
         <a href="#hero" class="nav-brand" aria-label="HarvestHub Home">
           <span class="nav-brand-icon" aria-hidden="true">🌾</span>
           <span>HarvestHub</span>
         </a>
-        <button
-          class="nav-toggle"
-          id="navToggle"
-          aria-label="Toggle navigation menu"
-          aria-expanded="false"
-        >
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
         <ul class="nav-links" id="navLinks" role="menubar">
+          <li role="none"><a href="#hero" role="menuitem" class="nav-active">Home</a></li>
+          <li role="none"><a href="docs.html" role="menuitem">Docs</a></li>
+          <li role="none"><a href="index.html" role="menuitem">Dashboard</a></li>
           <li role="none"><a href="#features" role="menuitem">Features</a></li>
-          <li role="none">
-            <a href="#how-it-works" role="menuitem">How It Works</a>
-          </li>
+          <li role="none"><a href="#how-it-works" role="menuitem">How It Works</a></li>
           <li role="none"><a href="#exports" role="menuitem">Exports</a></li>
           <li role="none">
-            <a href="#dashboard" role="menuitem">Dashboard</a>
-          </li>
-          <li role="none"><a href="#tech" role="menuitem">Tech Stack</a></li>
-          <li role="none">
-            <a
-              href="https://github.com/SufficientDaikon/harvesthub"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="nav-cta"
-              role="menuitem"
-            >
-              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-                />
-              </svg>
+            <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" rel="noopener noreferrer" class="nav-cta" role="menuitem">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
               Star on GitHub
             </a>
           </li>
-          <li role="none">
-            <a
-              href="marketing-ar.html"
-              role="menuitem"
-              style="
-                font-size: 12px;
-                padding: 4px 12px;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 20px;
-                text-decoration: none;
-                color: inherit;
-                transition: background 0.2s;
-              "
-              >🌐 عربي</a
-            >
-          </li>
+          <li role="none"><a href="marketing-ar.html" role="menuitem" class="nav-lang">🌐 عربي</a></li>
         </ul>
       </div>
     </nav>
@@ -2940,93 +2920,34 @@
     <!-- ============================================================
          FOOTER
          ============================================================ -->
-    <footer class="footer" role="contentinfo">
+        <footer class="footer" role="contentinfo">
       <div class="container">
         <div class="footer-inner">
           <div class="footer-brand">
             <h3><span aria-hidden="true">🌾</span> HarvestHub</h3>
-            <p>
-              Open-source adaptive web scraping platform. Extract product data
-              from any e-commerce site with confidence scoring, premium exports,
-              and a real-time dashboard.
-            </p>
+            <p>Open-source adaptive web scraping platform. Extract product data from any e-commerce site with confidence scoring, premium exports, and a real-time dashboard.</p>
           </div>
           <div class="footer-col">
             <h4>Product</h4>
             <ul>
-              <li><a href="#features">Features</a></li>
-              <li><a href="#exports">Exports</a></li>
-              <li><a href="#dashboard">Dashboard</a></li>
-              <li><a href="#quickstart">Quick Start</a></li>
+              <li><a href="marketing.html">Home</a></li>
+              <li><a href="docs.html">Documentation</a></li>
+              <li><a href="index.html">Dashboard</a></li>
+              <li><a href="/api-docs" target="_blank">API Docs</a></li>
             </ul>
           </div>
           <div class="footer-col">
             <h4>Resources</h4>
             <ul>
-              <li><a href="docs.html">Documentation</a></li>
-              <li><a href="index.html">Live Dashboard</a></li>
-              <li>
-                <a
-                  href="https://github.com/SufficientDaikon/harvesthub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >GitHub</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >MIT License</a
-                >
-              </li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>Tech</h4>
-            <ul>
-              <li><a href="#tech">Tech Stack</a></li>
-              <li>
-                <a
-                  href="https://github.com/nichochar/scrapling"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Scrapling</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://vitest.dev"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Vitest</a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://www.typescriptlang.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >TypeScript</a
-                >
-              </li>
+              <li><a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li><a href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></li>
+              <li><a href="marketing-ar.html">العربية</a></li>
             </ul>
           </div>
         </div>
         <div class="footer-bottom">
-          <span
-            >&copy; 2025 HarvestHub. Made with ❤️ and way too much coffee.</span
-          >
-          <span
-            >Open source under the
-            <a
-              href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              >MIT License</a
-            ></span
-          >
+          <span>&copy; 2025 HarvestHub. Made with ❤️ and way too much coffee.</span>
+          <span>Open source under the <a href="https://github.com/SufficientDaikon/harvesthub/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></span>
         </div>
       </div>
     </footer>

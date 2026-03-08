@@ -4,21 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HarvestHub — لوحة تحكم ذكاء المنتجات</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
       :root {
-        --bg-primary: #0f0f23;
-        --bg-secondary: #1a1a2e;
-        --bg-card: #16213e;
-        --bg-card-hover: #1a2744;
-        --accent: #e94560;
-        --accent-soft: rgba(233, 69, 96, 0.15);
-        --text-primary: #eee;
-        --text-secondary: #8892b0;
-        --text-muted: #5a6480;
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-card: #1a2539;
+        --bg-card-hover: #243044;
+        --accent: #10b981;
+        --accent-soft: rgba(16, 185, 129, 0.15);
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
         --border: rgba(255, 255, 255, 0.06);
-        --success: #00d68f;
+        --success: #10b981;
         --warning: #ffaa00;
-        --danger: #ff3d71;
+        --danger: #ef4444;
         --radius: 12px;
         --radius-sm: 8px;
         --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
@@ -29,9 +36,9 @@
         --bg-secondary: #ffffff;
         --bg-card: #ffffff;
         --bg-card-hover: #f0f2f5;
-        --accent: #e94560;
-        --accent-soft: rgba(233, 69, 96, 0.1);
-        --text-primary: #1a1a2e;
+        --accent: #10b981;
+        --accent-soft: rgba(16, 185, 129, 0.1);
+        --text-primary: #283548;
         --text-secondary: #4a5568;
         --text-muted: #9aa5b4;
         --border: rgba(0, 0, 0, 0.08);
@@ -60,7 +67,6 @@
         overflow-x: hidden;
         direction: rtl;
       }
-      @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
 
       /* Scrollbar */
       ::-webkit-scrollbar {
@@ -88,15 +94,17 @@
         display: flex;
         flex-direction: column;
         position: fixed;
-        top: 0;
+        top: 40px;
         right: 0;
         bottom: 0;
         z-index: 100;
+        height: calc(100vh - 40px);
       }
       .main {
         flex: 1;
         margin-right: 260px;
         padding: 32px;
+        margin-top: 40px;
       }
 
       /* Logo */
@@ -476,10 +484,12 @@
       @media (max-width: 768px) {
         .sidebar {
           display: none;
+          height: calc(100vh - 40px);
         }
         .main {
           margin-right: 0;
           padding: 16px;
+          margin-top: 40px;
         }
         .stats-grid {
           grid-template-columns: repeat(2, 1fr);
@@ -542,9 +552,83 @@
       select:hover {
         border-color: rgba(255, 255, 255, 0.15);
       }
+      /* Site-wide top bar */
+      .hh-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        height: 40px;
+        background: rgba(10, 15, 30, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+      }
+      .hh-topbar-inner {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .hh-topbar-brand {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hh-topbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .hh-topbar-nav a {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .hh-topbar-nav a:hover {
+        color: var(--text-primary);
+      }
+      .hh-topbar-active {
+        color: var(--accent) !important;
+      }
+      .hh-topbar-lang {
+        padding: 2px 10px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        font-size: 11px !important;
+      }
     </style>
   </head>
   <body>
+    <header class="hh-topbar">
+      <div class="hh-topbar-inner">
+        <a href="marketing-ar.html" class="hh-topbar-brand">🌾 HarvestHub</a>
+        <nav class="hh-topbar-nav">
+          <a href="marketing-ar.html">الرئيسية</a>
+          <a href="docs-ar.html">التوثيق</a>
+          <a href="index-ar.html" class="hh-topbar-active">لوحة التحكم</a>
+          <a
+            href="https://github.com/SufficientDaikon/harvesthub"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub</a
+          >
+          <a href="index.html" class="hh-topbar-lang">🌐 EN</a>
+        </nav>
+      </div>
+    </header>
+
     <div class="app">
       <!-- Sidebar -->
       <aside class="sidebar">
@@ -621,23 +705,89 @@
             </svg>
             الجدولة
           </button>
-          <a href="docs-ar.html" class="nav-item" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
-            <span style="font-size:16px">📄</span>
+          <a
+            href="docs-ar.html"
+            class="nav-item"
+            style="
+              text-decoration: none;
+              color: inherit;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 12px;
+              border-radius: var(--radius-sm);
+              cursor: pointer;
+              font-size: 13px;
+              transition: var(--transition);
+            "
+          >
+            <span style="font-size: 16px">📄</span>
             التوثيق
           </a>
-          <a href="marketing-ar.html" class="nav-item" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
-            <span style="font-size:16px">🚀</span>
+          <a
+            href="marketing-ar.html"
+            class="nav-item"
+            style="
+              text-decoration: none;
+              color: inherit;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 12px;
+              border-radius: var(--radius-sm);
+              cursor: pointer;
+              font-size: 13px;
+              transition: var(--transition);
+            "
+          >
+            <span style="font-size: 16px">🚀</span>
             التسويق
           </a>
         </nav>
 
-        <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" class="nav-item" style="margin-top:auto;text-decoration:none;color:var(--text-secondary);display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <a
+          href="https://github.com/SufficientDaikon/harvesthub"
+          target="_blank"
+          class="nav-item"
+          style="
+            margin-top: auto;
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+          "
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            />
+          </svg>
           GitHub
         </a>
 
-        <a href="index.html" class="nav-item" style="text-decoration:none;color:var(--text-secondary);display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
-          <span style="font-size:16px">🌐</span>
+        <a
+          href="index.html"
+          class="nav-item"
+          style="
+            text-decoration: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+          "
+        >
+          <span style="font-size: 16px">🌐</span>
           EN
         </a>
 
@@ -649,9 +799,23 @@
         <button
           id="themeToggle"
           onclick="toggleTheme()"
-          style="margin-top:12px;width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-secondary);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:var(--transition)"
-          onmouseover="this.style.background='var(--bg-card-hover)'"
-          onmouseout="this.style.background='var(--bg-card)'"
+          style="
+            margin-top: 12px;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+          "
+          onmouseover="this.style.background = 'var(--bg-card-hover)'"
+          onmouseout="this.style.background = 'var(--bg-card)'"
         >
           <span id="themeIcon">☀️</span>
           <span id="themeLabel">الوضع الفاتح</span>
@@ -659,8 +823,27 @@
       </aside>
 
       <!-- Main Content -->
-      <main class="main" style="position:relative">
-        <div id="demoBadge" style="display:none;position:fixed;top:12px;left:20px;background:linear-gradient(135deg,#e94560,#d4a853);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;z-index:1000;letter-spacing:0.5px;box-shadow:0 2px 12px rgba(233,69,96,0.3)">⚡ وضع تجريبي</div>
+      <main class="main" style="position: relative">
+        <div
+          id="demoBadge"
+          style="
+            display: none;
+            position: fixed;
+            top: 52px;
+            left: 20px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            z-index: 1000;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+          "
+        >
+          ⚡ وضع تجريبي
+        </div>
         <!-- Dashboard Page -->
         <div id="page-dashboard">
           <div class="page-header">
@@ -797,9 +980,7 @@
           <div class="page-header">
             <div>
               <h2 class="page-title">مركز التصدير</h2>
-              <p class="page-subtitle">
-                صدّر بياناتك بأي تنسيق تريده
-              </p>
+              <p class="page-subtitle">صدّر بياناتك بأي تنسيق تريده</p>
             </div>
           </div>
 
@@ -811,9 +992,7 @@
             >
               <div class="stat-label">📊 Excel</div>
               <div class="stat-value" style="font-size: 20px">XLSX</div>
-              <div class="stat-change">
-                تنسيق احترافي مع ملخص وتصفية وروابط
-              </div>
+              <div class="stat-change">تنسيق احترافي مع ملخص وتصفية وروابط</div>
             </div>
             <div
               class="stat-card"
@@ -822,9 +1001,7 @@
             >
               <div class="stat-label">📋 جداول</div>
               <div class="stat-value" style="font-size: 20px">CSV</div>
-              <div class="stat-change">
-                ترميز UTF-8 مع BOM لتوافق Excel
-              </div>
+              <div class="stat-change">ترميز UTF-8 مع BOM لتوافق Excel</div>
             </div>
             <div
               class="stat-card"
@@ -842,7 +1019,9 @@
             >
               <div class="stat-label">🛒 Google Merchant</div>
               <div class="stat-value" style="font-size: 20px">GMC Feed</div>
-              <div class="stat-change">خلاصة متوافقة مع Google Merchant Center</div>
+              <div class="stat-change">
+                خلاصة متوافقة مع Google Merchant Center
+              </div>
             </div>
           </div>
 
@@ -854,7 +1033,8 @@
               id="exportLog"
               style="padding: 20px; color: var(--text-muted); font-size: 13px"
             >
-              انقر على أي تنسيق أعلاه للتحميل. يشمل التصدير جميع المنتجات المخزنة.
+              انقر على أي تنسيق أعلاه للتحميل. يشمل التصدير جميع المنتجات
+              المخزنة.
             </div>
           </div>
         </div>
@@ -864,31 +1044,85 @@
           <div class="page-header">
             <div>
               <h2 class="page-title">البث المباشر للاستخراج</h2>
-              <p class="page-subtitle" id="liveSubtitle">في انتظار أحداث الاستخراج...</p>
+              <p class="page-subtitle" id="liveSubtitle">
+                في انتظار أحداث الاستخراج...
+              </p>
             </div>
             <div class="filters">
-              <span id="wsStatus" style="font-size:12px;padding:6px 12px;border-radius:20px;background:var(--bg-card);color:var(--text-muted)">● غير متصل</span>
-              <button class="btn btn-primary" onclick="clearLiveFeed()">مسح</button>
+              <span
+                id="wsStatus"
+                style="
+                  font-size: 12px;
+                  padding: 6px 12px;
+                  border-radius: 20px;
+                  background: var(--bg-card);
+                  color: var(--text-muted);
+                "
+                >● غير متصل</span
+              >
+              <button class="btn btn-primary" onclick="clearLiveFeed()">
+                مسح
+              </button>
             </div>
           </div>
 
           <!-- Progress bar -->
-          <div id="liveProgressWrap" style="display:none;margin-bottom:20px">
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:8px">
+          <div id="liveProgressWrap" style="display: none; margin-bottom: 20px">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                color: var(--text-secondary);
+                margin-bottom: 8px;
+              "
+            >
               <span id="liveProgressLabel">جاري الاستخراج…</span>
               <span id="liveProgressPct">0%</span>
             </div>
-            <div style="background:var(--bg-card);border-radius:4px;height:6px;overflow:hidden">
-              <div id="liveProgressBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s ease;border-radius:4px"></div>
+            <div
+              style="
+                background: var(--bg-card);
+                border-radius: 4px;
+                height: 6px;
+                overflow: hidden;
+              "
+            >
+              <div
+                id="liveProgressBar"
+                style="
+                  height: 100%;
+                  background: var(--accent);
+                  width: 0%;
+                  transition: width 0.3s ease;
+                  border-radius: 4px;
+                "
+              ></div>
             </div>
           </div>
 
           <!-- Stats row -->
-          <div id="liveStatsRow" style="display:none;gap:12px;margin-bottom:20px" class="stats-grid">
-            <div class="stat-card"><div class="stat-label">تمت المعالجة</div><div class="stat-value" id="liveDone">0</div></div>
-            <div class="stat-card"><div class="stat-label">نجحت</div><div class="stat-value success" id="liveOk">0</div></div>
-            <div class="stat-card"><div class="stat-label">فشلت</div><div class="stat-value danger" id="liveFail">0</div></div>
-            <div class="stat-card"><div class="stat-label">تم تخطيها</div><div class="stat-value" id="liveSkip">0</div></div>
+          <div
+            id="liveStatsRow"
+            style="display: none; gap: 12px; margin-bottom: 20px"
+            class="stats-grid"
+          >
+            <div class="stat-card">
+              <div class="stat-label">تمت المعالجة</div>
+              <div class="stat-value" id="liveDone">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">نجحت</div>
+              <div class="stat-value success" id="liveOk">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">فشلت</div>
+              <div class="stat-value danger" id="liveFail">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">تم تخطيها</div>
+              <div class="stat-value" id="liveSkip">0</div>
+            </div>
           </div>
 
           <!-- Event log -->
@@ -896,10 +1130,31 @@
             <div class="table-header">
               <span class="table-title">سجل الأحداث</span>
             </div>
-            <div id="liveFeedLog" style="padding:16px;font-family:monospace;font-size:12px;max-height:500px;overflow-y:auto;color:var(--text-secondary)">
-              <div style="color:var(--text-muted);text-align:center;padding:40px 0">
-                ابدأ مهمة استخراج من سطر الأوامر لمشاهدة التحديثات المباشرة هنا.<br>
-                <code style="color:var(--accent);margin-top:8px;display:block" dir="ltr">npx tsx src/cli/index.ts scrape --urls test-urls.txt</code>
+            <div
+              id="liveFeedLog"
+              style="
+                padding: 16px;
+                font-family: monospace;
+                font-size: 12px;
+                max-height: 500px;
+                overflow-y: auto;
+                color: var(--text-secondary);
+              "
+            >
+              <div
+                style="
+                  color: var(--text-muted);
+                  text-align: center;
+                  padding: 40px 0;
+                "
+              >
+                ابدأ مهمة استخراج من سطر الأوامر لمشاهدة التحديثات المباشرة
+                هنا.<br />
+                <code
+                  style="color: var(--accent); margin-top: 8px; display: block"
+                  dir="ltr"
+                  >npx tsx src/cli/index.ts scrape --urls test-urls.txt</code
+                >
               </div>
             </div>
           </div>
@@ -913,32 +1168,148 @@
               <p class="page-subtitle">أتمتة الاستخراج باستخدام مهام cron</p>
             </div>
             <div class="filters">
-              <button class="btn btn-primary" onclick="showNewScheduleForm()">+ جدولة جديدة</button>
+              <button class="btn btn-primary" onclick="showNewScheduleForm()">
+                + جدولة جديدة
+              </button>
             </div>
           </div>
 
           <!-- New schedule form (hidden by default) -->
-          <div id="newScheduleForm" style="display:none;margin-bottom:24px" class="table-card">
-            <div class="table-header"><span class="table-title">جدولة جديدة</span></div>
-            <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div
+            id="newScheduleForm"
+            style="display: none; margin-bottom: 24px"
+            class="table-card"
+          >
+            <div class="table-header">
+              <span class="table-title">جدولة جديدة</span>
+            </div>
+            <div
+              style="
+                padding: 20px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+              "
+            >
               <div>
-                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">الاسم</label>
-                <input id="sName" type="text" placeholder="استخراج الكتب يومياً" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+                <label
+                  style="
+                    font-size: 12px;
+                    color: var(--text-secondary);
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >الاسم</label
+                >
+                <input
+                  id="sName"
+                  type="text"
+                  placeholder="استخراج الكتب يومياً"
+                  style="
+                    width: 100%;
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    padding: 8px 12px;
+                    color: var(--text-primary);
+                    font-size: 13px;
+                  "
+                />
               </div>
               <div>
-                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">تعبير Cron</label>
-                <input id="sCron" type="text" placeholder="0 9 * * *  (يومياً الساعة 9 صباحاً)" dir="ltr" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+                <label
+                  style="
+                    font-size: 12px;
+                    color: var(--text-secondary);
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >تعبير Cron</label
+                >
+                <input
+                  id="sCron"
+                  type="text"
+                  placeholder="0 9 * * *  (يومياً الساعة 9 صباحاً)"
+                  dir="ltr"
+                  style="
+                    width: 100%;
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    padding: 8px 12px;
+                    color: var(--text-primary);
+                    font-size: 13px;
+                  "
+                />
               </div>
-              <div style="grid-column:1/-1">
-                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">مصدر الروابط (مسار ملف أو روابط مفصولة بفواصل)</label>
-                <input id="sSource" type="text" placeholder="test-urls.txt  أو  https://example.com/product/1,https://..." dir="ltr" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" />
+              <div style="grid-column: 1/-1">
+                <label
+                  style="
+                    font-size: 12px;
+                    color: var(--text-secondary);
+                    display: block;
+                    margin-bottom: 6px;
+                  "
+                  >مصدر الروابط (مسار ملف أو روابط مفصولة بفواصل)</label
+                >
+                <input
+                  id="sSource"
+                  type="text"
+                  placeholder="test-urls.txt  أو  https://example.com/product/1,https://..."
+                  dir="ltr"
+                  style="
+                    width: 100%;
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    padding: 8px 12px;
+                    color: var(--text-primary);
+                    font-size: 13px;
+                  "
+                />
               </div>
-              <div style="grid-column:1/-1;display:flex;gap:12px;align-items:center">
-                <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);cursor:pointer">
-                  <input type="checkbox" id="sEnabled" checked style="accent-color:var(--accent)" /> مفعّل فوراً
+              <div
+                style="
+                  grid-column: 1/-1;
+                  display: flex;
+                  gap: 12px;
+                  align-items: center;
+                "
+              >
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 13px;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    id="sEnabled"
+                    checked
+                    style="accent-color: var(--accent)"
+                  />
+                  مفعّل فوراً
                 </label>
-                <button class="btn btn-primary" onclick="createSchedule()" style="margin-right:auto">إنشاء</button>
-                <button class="btn" onclick="document.getElementById('newScheduleForm').style.display='none'">إلغاء</button>
+                <button
+                  class="btn btn-primary"
+                  onclick="createSchedule()"
+                  style="margin-right: auto"
+                >
+                  إنشاء
+                </button>
+                <button
+                  class="btn"
+                  onclick="
+                    document.getElementById('newScheduleForm').style.display =
+                      'none'
+                  "
+                >
+                  إلغاء
+                </button>
               </div>
             </div>
           </div>
@@ -956,7 +1327,11 @@
                 </tr>
               </thead>
               <tbody id="schedulesTable">
-                <tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>
+                <tr>
+                  <td colspan="6">
+                    <div class="loading"><div class="spinner"></div></div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -987,52 +1362,714 @@
       }
 
       // ── Static / Demo Mode ────────────────────────────────────────────
-      const STATIC_MODE = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
+      const STATIC_MODE =
+        !window.location.hostname.includes("localhost") &&
+        !window.location.hostname.includes("127.0.0.1");
 
       const MOCK_PRODUCTS = [
-        { id:"p1", sourceUrl:"https://apple.com/iphone-15-pro", scrapedAt:"2026-03-07T12:00:00Z", title:"iPhone 15 Pro 256GB", price:1199.00, currency:"USD", description:"هاتف Apple iPhone 15 Pro بمعالج A17 Pro", images:["https://placehold.co/200"], availability:"in_stock", brand:"Apple", sku:"IPH15P-256", category:"إلكترونيات", rating:4.8, reviewCount:2340, overallConfidence:95, priceHistory:[{date:"2026-02-01",price:1199},{date:"2026-03-01",price:1149}] },
-        { id:"p2", sourceUrl:"https://samsung.com/galaxy-s24-ultra", scrapedAt:"2026-03-07T12:05:00Z", title:"Samsung Galaxy S24 Ultra", price:1299.99, currency:"USD", description:"هاتف Samsung Galaxy S24 Ultra سعة 512 جيجابايت", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-S928B", category:"إلكترونيات", rating:4.7, reviewCount:1890, overallConfidence:92, priceHistory:[{date:"2026-02-01",price:1319.99},{date:"2026-03-01",price:1299.99}] },
-        { id:"p3", sourceUrl:"https://sony.com/wh-1000xm5", scrapedAt:"2026-03-07T11:30:00Z", title:"Sony WH-1000XM5 سماعات لاسلكية", price:348.00, currency:"USD", description:"إلغاء ضوضاء رائد في الصناعة", images:[], availability:"in_stock", brand:"Sony", sku:"WH1000XM5B", category:"إلكترونيات", rating:4.6, reviewCount:4520, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:348}] },
-        { id:"p4", sourceUrl:"https://nike.com/air-max-90", scrapedAt:"2026-03-07T10:00:00Z", title:"Nike Air Max 90", price:130.00, currency:"USD", description:"حذاء Nike Air Max 90 الكلاسيكي", images:[], availability:"in_stock", brand:"Nike", sku:"CN8490-001", category:"ملابس", rating:4.5, reviewCount:3210, overallConfidence:85, priceHistory:[{date:"2026-02-15",price:130}] },
-        { id:"p5", sourceUrl:"https://apple.com/macbook-pro-14", scrapedAt:"2026-03-07T09:45:00Z", title:"MacBook Pro 14\" M3 Pro", price:1999.00, currency:"USD", description:"لابتوب Apple MacBook Pro 14 بوصة بمعالج M3 Pro", images:[], availability:"in_stock", brand:"Apple", sku:"MBP14-M3P", category:"إلكترونيات", rating:4.9, reviewCount:1560, overallConfidence:97, priceHistory:[{date:"2026-01-15",price:1999}] },
-        { id:"p6", sourceUrl:"https://apple.com/ipad-air", scrapedAt:"2026-03-07T09:30:00Z", title:"iPad Air M2 11 بوصة", price:599.00, currency:"USD", description:"جهاز iPad Air بمعالج M2", images:[], availability:"in_stock", brand:"Apple", sku:"IPA-M2-11", category:"إلكترونيات", rating:4.7, reviewCount:980, overallConfidence:90, priceHistory:[{date:"2026-02-01",price:649},{date:"2026-03-01",price:599}] },
-        { id:"p7", sourceUrl:"https://dyson.com/v15-detect", scrapedAt:"2026-03-06T18:00:00Z", title:"Dyson V15 Detect Absolute", price:749.99, currency:"USD", description:"مكنسة Dyson V15 اللاسلكية بتقنية الكشف بالليزر", images:[], availability:"in_stock", brand:"Dyson", sku:"DYS-V15-ABS", category:"المنزل والحديقة", rating:4.4, reviewCount:2100, overallConfidence:82, priceHistory:[{date:"2026-02-01",price:749.99}] },
-        { id:"p8", sourceUrl:"https://kitchenaid.com/stand-mixer", scrapedAt:"2026-03-06T17:30:00Z", title:"KitchenAid Artisan خلاط قائم", price:449.99, currency:"USD", description:"خلاط قائم بسعة 5 كوارت", images:[], availability:"in_stock", brand:"KitchenAid", sku:"KSM150PS", category:"المنزل والحديقة", rating:4.8, reviewCount:5600, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:479.99},{date:"2026-03-01",price:449.99}] },
-        { id:"p9", sourceUrl:"https://bose.com/qc-ultra", scrapedAt:"2026-03-06T16:00:00Z", title:"Bose QuietComfort Ultra سماعات", price:429.00, currency:"USD", description:"سماعات إلغاء ضوضاء متميزة", images:[], availability:"in_stock", brand:"Bose", sku:"BOSE-QCU", category:"إلكترونيات", rating:4.5, reviewCount:1240, overallConfidence:87, priceHistory:[{date:"2026-02-15",price:429}] },
-        { id:"p10", sourceUrl:"https://dell.com/xps-15", scrapedAt:"2026-03-06T15:00:00Z", title:"Dell XPS 15 لابتوب", price:1549.99, currency:"USD", description:"لابتوب Dell XPS 15 بمعالج Intel Core i7 وذاكرة 16 جيجابايت", images:[], availability:"in_stock", brand:"Dell", sku:"XPS9530", category:"إلكترونيات", rating:4.3, reviewCount:870, overallConfidence:84, priceHistory:[{date:"2026-01-01",price:1649.99},{date:"2026-03-01",price:1549.99}] },
-        { id:"p11", sourceUrl:"https://adidas.com/ultraboost-23", scrapedAt:"2026-03-06T14:00:00Z", title:"Adidas Ultraboost Light", price:190.00, currency:"USD", description:"حذاء Adidas Ultraboost Light للجري", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6339", category:"ملابس", rating:4.6, reviewCount:2780, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:190}] },
-        { id:"p12", sourceUrl:"https://samsung.com/65-qled", scrapedAt:"2026-03-06T13:00:00Z", title:"Samsung 65\" QLED 4K تلفاز ذكي", price:997.99, currency:"USD", description:"تلفاز Samsung QLED 4K الذكي Q80C", images:[], availability:"in_stock", brand:"Samsung", sku:"QN65Q80C", category:"إلكترونيات", rating:4.5, reviewCount:3400, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:1197.99},{date:"2026-03-01",price:997.99}] },
-        { id:"p13", sourceUrl:"https://lg.com/oled-c3", scrapedAt:"2026-03-06T12:30:00Z", title:"LG C3 55\" OLED تلفاز", price:1296.99, currency:"USD", description:"تلفاز LG OLED evo C3 بحجم 55 بوصة 4K ذكي", images:[], availability:"in_stock", brand:"LG", sku:"OLED55C3", category:"إلكترونيات", rating:4.7, reviewCount:2100, overallConfidence:93, priceHistory:[{date:"2026-01-01",price:1499.99},{date:"2026-03-01",price:1296.99}] },
-        { id:"p14", sourceUrl:"https://hp.com/spectre-x360", scrapedAt:"2026-03-06T11:00:00Z", title:"HP Spectre x360 14", price:1449.99, currency:"USD", description:"لابتوب HP Spectre x360 قابل للتحويل", images:[], availability:"out_of_stock", brand:"HP", sku:"HP-SPX360", category:"إلكترونيات", rating:4.4, reviewCount:650, overallConfidence:81, priceHistory:[{date:"2026-02-01",price:1449.99}] },
-        { id:"p15", sourceUrl:"https://nike.com/air-jordan-1", scrapedAt:"2026-03-06T10:00:00Z", title:"Air Jordan 1 Retro High OG", price:180.00, currency:"USD", description:"حذاء Air Jordan 1 Retro الكلاسيكي", images:[], availability:"out_of_stock", brand:"Nike", sku:"DZ5485-612", category:"ملابس", rating:4.8, reviewCount:8900, overallConfidence:79, priceHistory:[{date:"2026-02-01",price:180}] },
-        { id:"p16", sourceUrl:"https://sony.com/ps5", scrapedAt:"2026-03-06T09:00:00Z", title:"PlayStation 5 جهاز ألعاب", price:499.99, currency:"USD", description:"جهاز Sony PS5 نسخة القرص", images:[], availability:"in_stock", brand:"Sony", sku:"CFI-1215A", category:"إلكترونيات", rating:4.8, reviewCount:12400, overallConfidence:96, priceHistory:[{date:"2026-01-01",price:499.99}] },
-        { id:"p17", sourceUrl:"https://amazon.com/kindle-paperwhite", scrapedAt:"2026-03-05T20:00:00Z", title:"Kindle Paperwhite (2024)", price:149.99, currency:"USD", description:"قارئ Amazon Kindle Paperwhite بشاشة 6.8 بوصة", images:[], availability:"in_stock", brand:"Amazon", sku:"KPW-2024", category:"كتب", rating:4.6, reviewCount:6700, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:149.99}] },
-        { id:"p18", sourceUrl:"https://lego.com/technic-porsche", scrapedAt:"2026-03-05T18:00:00Z", title:"LEGO Technic Porsche 911 GT3 RS", price:449.99, currency:"USD", description:"مجموعة LEGO Technic 42156 بورشه 911 GT3 RS", images:[], availability:"in_stock", brand:"LEGO", sku:"42156", category:"ألعاب", rating:4.9, reviewCount:890, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:499.99},{date:"2026-03-01",price:449.99}] },
-        { id:"p19", sourceUrl:"https://dell.com/monitor-u2723qe", scrapedAt:"2026-03-05T16:00:00Z", title:"Dell UltraSharp U2723QE شاشة 27\" 4K", price:519.99, currency:"USD", description:"شاشة Dell بحجم 27 بوصة 4K مع USB-C Hub", images:[], availability:"in_stock", brand:"Dell", sku:"U2723QE", category:"إلكترونيات", rating:4.5, reviewCount:1340, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:569.99},{date:"2026-03-01",price:519.99}] },
-        { id:"p20", sourceUrl:"https://adidas.com/stan-smith", scrapedAt:"2026-03-05T14:00:00Z", title:"Adidas Stan Smith Lux", price:120.00, currency:"USD", description:"حذاء Adidas Stan Smith Lux الأنيق", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6785", category:"ملابس", rating:4.3, reviewCount:1900, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:130},{date:"2026-03-01",price:120}] },
-        { id:"p21", sourceUrl:"https://dyson.com/airwrap", scrapedAt:"2026-03-05T12:00:00Z", title:"Dyson Airwrap مصفف شعر متعدد", price:599.99, currency:"USD", description:"Dyson Airwrap Complete Long لتصفيف الشعر", images:[], availability:"out_of_stock", brand:"Dyson", sku:"DYS-AW-CL", category:"المنزل والحديقة", rating:4.3, reviewCount:3200, overallConfidence:80, priceHistory:[{date:"2026-02-01",price:599.99}] },
-        { id:"p22", sourceUrl:"https://apple.com/airpods-pro", scrapedAt:"2026-03-05T10:00:00Z", title:"AirPods Pro (الجيل الثاني) USB-C", price:249.00, currency:"USD", description:"سماعات Apple AirPods Pro بمنفذ USB-C", images:[], availability:"in_stock", brand:"Apple", sku:"MTJV3AM", category:"إلكترونيات", rating:4.7, reviewCount:7800, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:249}] },
-        { id:"p23", sourceUrl:"https://samsung.com/galaxy-watch6", scrapedAt:"2026-03-05T08:00:00Z", title:"Samsung Galaxy Watch6 Classic 47mm", price:349.99, currency:"USD", description:"ساعة Samsung Galaxy Watch6 Classic الذكية", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-R960", category:"إلكترونيات", rating:4.4, reviewCount:1450, overallConfidence:85, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:349.99}] },
-        { id:"p24", sourceUrl:"https://nike.com/dunk-low", scrapedAt:"2026-03-05T06:00:00Z", title:"Nike Dunk Low Retro", price:110.00, currency:"USD", description:"حذاء Nike Dunk Low Retro الكاجوال", images:[], availability:"out_of_stock", brand:"Nike", sku:"DD1391-100", category:"ملابس", rating:4.6, reviewCount:5400, overallConfidence:78, priceHistory:[{date:"2026-02-01",price:110}] },
-        { id:"p25", sourceUrl:"https://sonos.com/era-300", scrapedAt:"2026-03-04T22:00:00Z", title:"Sonos Era 300 مكبر صوت", price:449.00, currency:"USD", description:"مكبر صوت Sonos Era 300 بتقنية الصوت المكاني", images:[], availability:"in_stock", brand:"Sonos", sku:"E30G1US1", category:"إلكترونيات", rating:4.5, reviewCount:670, overallConfidence:87, priceHistory:[{date:"2026-02-01",price:449}] },
-        { id:"p26", sourceUrl:"https://logitech.com/mx-master-3s", scrapedAt:"2026-03-04T20:00:00Z", title:"Logitech MX Master 3S ماوس", price:99.99, currency:"USD", description:"ماوس لاسلكي متقدم للإنتاجية", images:[], availability:"in_stock", brand:"Logitech", sku:"910-006556", category:"إلكترونيات", rating:4.7, reviewCount:4300, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:99.99}] },
-        { id:"p27", sourceUrl:"https://fitbit.com/charge-6", scrapedAt:"2026-03-04T18:00:00Z", title:"Fitbit Charge 6 متتبع لياقة", price:159.95, currency:"USD", description:"متتبع صحة ولياقة بدنية متقدم", images:[], availability:"in_stock", brand:"Fitbit", sku:"FB423", category:"رياضة", rating:4.2, reviewCount:2100, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:159.95}] },
-        { id:"p28", sourceUrl:"https://weber.com/genesis-e-335", scrapedAt:"2026-03-04T16:00:00Z", title:"Weber Genesis E-335 شواية غاز", price:1149.00, currency:"USD", description:"شواية غاز بثلاث شعلات مع شعلة جانبية", images:[], availability:"out_of_stock", brand:"Weber", sku:"35410001", category:"المنزل والحديقة", rating:4.6, reviewCount:890, overallConfidence:76, priceHistory:[{date:"2026-02-01",price:1149}] },
-        { id:"p29", sourceUrl:"https://garmin.com/fenix-7", scrapedAt:"2026-03-04T14:00:00Z", title:"Garmin Fenix 7X Solar", price:799.99, currency:"USD", description:"ساعة GPS رياضية متعددة الاستخدامات", images:[], availability:"in_stock", brand:"Garmin", sku:"010-02541-01", category:"رياضة", rating:4.7, reviewCount:1670, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:849.99},{date:"2026-03-01",price:799.99}] },
-        { id:"p30", sourceUrl:"https://amazon.com/echo-dot-5", scrapedAt:"2026-03-04T12:00:00Z", title:"Amazon Echo Dot (الجيل الخامس)", price:49.99, currency:"USD", description:"مكبر صوت ذكي مع Alexa", images:[], availability:"in_stock", brand:"Amazon", sku:"B09B8V1LZ3", category:"إلكترونيات", rating:4.4, reviewCount:15200, overallConfidence:90, priceHistory:[{date:"2026-01-01",price:49.99},{date:"2026-02-14",price:29.99},{date:"2026-03-01",price:49.99}] },
-        { id:"p31", sourceUrl:"https://cricut.com/maker-3", scrapedAt:"2026-03-04T10:00:00Z", title:"Cricut Maker 3", price:399.00, currency:"USD", description:"آلة قطع ذكية متطورة", images:[], availability:"in_stock", brand:"Cricut", sku:"2008338", category:"المنزل والحديقة", rating:4.5, reviewCount:3400, overallConfidence:84, priceHistory:[{date:"2026-02-01",price:399}] },
-        { id:"p32", sourceUrl:"https://bosch.com/drill-set", scrapedAt:"2026-03-03T20:00:00Z", title:"Bosch 18V طقم مثقاب", price:3.99, currency:"USD", description:"طقم مثقاب/مفك مدمج (تصفية)", images:[], availability:"in_stock", brand:"Bosch", sku:"GSR18V-190B22", category:"سيارات", rating:4.6, reviewCount:2100, overallConfidence:72, priceHistory:[{date:"2026-02-01",price:129.99},{date:"2026-03-01",price:3.99}] },
+        {
+          id: "p1",
+          sourceUrl: "https://apple.com/iphone-15-pro",
+          scrapedAt: "2026-03-07T12:00:00Z",
+          title: "iPhone 15 Pro 256GB",
+          price: 1199.0,
+          currency: "USD",
+          description: "هاتف Apple iPhone 15 Pro بمعالج A17 Pro",
+          images: ["https://placehold.co/200"],
+          availability: "in_stock",
+          brand: "Apple",
+          sku: "IPH15P-256",
+          category: "إلكترونيات",
+          rating: 4.8,
+          reviewCount: 2340,
+          overallConfidence: 95,
+          priceHistory: [
+            { date: "2026-02-01", price: 1199 },
+            { date: "2026-03-01", price: 1149 },
+          ],
+        },
+        {
+          id: "p2",
+          sourceUrl: "https://samsung.com/galaxy-s24-ultra",
+          scrapedAt: "2026-03-07T12:05:00Z",
+          title: "Samsung Galaxy S24 Ultra",
+          price: 1299.99,
+          currency: "USD",
+          description: "هاتف Samsung Galaxy S24 Ultra سعة 512 جيجابايت",
+          images: [],
+          availability: "in_stock",
+          brand: "Samsung",
+          sku: "SM-S928B",
+          category: "إلكترونيات",
+          rating: 4.7,
+          reviewCount: 1890,
+          overallConfidence: 92,
+          priceHistory: [
+            { date: "2026-02-01", price: 1319.99 },
+            { date: "2026-03-01", price: 1299.99 },
+          ],
+        },
+        {
+          id: "p3",
+          sourceUrl: "https://sony.com/wh-1000xm5",
+          scrapedAt: "2026-03-07T11:30:00Z",
+          title: "Sony WH-1000XM5 سماعات لاسلكية",
+          price: 348.0,
+          currency: "USD",
+          description: "إلغاء ضوضاء رائد في الصناعة",
+          images: [],
+          availability: "in_stock",
+          brand: "Sony",
+          sku: "WH1000XM5B",
+          category: "إلكترونيات",
+          rating: 4.6,
+          reviewCount: 4520,
+          overallConfidence: 88,
+          priceHistory: [
+            { date: "2026-02-01", price: 399.99 },
+            { date: "2026-03-01", price: 348 },
+          ],
+        },
+        {
+          id: "p4",
+          sourceUrl: "https://nike.com/air-max-90",
+          scrapedAt: "2026-03-07T10:00:00Z",
+          title: "Nike Air Max 90",
+          price: 130.0,
+          currency: "USD",
+          description: "حذاء Nike Air Max 90 الكلاسيكي",
+          images: [],
+          availability: "in_stock",
+          brand: "Nike",
+          sku: "CN8490-001",
+          category: "ملابس",
+          rating: 4.5,
+          reviewCount: 3210,
+          overallConfidence: 85,
+          priceHistory: [{ date: "2026-02-15", price: 130 }],
+        },
+        {
+          id: "p5",
+          sourceUrl: "https://apple.com/macbook-pro-14",
+          scrapedAt: "2026-03-07T09:45:00Z",
+          title: 'MacBook Pro 14" M3 Pro',
+          price: 1999.0,
+          currency: "USD",
+          description: "لابتوب Apple MacBook Pro 14 بوصة بمعالج M3 Pro",
+          images: [],
+          availability: "in_stock",
+          brand: "Apple",
+          sku: "MBP14-M3P",
+          category: "إلكترونيات",
+          rating: 4.9,
+          reviewCount: 1560,
+          overallConfidence: 97,
+          priceHistory: [{ date: "2026-01-15", price: 1999 }],
+        },
+        {
+          id: "p6",
+          sourceUrl: "https://apple.com/ipad-air",
+          scrapedAt: "2026-03-07T09:30:00Z",
+          title: "iPad Air M2 11 بوصة",
+          price: 599.0,
+          currency: "USD",
+          description: "جهاز iPad Air بمعالج M2",
+          images: [],
+          availability: "in_stock",
+          brand: "Apple",
+          sku: "IPA-M2-11",
+          category: "إلكترونيات",
+          rating: 4.7,
+          reviewCount: 980,
+          overallConfidence: 90,
+          priceHistory: [
+            { date: "2026-02-01", price: 649 },
+            { date: "2026-03-01", price: 599 },
+          ],
+        },
+        {
+          id: "p7",
+          sourceUrl: "https://dyson.com/v15-detect",
+          scrapedAt: "2026-03-06T18:00:00Z",
+          title: "Dyson V15 Detect Absolute",
+          price: 749.99,
+          currency: "USD",
+          description: "مكنسة Dyson V15 اللاسلكية بتقنية الكشف بالليزر",
+          images: [],
+          availability: "in_stock",
+          brand: "Dyson",
+          sku: "DYS-V15-ABS",
+          category: "المنزل والحديقة",
+          rating: 4.4,
+          reviewCount: 2100,
+          overallConfidence: 82,
+          priceHistory: [{ date: "2026-02-01", price: 749.99 }],
+        },
+        {
+          id: "p8",
+          sourceUrl: "https://kitchenaid.com/stand-mixer",
+          scrapedAt: "2026-03-06T17:30:00Z",
+          title: "KitchenAid Artisan خلاط قائم",
+          price: 449.99,
+          currency: "USD",
+          description: "خلاط قائم بسعة 5 كوارت",
+          images: [],
+          availability: "in_stock",
+          brand: "KitchenAid",
+          sku: "KSM150PS",
+          category: "المنزل والحديقة",
+          rating: 4.8,
+          reviewCount: 5600,
+          overallConfidence: 91,
+          priceHistory: [
+            { date: "2026-01-01", price: 479.99 },
+            { date: "2026-03-01", price: 449.99 },
+          ],
+        },
+        {
+          id: "p9",
+          sourceUrl: "https://bose.com/qc-ultra",
+          scrapedAt: "2026-03-06T16:00:00Z",
+          title: "Bose QuietComfort Ultra سماعات",
+          price: 429.0,
+          currency: "USD",
+          description: "سماعات إلغاء ضوضاء متميزة",
+          images: [],
+          availability: "in_stock",
+          brand: "Bose",
+          sku: "BOSE-QCU",
+          category: "إلكترونيات",
+          rating: 4.5,
+          reviewCount: 1240,
+          overallConfidence: 87,
+          priceHistory: [{ date: "2026-02-15", price: 429 }],
+        },
+        {
+          id: "p10",
+          sourceUrl: "https://dell.com/xps-15",
+          scrapedAt: "2026-03-06T15:00:00Z",
+          title: "Dell XPS 15 لابتوب",
+          price: 1549.99,
+          currency: "USD",
+          description:
+            "لابتوب Dell XPS 15 بمعالج Intel Core i7 وذاكرة 16 جيجابايت",
+          images: [],
+          availability: "in_stock",
+          brand: "Dell",
+          sku: "XPS9530",
+          category: "إلكترونيات",
+          rating: 4.3,
+          reviewCount: 870,
+          overallConfidence: 84,
+          priceHistory: [
+            { date: "2026-01-01", price: 1649.99 },
+            { date: "2026-03-01", price: 1549.99 },
+          ],
+        },
+        {
+          id: "p11",
+          sourceUrl: "https://adidas.com/ultraboost-23",
+          scrapedAt: "2026-03-06T14:00:00Z",
+          title: "Adidas Ultraboost Light",
+          price: 190.0,
+          currency: "USD",
+          description: "حذاء Adidas Ultraboost Light للجري",
+          images: [],
+          availability: "in_stock",
+          brand: "Adidas",
+          sku: "HQ6339",
+          category: "ملابس",
+          rating: 4.6,
+          reviewCount: 2780,
+          overallConfidence: 86,
+          priceHistory: [{ date: "2026-02-01", price: 190 }],
+        },
+        {
+          id: "p12",
+          sourceUrl: "https://samsung.com/65-qled",
+          scrapedAt: "2026-03-06T13:00:00Z",
+          title: 'Samsung 65" QLED 4K تلفاز ذكي',
+          price: 997.99,
+          currency: "USD",
+          description: "تلفاز Samsung QLED 4K الذكي Q80C",
+          images: [],
+          availability: "in_stock",
+          brand: "Samsung",
+          sku: "QN65Q80C",
+          category: "إلكترونيات",
+          rating: 4.5,
+          reviewCount: 3400,
+          overallConfidence: 89,
+          priceHistory: [
+            { date: "2026-01-15", price: 1197.99 },
+            { date: "2026-03-01", price: 997.99 },
+          ],
+        },
+        {
+          id: "p13",
+          sourceUrl: "https://lg.com/oled-c3",
+          scrapedAt: "2026-03-06T12:30:00Z",
+          title: 'LG C3 55" OLED تلفاز',
+          price: 1296.99,
+          currency: "USD",
+          description: "تلفاز LG OLED evo C3 بحجم 55 بوصة 4K ذكي",
+          images: [],
+          availability: "in_stock",
+          brand: "LG",
+          sku: "OLED55C3",
+          category: "إلكترونيات",
+          rating: 4.7,
+          reviewCount: 2100,
+          overallConfidence: 93,
+          priceHistory: [
+            { date: "2026-01-01", price: 1499.99 },
+            { date: "2026-03-01", price: 1296.99 },
+          ],
+        },
+        {
+          id: "p14",
+          sourceUrl: "https://hp.com/spectre-x360",
+          scrapedAt: "2026-03-06T11:00:00Z",
+          title: "HP Spectre x360 14",
+          price: 1449.99,
+          currency: "USD",
+          description: "لابتوب HP Spectre x360 قابل للتحويل",
+          images: [],
+          availability: "out_of_stock",
+          brand: "HP",
+          sku: "HP-SPX360",
+          category: "إلكترونيات",
+          rating: 4.4,
+          reviewCount: 650,
+          overallConfidence: 81,
+          priceHistory: [{ date: "2026-02-01", price: 1449.99 }],
+        },
+        {
+          id: "p15",
+          sourceUrl: "https://nike.com/air-jordan-1",
+          scrapedAt: "2026-03-06T10:00:00Z",
+          title: "Air Jordan 1 Retro High OG",
+          price: 180.0,
+          currency: "USD",
+          description: "حذاء Air Jordan 1 Retro الكلاسيكي",
+          images: [],
+          availability: "out_of_stock",
+          brand: "Nike",
+          sku: "DZ5485-612",
+          category: "ملابس",
+          rating: 4.8,
+          reviewCount: 8900,
+          overallConfidence: 79,
+          priceHistory: [{ date: "2026-02-01", price: 180 }],
+        },
+        {
+          id: "p16",
+          sourceUrl: "https://sony.com/ps5",
+          scrapedAt: "2026-03-06T09:00:00Z",
+          title: "PlayStation 5 جهاز ألعاب",
+          price: 499.99,
+          currency: "USD",
+          description: "جهاز Sony PS5 نسخة القرص",
+          images: [],
+          availability: "in_stock",
+          brand: "Sony",
+          sku: "CFI-1215A",
+          category: "إلكترونيات",
+          rating: 4.8,
+          reviewCount: 12400,
+          overallConfidence: 96,
+          priceHistory: [{ date: "2026-01-01", price: 499.99 }],
+        },
+        {
+          id: "p17",
+          sourceUrl: "https://amazon.com/kindle-paperwhite",
+          scrapedAt: "2026-03-05T20:00:00Z",
+          title: "Kindle Paperwhite (2024)",
+          price: 149.99,
+          currency: "USD",
+          description: "قارئ Amazon Kindle Paperwhite بشاشة 6.8 بوصة",
+          images: [],
+          availability: "in_stock",
+          brand: "Amazon",
+          sku: "KPW-2024",
+          category: "كتب",
+          rating: 4.6,
+          reviewCount: 6700,
+          overallConfidence: 88,
+          priceHistory: [{ date: "2026-02-01", price: 149.99 }],
+        },
+        {
+          id: "p18",
+          sourceUrl: "https://lego.com/technic-porsche",
+          scrapedAt: "2026-03-05T18:00:00Z",
+          title: "LEGO Technic Porsche 911 GT3 RS",
+          price: 449.99,
+          currency: "USD",
+          description: "مجموعة LEGO Technic 42156 بورشه 911 GT3 RS",
+          images: [],
+          availability: "in_stock",
+          brand: "LEGO",
+          sku: "42156",
+          category: "ألعاب",
+          rating: 4.9,
+          reviewCount: 890,
+          overallConfidence: 94,
+          priceHistory: [
+            { date: "2026-01-15", price: 499.99 },
+            { date: "2026-03-01", price: 449.99 },
+          ],
+        },
+        {
+          id: "p19",
+          sourceUrl: "https://dell.com/monitor-u2723qe",
+          scrapedAt: "2026-03-05T16:00:00Z",
+          title: 'Dell UltraSharp U2723QE شاشة 27" 4K',
+          price: 519.99,
+          currency: "USD",
+          description: "شاشة Dell بحجم 27 بوصة 4K مع USB-C Hub",
+          images: [],
+          availability: "in_stock",
+          brand: "Dell",
+          sku: "U2723QE",
+          category: "إلكترونيات",
+          rating: 4.5,
+          reviewCount: 1340,
+          overallConfidence: 86,
+          priceHistory: [
+            { date: "2026-02-01", price: 569.99 },
+            { date: "2026-03-01", price: 519.99 },
+          ],
+        },
+        {
+          id: "p20",
+          sourceUrl: "https://adidas.com/stan-smith",
+          scrapedAt: "2026-03-05T14:00:00Z",
+          title: "Adidas Stan Smith Lux",
+          price: 120.0,
+          currency: "USD",
+          description: "حذاء Adidas Stan Smith Lux الأنيق",
+          images: [],
+          availability: "in_stock",
+          brand: "Adidas",
+          sku: "HQ6785",
+          category: "ملابس",
+          rating: 4.3,
+          reviewCount: 1900,
+          overallConfidence: 83,
+          priceHistory: [
+            { date: "2026-02-01", price: 130 },
+            { date: "2026-03-01", price: 120 },
+          ],
+        },
+        {
+          id: "p21",
+          sourceUrl: "https://dyson.com/airwrap",
+          scrapedAt: "2026-03-05T12:00:00Z",
+          title: "Dyson Airwrap مصفف شعر متعدد",
+          price: 599.99,
+          currency: "USD",
+          description: "Dyson Airwrap Complete Long لتصفيف الشعر",
+          images: [],
+          availability: "out_of_stock",
+          brand: "Dyson",
+          sku: "DYS-AW-CL",
+          category: "المنزل والحديقة",
+          rating: 4.3,
+          reviewCount: 3200,
+          overallConfidence: 80,
+          priceHistory: [{ date: "2026-02-01", price: 599.99 }],
+        },
+        {
+          id: "p22",
+          sourceUrl: "https://apple.com/airpods-pro",
+          scrapedAt: "2026-03-05T10:00:00Z",
+          title: "AirPods Pro (الجيل الثاني) USB-C",
+          price: 249.0,
+          currency: "USD",
+          description: "سماعات Apple AirPods Pro بمنفذ USB-C",
+          images: [],
+          availability: "in_stock",
+          brand: "Apple",
+          sku: "MTJV3AM",
+          category: "إلكترونيات",
+          rating: 4.7,
+          reviewCount: 7800,
+          overallConfidence: 94,
+          priceHistory: [{ date: "2026-01-15", price: 249 }],
+        },
+        {
+          id: "p23",
+          sourceUrl: "https://samsung.com/galaxy-watch6",
+          scrapedAt: "2026-03-05T08:00:00Z",
+          title: "Samsung Galaxy Watch6 Classic 47mm",
+          price: 349.99,
+          currency: "USD",
+          description: "ساعة Samsung Galaxy Watch6 Classic الذكية",
+          images: [],
+          availability: "in_stock",
+          brand: "Samsung",
+          sku: "SM-R960",
+          category: "إلكترونيات",
+          rating: 4.4,
+          reviewCount: 1450,
+          overallConfidence: 85,
+          priceHistory: [
+            { date: "2026-02-01", price: 399.99 },
+            { date: "2026-03-01", price: 349.99 },
+          ],
+        },
+        {
+          id: "p24",
+          sourceUrl: "https://nike.com/dunk-low",
+          scrapedAt: "2026-03-05T06:00:00Z",
+          title: "Nike Dunk Low Retro",
+          price: 110.0,
+          currency: "USD",
+          description: "حذاء Nike Dunk Low Retro الكاجوال",
+          images: [],
+          availability: "out_of_stock",
+          brand: "Nike",
+          sku: "DD1391-100",
+          category: "ملابس",
+          rating: 4.6,
+          reviewCount: 5400,
+          overallConfidence: 78,
+          priceHistory: [{ date: "2026-02-01", price: 110 }],
+        },
+        {
+          id: "p25",
+          sourceUrl: "https://sonos.com/era-300",
+          scrapedAt: "2026-03-04T22:00:00Z",
+          title: "Sonos Era 300 مكبر صوت",
+          price: 449.0,
+          currency: "USD",
+          description: "مكبر صوت Sonos Era 300 بتقنية الصوت المكاني",
+          images: [],
+          availability: "in_stock",
+          brand: "Sonos",
+          sku: "E30G1US1",
+          category: "إلكترونيات",
+          rating: 4.5,
+          reviewCount: 670,
+          overallConfidence: 87,
+          priceHistory: [{ date: "2026-02-01", price: 449 }],
+        },
+        {
+          id: "p26",
+          sourceUrl: "https://logitech.com/mx-master-3s",
+          scrapedAt: "2026-03-04T20:00:00Z",
+          title: "Logitech MX Master 3S ماوس",
+          price: 99.99,
+          currency: "USD",
+          description: "ماوس لاسلكي متقدم للإنتاجية",
+          images: [],
+          availability: "in_stock",
+          brand: "Logitech",
+          sku: "910-006556",
+          category: "إلكترونيات",
+          rating: 4.7,
+          reviewCount: 4300,
+          overallConfidence: 91,
+          priceHistory: [{ date: "2026-01-01", price: 99.99 }],
+        },
+        {
+          id: "p27",
+          sourceUrl: "https://fitbit.com/charge-6",
+          scrapedAt: "2026-03-04T18:00:00Z",
+          title: "Fitbit Charge 6 متتبع لياقة",
+          price: 159.95,
+          currency: "USD",
+          description: "متتبع صحة ولياقة بدنية متقدم",
+          images: [],
+          availability: "in_stock",
+          brand: "Fitbit",
+          sku: "FB423",
+          category: "رياضة",
+          rating: 4.2,
+          reviewCount: 2100,
+          overallConfidence: 83,
+          priceHistory: [{ date: "2026-02-01", price: 159.95 }],
+        },
+        {
+          id: "p28",
+          sourceUrl: "https://weber.com/genesis-e-335",
+          scrapedAt: "2026-03-04T16:00:00Z",
+          title: "Weber Genesis E-335 شواية غاز",
+          price: 1149.0,
+          currency: "USD",
+          description: "شواية غاز بثلاث شعلات مع شعلة جانبية",
+          images: [],
+          availability: "out_of_stock",
+          brand: "Weber",
+          sku: "35410001",
+          category: "المنزل والحديقة",
+          rating: 4.6,
+          reviewCount: 890,
+          overallConfidence: 76,
+          priceHistory: [{ date: "2026-02-01", price: 1149 }],
+        },
+        {
+          id: "p29",
+          sourceUrl: "https://garmin.com/fenix-7",
+          scrapedAt: "2026-03-04T14:00:00Z",
+          title: "Garmin Fenix 7X Solar",
+          price: 799.99,
+          currency: "USD",
+          description: "ساعة GPS رياضية متعددة الاستخدامات",
+          images: [],
+          availability: "in_stock",
+          brand: "Garmin",
+          sku: "010-02541-01",
+          category: "رياضة",
+          rating: 4.7,
+          reviewCount: 1670,
+          overallConfidence: 89,
+          priceHistory: [
+            { date: "2026-01-15", price: 849.99 },
+            { date: "2026-03-01", price: 799.99 },
+          ],
+        },
+        {
+          id: "p30",
+          sourceUrl: "https://amazon.com/echo-dot-5",
+          scrapedAt: "2026-03-04T12:00:00Z",
+          title: "Amazon Echo Dot (الجيل الخامس)",
+          price: 49.99,
+          currency: "USD",
+          description: "مكبر صوت ذكي مع Alexa",
+          images: [],
+          availability: "in_stock",
+          brand: "Amazon",
+          sku: "B09B8V1LZ3",
+          category: "إلكترونيات",
+          rating: 4.4,
+          reviewCount: 15200,
+          overallConfidence: 90,
+          priceHistory: [
+            { date: "2026-01-01", price: 49.99 },
+            { date: "2026-02-14", price: 29.99 },
+            { date: "2026-03-01", price: 49.99 },
+          ],
+        },
+        {
+          id: "p31",
+          sourceUrl: "https://cricut.com/maker-3",
+          scrapedAt: "2026-03-04T10:00:00Z",
+          title: "Cricut Maker 3",
+          price: 399.0,
+          currency: "USD",
+          description: "آلة قطع ذكية متطورة",
+          images: [],
+          availability: "in_stock",
+          brand: "Cricut",
+          sku: "2008338",
+          category: "المنزل والحديقة",
+          rating: 4.5,
+          reviewCount: 3400,
+          overallConfidence: 84,
+          priceHistory: [{ date: "2026-02-01", price: 399 }],
+        },
+        {
+          id: "p32",
+          sourceUrl: "https://bosch.com/drill-set",
+          scrapedAt: "2026-03-03T20:00:00Z",
+          title: "Bosch 18V طقم مثقاب",
+          price: 3.99,
+          currency: "USD",
+          description: "طقم مثقاب/مفك مدمج (تصفية)",
+          images: [],
+          availability: "in_stock",
+          brand: "Bosch",
+          sku: "GSR18V-190B22",
+          category: "سيارات",
+          rating: 4.6,
+          reviewCount: 2100,
+          overallConfidence: 72,
+          priceHistory: [
+            { date: "2026-02-01", price: 129.99 },
+            { date: "2026-03-01", price: 3.99 },
+          ],
+        },
       ];
 
       const MOCK_DATA = {
-        stats: { totalProducts:147, inStock:112, outOfStock:35, avgPrice:89.50, avgConfidence:82, priceRange:{min:3.99,max:1299.99}, topBrands:[{name:"Apple",count:23},{name:"Samsung",count:18},{name:"Sony",count:15},{name:"Nike",count:12},{name:"Adidas",count:10},{name:"LG",count:9},{name:"Dell",count:8},{name:"HP",count:7}], topCategories:[{name:"إلكترونيات",count:45},{name:"ملابس",count:28},{name:"المنزل والحديقة",count:22},{name:"رياضة",count:18},{name:"كتب",count:15},{name:"ألعاب",count:12},{name:"سيارات",count:7}] },
-        status: { engine:"ready", userAgents:20, proxies:0, productCount:147, totalJobs:12, lastJob:{id:"job_abc123",status:"completed",completedUrls:25,totalUrls:25,completedAt:"2026-03-07T18:30:00Z"}, uptime:86400 },
-        schedules: { schedules:[
-          { id:"sch_1", name:"الإلكترونيات اليومية", cronExpression:"0 9 * * *", urlSource:"electronics-urls.txt", enabled:true, running:true, lastRunAt:"2026-03-07T09:00:00Z", lastRunStatus:"completed" },
-          { id:"sch_2", name:"الأزياء الأسبوعية", cronExpression:"0 6 * * 1", urlSource:"fashion-urls.txt", enabled:true, running:false, lastRunAt:"2026-03-04T06:00:00Z", lastRunStatus:"completed" },
-          { id:"sch_3", name:"مراقبة الأسعار", cronExpression:"*/30 * * * *", urlSource:"watchlist.txt", enabled:false, running:false, lastRunAt:null, lastRunStatus:null }
-        ]},
-        jobs: { jobs:[] }
+        stats: {
+          totalProducts: 147,
+          inStock: 112,
+          outOfStock: 35,
+          avgPrice: 89.5,
+          avgConfidence: 82,
+          priceRange: { min: 3.99, max: 1299.99 },
+          topBrands: [
+            { name: "Apple", count: 23 },
+            { name: "Samsung", count: 18 },
+            { name: "Sony", count: 15 },
+            { name: "Nike", count: 12 },
+            { name: "Adidas", count: 10 },
+            { name: "LG", count: 9 },
+            { name: "Dell", count: 8 },
+            { name: "HP", count: 7 },
+          ],
+          topCategories: [
+            { name: "إلكترونيات", count: 45 },
+            { name: "ملابس", count: 28 },
+            { name: "المنزل والحديقة", count: 22 },
+            { name: "رياضة", count: 18 },
+            { name: "كتب", count: 15 },
+            { name: "ألعاب", count: 12 },
+            { name: "سيارات", count: 7 },
+          ],
+        },
+        status: {
+          engine: "ready",
+          userAgents: 20,
+          proxies: 0,
+          productCount: 147,
+          totalJobs: 12,
+          lastJob: {
+            id: "job_abc123",
+            status: "completed",
+            completedUrls: 25,
+            totalUrls: 25,
+            completedAt: "2026-03-07T18:30:00Z",
+          },
+          uptime: 86400,
+        },
+        schedules: {
+          schedules: [
+            {
+              id: "sch_1",
+              name: "الإلكترونيات اليومية",
+              cronExpression: "0 9 * * *",
+              urlSource: "electronics-urls.txt",
+              enabled: true,
+              running: true,
+              lastRunAt: "2026-03-07T09:00:00Z",
+              lastRunStatus: "completed",
+            },
+            {
+              id: "sch_2",
+              name: "الأزياء الأسبوعية",
+              cronExpression: "0 6 * * 1",
+              urlSource: "fashion-urls.txt",
+              enabled: true,
+              running: false,
+              lastRunAt: "2026-03-04T06:00:00Z",
+              lastRunStatus: "completed",
+            },
+            {
+              id: "sch_3",
+              name: "مراقبة الأسعار",
+              cronExpression: "*/30 * * * *",
+              urlSource: "watchlist.txt",
+              enabled: false,
+              running: false,
+              lastRunAt: null,
+              lastRunStatus: null,
+            },
+          ],
+        },
+        jobs: { jobs: [] },
       };
 
       function getMockData(path) {
@@ -1049,13 +2086,25 @@
           const brand = url.searchParams.get("brand") || "";
           const availability = url.searchParams.get("availability") || "";
           let filtered = MOCK_PRODUCTS;
-          if (search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || (p.brand||"").toLowerCase().includes(search) || (p.category||"").toLowerCase().includes(search));
-          if (brand) filtered = filtered.filter(p => p.brand === brand);
-          if (availability) filtered = filtered.filter(p => p.availability === availability);
+          if (search)
+            filtered = filtered.filter(
+              (p) =>
+                p.title.toLowerCase().includes(search) ||
+                (p.brand || "").toLowerCase().includes(search) ||
+                (p.category || "").toLowerCase().includes(search),
+            );
+          if (brand) filtered = filtered.filter((p) => p.brand === brand);
+          if (availability)
+            filtered = filtered.filter((p) => p.availability === availability);
           const total = filtered.length;
           const totalPages = Math.max(1, Math.ceil(total / limit));
           const start = (page - 1) * limit;
-          return { products: filtered.slice(start, start + limit), total, page, totalPages };
+          return {
+            products: filtered.slice(start, start + limit),
+            total,
+            page,
+            totalPages,
+          };
         }
         return {};
       }
@@ -1103,7 +2152,7 @@
           }
 
           // Bar charts
-          renderBarChart("brandsChart", stats.topBrands, "#e94560");
+          renderBarChart("brandsChart", stats.topBrands, "#10b981");
           renderBarChart("categoriesChart", stats.topCategories, "#00d68f");
 
           // Populate brand filter
@@ -1238,15 +2287,19 @@
         if (!h || h.length === 0) return "";
         const last = h[h.length - 1];
         if (!last) return "";
-        if (p.price > last.price) return '<span title="ارتفع السعر" style="color:var(--danger);font-size:14px">↑</span>';
-        if (p.price < last.price) return '<span title="انخفض السعر" style="color:var(--success);font-size:14px">↓</span>';
+        if (p.price > last.price)
+          return '<span title="ارتفع السعر" style="color:var(--danger);font-size:14px">↑</span>';
+        if (p.price < last.price)
+          return '<span title="انخفض السعر" style="color:var(--success);font-size:14px">↓</span>';
         return '<span title="السعر مستقر" style="color:var(--text-muted);font-size:14px">→</span>';
       }
 
       // Exports
       function downloadExport(format) {
         if (STATIC_MODE) {
-          alert("التصدير متاح عند التشغيل المحلي:\nnpx tsx src/cli/index.ts dashboard -p 4000");
+          alert(
+            "التصدير متاح عند التشغيل المحلي:\nnpx tsx src/cli/index.ts dashboard -p 4000",
+          );
           return;
         }
         const log = document.getElementById("exportLog");
@@ -1357,8 +2410,7 @@
           );
         } else if (ev.type === "scrape:complete") {
           document.getElementById("liveProgressBar").style.width = "100%";
-          document.getElementById("liveProgressLabel").textContent =
-            "اكتمل!";
+          document.getElementById("liveProgressLabel").textContent = "اكتمل!";
           document.getElementById("liveProgressPct").textContent = "100%";
           document.getElementById("liveSubtitle").textContent =
             `آخر مهمة: ${ev.data.succeeded}/${ev.data.total} نجحت في ${ev.data.elapsedSec} ثانية`;
@@ -1422,11 +2474,13 @@
 
       async function loadSchedulesPage() {
         const tbody = document.getElementById("schedulesTable");
-        tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
+        tbody.innerHTML =
+          '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
         try {
           const data = await api("/api/schedules");
           if (!data.schedules.length) {
-            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><h3>لا توجد جداول بعد</h3><p>انقر "+ جدولة جديدة" لإنشاء واحدة</p></div></td></tr>';
+            tbody.innerHTML =
+              '<tr><td colspan="6"><div class="empty-state"><h3>لا توجد جداول بعد</h3><p>انقر "+ جدولة جديدة" لإنشاء واحدة</p></div></td></tr>';
             return;
           }
           tbody.innerHTML = data.schedules
@@ -1437,11 +2491,12 @@
               const statusBadge = s.enabled
                 ? '<span class="badge badge-success">مفعّل</span>'
                 : '<span class="badge badge-warning">معطّل</span>';
-              const runBadge = s.lastRunStatus === "completed"
-                ? '<span class="badge badge-success">OK</span>'
-                : s.lastRunStatus === "failed"
-                  ? '<span class="badge badge-danger">Failed</span>'
-                  : '<span class="badge" style="background:var(--bg-card);color:var(--text-muted)">—</span>';
+              const runBadge =
+                s.lastRunStatus === "completed"
+                  ? '<span class="badge badge-success">OK</span>'
+                  : s.lastRunStatus === "failed"
+                    ? '<span class="badge badge-danger">Failed</span>'
+                    : '<span class="badge" style="background:var(--bg-card);color:var(--text-muted)">—</span>';
               return `<tr>
                 <td><strong>${esc(s.name)}</strong></td>
                 <td><code style="font-size:11px;color:var(--accent)">${esc(s.cronExpression)}</code></td>
@@ -1456,12 +2511,18 @@
             })
             .join("");
         } catch (err) {
-          tbody.innerHTML = '<tr><td colspan="6" style="color:var(--danger);padding:20px">فشل تحميل الجداول</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="color:var(--danger);padding:20px">فشل تحميل الجداول</td></tr>';
         }
       }
 
       async function createSchedule() {
-        if (STATIC_MODE) { alert("إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
+        if (STATIC_MODE) {
+          alert(
+            "إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000",
+          );
+          return;
+        }
         const name = document.getElementById("sName").value.trim();
         const cronExpression = document.getElementById("sCron").value.trim();
         const urlSource = document.getElementById("sSource").value.trim();
@@ -1487,7 +2548,12 @@
       }
 
       async function toggleSchedule(id, enabled) {
-        if (STATIC_MODE) { alert("إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
+        if (STATIC_MODE) {
+          alert(
+            "إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000",
+          );
+          return;
+        }
         await fetch(`/api/schedules/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -1497,7 +2563,12 @@
       }
 
       async function deleteScheduleUI(id) {
-        if (STATIC_MODE) { alert("إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
+        if (STATIC_MODE) {
+          alert(
+            "إدارة الجداول تتطلب الخادم المحلي.\nشغّل: npx tsx src/cli/index.ts dashboard -p 4000",
+          );
+          return;
+        }
         if (!confirm("هل تريد حذف هذه الجدولة؟")) return;
         await fetch(`/api/schedules/${id}`, { method: "DELETE" });
         await loadSchedulesPage();
@@ -1505,7 +2576,8 @@
 
       // ── Theme Toggle ─────────────────────────────────────────────────────
       function toggleTheme() {
-        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        const isLight =
+          document.documentElement.getAttribute("data-theme") === "light";
         const newTheme = isLight ? "dark" : "light";
         applyTheme(newTheme);
         localStorage.setItem("hh-theme", newTheme);
