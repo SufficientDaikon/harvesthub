@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HarvestHub — Adaptive Web Scraping Platform</title>
+    <title>HarvestHub — منصة استخراج بيانات الويب التكيفية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -36,7 +36,9 @@
         --coral: #e94560;
         --purple: #a78bfa;
         --font-serif: "Instrument Serif", Georgia, serif;
-        --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+        --font-sans:
+          "IBM Plex Sans Arabic", "DM Sans", system-ui, -apple-system,
+          sans-serif;
         --font-mono: "JetBrains Mono", "Cascadia Code", monospace;
       }
 
@@ -52,6 +54,7 @@
         line-height: 1.7;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
+        direction: rtl;
       }
 
       ::selection {
@@ -118,6 +121,7 @@
         display: flex;
         gap: 2rem;
         align-items: center;
+        flex-direction: row-reverse;
       }
       .nav-links a {
         color: var(--text-dim);
@@ -133,7 +137,7 @@
         content: "";
         position: absolute;
         bottom: -4px;
-        left: 0;
+        right: 0;
         width: 0;
         height: 1px;
         background: var(--wheat);
@@ -161,6 +165,17 @@
       }
       .nav-cta::after {
         display: none !important;
+      }
+      .lang-switch {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        text-decoration: none;
+        transition: color 0.2s;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .lang-switch:hover {
+        color: var(--wheat);
       }
 
       /* ═══ HERO ═══ */
@@ -203,7 +218,7 @@
         width: 500px;
         height: 500px;
         top: 5%;
-        right: 5%;
+        left: 5%;
         background: radial-gradient(circle, var(--wheat), transparent 70%);
         animation: orb-drift 12s ease-in-out infinite;
       }
@@ -211,7 +226,7 @@
         width: 300px;
         height: 300px;
         bottom: 15%;
-        left: 8%;
+        right: 8%;
         background: radial-gradient(circle, var(--sage), transparent 70%);
         animation: orb-drift 16s ease-in-out infinite reverse;
         opacity: 0.06;
@@ -222,10 +237,10 @@
           transform: translate(0, 0) scale(1);
         }
         33% {
-          transform: translate(-20px, 15px) scale(1.05);
+          transform: translate(20px, 15px) scale(1.05);
         }
         66% {
-          transform: translate(15px, -10px) scale(0.97);
+          transform: translate(-15px, -10px) scale(0.97);
         }
       }
 
@@ -248,6 +263,7 @@
         letter-spacing: 0.04em;
         margin-bottom: 2.8rem;
         animation: fade-up 0.7s ease both;
+        direction: ltr;
       }
       .hero-badge .dot {
         width: 6px;
@@ -267,16 +283,16 @@
       }
 
       .hero h1 {
-        font-family: var(--font-serif);
+        font-family: var(--font-sans);
         font-size: clamp(2.8rem, 6.5vw, 5.2rem);
-        font-weight: 400;
-        line-height: 1.06;
-        letter-spacing: -0.03em;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
         margin-bottom: 1.8rem;
         animation: fade-up 0.7s ease 0.08s both;
       }
       .hero h1 em {
-        font-style: italic;
+        font-style: normal;
         color: var(--wheat);
         position: relative;
       }
@@ -294,9 +310,9 @@
       .hero-sub {
         font-size: 1.1rem;
         color: var(--text-dim);
-        max-width: 580px;
+        max-width: 620px;
         margin: 0 auto 3rem;
-        line-height: 1.85;
+        line-height: 2;
         animation: fade-up 0.7s ease 0.16s both;
       }
       .hero-actions {
@@ -394,21 +410,24 @@
         text-transform: uppercase;
         letter-spacing: 0.16em;
         margin-bottom: 1rem;
+        text-align: right;
       }
       .section-title {
-        font-family: var(--font-serif);
+        font-family: var(--font-sans);
         font-size: clamp(1.9rem, 3.8vw, 2.8rem);
-        font-weight: 400;
-        letter-spacing: -0.02em;
+        font-weight: 700;
+        letter-spacing: -0.01em;
         margin-bottom: 1rem;
-        line-height: 1.15;
+        line-height: 1.3;
+        text-align: right;
       }
       .section-desc {
         color: var(--text-dim);
         font-size: 1rem;
         max-width: 540px;
-        line-height: 1.8;
+        line-height: 1.9;
         margin-bottom: 3.5rem;
+        text-align: right;
       }
       .glow-divider {
         height: 1px;
@@ -436,6 +455,7 @@
         padding: 2.4rem;
         transition: all 0.35s ease;
         position: relative;
+        text-align: right;
       }
       .feature-card:hover {
         background: var(--surface-2);
@@ -479,7 +499,7 @@
       .feature-card p {
         color: var(--text-dim);
         font-size: 0.84rem;
-        line-height: 1.65;
+        line-height: 1.75;
       }
 
       /* ═══ ARCHITECTURE ═══ */
@@ -493,6 +513,7 @@
         gap: 0;
         padding: 3rem 0;
         flex-wrap: wrap;
+        flex-direction: row-reverse;
       }
       .arch-node {
         display: flex;
@@ -522,6 +543,7 @@
         color: var(--text-muted);
         margin-top: 0.2rem;
         font-family: var(--font-mono);
+        direction: ltr;
       }
       .arch-box.py {
         border-color: #2b5b84;
@@ -551,19 +573,23 @@
       /* ═══ CLI TERMINAL ═══ */
       .terminal-grid {
         display: grid;
-        grid-template-columns: 1fr 1.2fr;
+        grid-template-columns: 1.2fr 1fr;
         gap: 3rem;
         align-items: start;
       }
+      .terminal-info {
+        text-align: right;
+      }
       .terminal-info h3 {
-        font-family: var(--font-serif);
+        font-family: var(--font-sans);
         font-size: 1.7rem;
         margin-bottom: 1rem;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
+        font-weight: 700;
       }
       .terminal-info p {
         color: var(--text-dim);
-        line-height: 1.75;
+        line-height: 1.85;
         margin-bottom: 1.4rem;
       }
       .cmd-list {
@@ -577,6 +603,8 @@
         align-items: flex-start;
         gap: 0.75rem;
         border-bottom: 1px solid var(--border);
+        flex-direction: row-reverse;
+        text-align: right;
       }
       .cmd-list li:last-child {
         border-bottom: none;
@@ -587,6 +615,8 @@
         font-size: 0.82rem;
         font-weight: 500;
         min-width: 80px;
+        direction: ltr;
+        text-align: left;
       }
       .terminal-window {
         background: #0a0e16;
@@ -596,6 +626,8 @@
         box-shadow:
           0 24px 64px rgba(0, 0, 0, 0.5),
           0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        direction: ltr;
+        text-align: left;
       }
       .terminal-chrome {
         display: flex;
@@ -631,6 +663,8 @@
         font-family: var(--font-mono);
         font-size: 0.78rem;
         line-height: 1.85;
+        direction: ltr;
+        text-align: left;
       }
       .t-line {
         white-space: nowrap;
@@ -698,6 +732,7 @@
         border-radius: 4px;
         display: inline-block;
         margin-bottom: 0.7rem;
+        direction: ltr;
       }
       .export-card h4 {
         font-weight: 600;
@@ -707,7 +742,7 @@
       .export-card p {
         color: var(--text-dim);
         font-size: 0.8rem;
-        line-height: 1.6;
+        line-height: 1.7;
       }
 
       /* ═══ TECH STACK ═══ */
@@ -727,6 +762,8 @@
         align-items: center;
         gap: 1.1rem;
         transition: background 0.3s;
+        flex-direction: row-reverse;
+        text-align: right;
       }
       .stack-item:hover {
         background: var(--surface-2);
@@ -751,7 +788,7 @@
       .stack-item p {
         color: var(--text-dim);
         font-size: 0.78rem;
-        line-height: 1.5;
+        line-height: 1.6;
       }
 
       /* ═══ QUICKSTART ═══ */
@@ -768,6 +805,8 @@
         display: flex;
         gap: 1.4rem;
         align-items: flex-start;
+        flex-direction: row-reverse;
+        text-align: right;
       }
       .step-num {
         width: 34px;
@@ -791,7 +830,7 @@
       .step-content p {
         color: var(--text-dim);
         font-size: 0.85rem;
-        line-height: 1.6;
+        line-height: 1.7;
         margin-bottom: 0.7rem;
       }
       .step-code {
@@ -806,14 +845,16 @@
         cursor: pointer;
         transition: border-color 0.2s;
         position: relative;
+        direction: ltr;
+        text-align: left;
       }
       .step-code:hover {
         border-color: var(--wheat-dim);
       }
       .step-code::after {
-        content: "COPY";
+        content: "نسخ";
         position: absolute;
-        right: 0.8rem;
+        left: 0.8rem;
         top: 50%;
         transform: translateY(-50%);
         font-size: 0.58rem;
@@ -821,6 +862,7 @@
         letter-spacing: 0.1em;
         opacity: 0;
         transition: opacity 0.2s;
+        font-family: var(--font-sans);
       }
       .step-code:hover::after {
         opacity: 0.7;
@@ -829,7 +871,7 @@
         border-color: var(--sage);
       }
       .step-code.copied::after {
-        content: "COPIED ✓";
+        content: "تم النسخ ✓";
         opacity: 1;
         color: var(--sage);
       }
@@ -849,6 +891,7 @@
         padding: 0.65rem 1rem;
         background: var(--surface-2);
         border-bottom: 1px solid var(--border);
+        direction: ltr;
       }
       .preview-chrome .dots {
         display: flex;
@@ -878,6 +921,7 @@
         padding: 0.25rem 1rem;
         border-radius: 6px;
         margin: 0 3rem;
+        direction: ltr;
       }
       .preview-iframe {
         width: 100%;
@@ -905,7 +949,7 @@
         max-width: 460px;
         margin-left: auto;
         margin-right: auto;
-        line-height: 1.7;
+        line-height: 1.8;
       }
       .footer-links {
         display: flex;
@@ -930,6 +974,7 @@
         font-size: 0.7rem;
         color: var(--text-muted);
         font-family: var(--font-mono);
+        direction: ltr;
       }
 
       /* ═══ RESPONSIVE ═══ */
@@ -962,7 +1007,7 @@
           flex-direction: column;
           gap: 1.5rem;
         }
-        .nav-links a:not(.nav-cta) {
+        .nav-links a:not(.nav-cta):not(.lang-switch) {
           display: none;
         }
         .hero {
@@ -996,17 +1041,21 @@
   <body>
     <!-- ═══ NAV ═══ -->
     <nav class="nav" id="nav">
-      <a href="marketing.html" class="nav-logo"><span>🌾</span> HarvestHub</a>
+      <a href="marketing-ar.html" class="nav-logo"
+        ><span>🌾</span> HarvestHub</a
+      >
       <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#cli">CLI</a>
-        <a href="#exports">Exports</a>
-        <a href="#quickstart">Setup</a>
-        <a href="index.html">Dashboard</a>
-        <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank">GitHub</a>
-        <a href="index.html" class="nav-cta">Live Dashboard →</a>
-        <a href="docs-ar.html" style="font-size:12px;padding:4px 12px;background:rgba(255,255,255,0.1);border-radius:20px;text-decoration:none;color:rgba(255,255,255,0.8);transition:background 0.2s;margin-left:4px">🌐 عربي</a>
+        <a href="index-ar.html" class="nav-cta">← لوحة التحكم المباشرة</a>
+        <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank"
+          >GitHub</a
+        >
+        <a href="index-ar.html">لوحة التحكم</a>
+        <a href="#quickstart">الإعداد</a>
+        <a href="#exports">التصدير</a>
+        <a href="#cli">سطر الأوامر</a>
+        <a href="#architecture">البنية</a>
+        <a href="#features">المميزات</a>
+        <a href="docs.html" class="lang-switch">🌐 EN</a>
       </div>
     </nav>
 
@@ -1018,32 +1067,34 @@
         <div class="hero-badge">
           <span class="dot"></span> v1.0 — TypeScript + Scrapling Engine
         </div>
-        <h1>Stop copying data.<br />Start <em>harvesting</em> it.</h1>
+        <h1>توقّف عن نسخ البيانات.<br />ابدأ <em>بحصادها</em>.</h1>
         <p class="hero-sub">
-          An adaptive scraping platform that extracts product data from any
-          e&#8209;commerce site — powered by AI&#8209;driven heuristics, premium
-          exports, and a dashboard that looks like a $200/mo SaaS.
+          منصة استخراج بيانات تكيفية تجمع معلومات المنتجات من أي موقع تجارة
+          إلكترونية — مدعومة بخوارزميات ذكية، وتصدير احترافي، ولوحة تحكم تبدو
+          وكأنها خدمة SaaS بقيمة 200$ شهرياً.
         </p>
         <div class="hero-actions">
-          <a href="#quickstart" class="btn btn-primary">Get Started →</a>
-          <a href="index.html" class="btn btn-ghost">⬡ Live Dashboard</a>
+          <a href="#quickstart" class="btn btn-primary">← ابدأ الآن</a>
+          <a href="index-ar.html" class="btn btn-ghost"
+            >⬡ لوحة التحكم المباشرة</a
+          >
         </div>
         <div class="hero-metrics" id="hero-metrics">
           <div class="metric">
             <div class="metric-val" data-target="104">0</div>
-            <div class="metric-label">Products Harvested</div>
+            <div class="metric-label">منتج تم حصاده</div>
           </div>
           <div class="metric">
             <div class="metric-val" data-target="4">0</div>
-            <div class="metric-label">Export Formats</div>
+            <div class="metric-label">صيغ تصدير</div>
           </div>
           <div class="metric">
             <div class="metric-val" data-target="48">0</div>
-            <div class="metric-label">Tests Passing</div>
+            <div class="metric-label">اختبار ناجح</div>
           </div>
           <div class="metric">
             <div class="metric-val" data-target="0" data-fixed="true">0</div>
-            <div class="metric-label">TypeScript Errors</div>
+            <div class="metric-label">أخطاء TypeScript</div>
           </div>
         </div>
       </div>
@@ -1054,63 +1105,59 @@
     <!-- ═══ FEATURES ═══ -->
     <section id="features">
       <div class="section-inner">
-        <div class="section-label reveal">01 — Capabilities</div>
-        <h2 class="section-title reveal">
-          Everything you need.<br />Nothing you don't.
-        </h2>
+        <div class="section-label reveal">01 — القدرات</div>
+        <h2 class="section-title reveal">كل ما تحتاجه.<br />ولا شيء زائد.</h2>
         <p class="section-desc reveal">
-          Six capabilities that turn any product URL into clean, structured,
-          export&#8209;ready data.
+          ست قدرات تحوّل أي رابط منتج إلى بيانات منظمة ونظيفة وجاهزة للتصدير.
         </p>
         <div class="features-grid reveal">
           <div class="feature-card">
             <div class="feature-icon">🔍</div>
-            <h3>Adaptive Extraction</h3>
+            <h3>الاستخراج التكيفي</h3>
             <p>
-              Three&#8209;tier strategy: JSON&#8209;LD structured data →
-              microdata attributes → CSS heuristics. Every field gets a
-              confidence score.
+              استراتيجية ثلاثية المستويات: بيانات JSON‑LD المهيكلة ← سمات
+              البيانات الوصفية ← الاستدلال عبر CSS. كل حقل يحصل على درجة ثقة
+              خاصة به.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🛡️</div>
-            <h3>Anti&#8209;Bot Bypass</h3>
+            <h3>تجاوز حماية البوتات</h3>
             <p>
-              Scrapling engine with TLS fingerprinting, user&#8209;agent
-              rotation, and stealth mode. Zero paid proxies required.
+              محرك Scrapling مع بصمات TLS، وتدوير وكيل المستخدم، ووضع التخفي.
+              بدون أي بروكسيات مدفوعة.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🔄</div>
-            <h3>Smart Retry Engine</h3>
+            <h3>محرك إعادة المحاولة</h3>
             <p>
-              Exponential backoff with jitter. Three&#8209;tier error
-              classification: transient → retry, permanent → skip, blocked →
-              rotate.
+              تراجع أُسّي مع تشويش عشوائي. تصنيف ثلاثي للأخطاء: مؤقت ← إعادة
+              المحاولة، دائم ← تخطي، محظور ← تدوير.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📊</div>
-            <h3>Premium Exports</h3>
+            <h3>التصدير الذكي</h3>
             <p>
-              Styled XLSX with summary sheets, UTF&#8209;8 CSV, typed JSON, and
-              Google Merchant Center TSV feeds. Production&#8209;ready.
+              ملفات XLSX مُنسّقة مع أوراق ملخص، CSV بترميز UTF‑8، JSON مُحدّد
+              الأنواع، وخلاصات Google Merchant Center بصيغة TSV. جاهزة للإنتاج.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">⚡</div>
-            <h3>Rate&#8209;Aware Pipeline</h3>
+            <h3>تحكم بالسرعة</h3>
             <p>
-              Per&#8209;domain token&#8209;bucket rate limiting. Configurable
-              concurrency. Respects site boundaries automatically.
+              تحديد معدل الطلبات بنظام Token Bucket لكل نطاق. تزامن قابل
+              للتعديل. يحترم حدود الموقع تلقائياً.
             </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🖥️</div>
-            <h3>SaaS Dashboard</h3>
+            <h3>لوحة تحكم فورية</h3>
             <p>
-              Real&#8209;time web UI with search, filters, charts, pagination,
-              and one&#8209;click exports. Looks premium. Costs nothing.
+              واجهة ويب فورية مع بحث، وفلاتر، ورسوم بيانية، وترقيم صفحات، وتصدير
+              بنقرة واحدة. تبدو احترافية. بدون أي تكلفة.
             </p>
           </div>
         </div>
@@ -1122,42 +1169,40 @@
     <!-- ═══ ARCHITECTURE ═══ -->
     <section class="arch-section" id="architecture">
       <div class="section-inner">
-        <div class="section-label reveal">02 — Architecture</div>
-        <h2 class="section-title reveal">
-          Hybrid engine.<br />Zero infrastructure.
-        </h2>
+        <div class="section-label reveal">02 — البنية</div>
+        <h2 class="section-title reveal">محرك هجين.<br />بنية تحتية صفرية.</h2>
         <p class="section-desc reveal">
-          Python scrapes. TypeScript orchestrates. They communicate via
-          subprocess JSON IPC — no servers, no Docker, no queues.
+          Python يستخرج البيانات. TypeScript ينسّق العمليات. يتواصلان عبر JSON
+          IPC كعمليات فرعية — بدون خوادم، بدون Docker، بدون طوابير.
         </p>
         <div class="arch-flow reveal">
           <div class="arch-node">
             <div class="arch-box gold">
-              📋 URLs<span class="sub">.txt input</span>
+              📋 روابط<span class="sub">.txt input</span>
             </div>
           </div>
-          <div class="arch-arrow">→<small>parse</small></div>
+          <div class="arch-arrow">←<small>parse</small></div>
           <div class="arch-node">
             <div class="arch-box ts">
               ⚙️ CLI<span class="sub">TypeScript</span>
             </div>
           </div>
-          <div class="arch-arrow">→<small>stdin</small></div>
+          <div class="arch-arrow">←<small>stdin</small></div>
           <div class="arch-node">
             <div class="arch-box py">
               🐍 Scrapling<span class="sub">Python 3.13</span>
             </div>
           </div>
-          <div class="arch-arrow">→<small>stdout</small></div>
+          <div class="arch-arrow">←<small>stdout</small></div>
           <div class="arch-node">
             <div class="arch-box ts">
-              🔧 Normalize<span class="sub">TypeScript</span>
+              🔧 تطبيع<span class="sub">TypeScript</span>
             </div>
           </div>
-          <div class="arch-arrow">→<small>store</small></div>
+          <div class="arch-arrow">←<small>store</small></div>
           <div class="arch-node">
             <div class="arch-box gold">
-              📦 Export<span class="sub">4 formats</span>
+              📦 تصدير<span class="sub">4 formats</span>
             </div>
           </div>
         </div>
@@ -1169,37 +1214,8 @@
     <!-- ═══ CLI ═══ -->
     <section id="cli">
       <div class="section-inner">
-        <div class="section-label reveal">03 — Command Line</div>
+        <div class="section-label reveal">03 — سطر الأوامر</div>
         <div class="terminal-grid">
-          <div class="terminal-info reveal">
-            <h3>Five commands.<br />Full control.</h3>
-            <p>
-              Every operation is one CLI command. No config files. No YAML. No
-              ceremony.
-            </p>
-            <ul class="cmd-list">
-              <li>
-                <span class="cmd-name">scrape</span> Harvest product data from
-                any URL list
-              </li>
-              <li>
-                <span class="cmd-name">export</span> Generate XLSX, CSV, JSON,
-                or GMC feeds
-              </li>
-              <li>
-                <span class="cmd-name">status</span> Health check on engine +
-                data store
-              </li>
-              <li>
-                <span class="cmd-name">migrate</span> Import data from legacy
-                sources
-              </li>
-              <li>
-                <span class="cmd-name">dashboard</span> Launch the premium web
-                UI
-              </li>
-            </ul>
-          </div>
           <div class="terminal-window reveal reveal-d1">
             <div class="terminal-chrome">
               <span class="dot r"></span><span class="dot y"></span
@@ -1292,6 +1308,35 @@
               </div>
             </div>
           </div>
+          <div class="terminal-info reveal">
+            <h3>خمسة أوامر.<br />تحكم كامل.</h3>
+            <p>
+              كل عملية هي أمر واحد في سطر الأوامر. بدون ملفات إعدادات. بدون
+              YAML. بدون تعقيدات.
+            </p>
+            <ul class="cmd-list">
+              <li>
+                <span class="cmd-name">scrape</span> حصاد بيانات المنتجات من أي
+                قائمة روابط
+              </li>
+              <li>
+                <span class="cmd-name">export</span> إنشاء ملفات XLSX أو CSV أو
+                JSON أو خلاصات GMC
+              </li>
+              <li>
+                <span class="cmd-name">status</span> فحص صحة المحرك ومخزن
+                البيانات
+              </li>
+              <li>
+                <span class="cmd-name">migrate</span> استيراد البيانات من مصادر
+                قديمة
+              </li>
+              <li>
+                <span class="cmd-name">dashboard</span> تشغيل واجهة الويب
+                الاحترافية
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -1301,23 +1346,20 @@
     <!-- ═══ EXPORTS ═══ -->
     <section class="exports-section" id="exports">
       <div class="section-inner">
-        <div class="section-label reveal">04 — Export Formats</div>
-        <h2 class="section-title reveal">
-          Four formats.<br />Every workflow covered.
-        </h2>
+        <div class="section-label reveal">04 — صيغ التصدير</div>
+        <h2 class="section-title reveal">أربع صيغ.<br />تغطي كل سير عمل.</h2>
         <p class="section-desc reveal">
-          From the board&#8209;room spreadsheet to the Google Merchant feed —
-          one command, any format.
+          من جدول بيانات الاجتماعات إلى خلاصة Google Merchant — أمر واحد، أي
+          صيغة.
         </p>
         <div class="export-grid">
           <div class="export-card reveal">
             <div class="export-icon">📗</div>
             <div class="export-ext">.xlsx</div>
-            <h4>Excel Workbook</h4>
+            <h4>مصنف Excel</h4>
             <p>
-              Summary dashboard sheet, conditional formatting,
-              auto&#8209;filters, hyperlinks, alternating rows.
-              Boss&#8209;ready.
+              ورقة ملخص، تنسيق شرطي، فلاتر تلقائية، روابط تشعبية، وصفوف متناوبة.
+              جاهز للمدير.
             </p>
           </div>
           <div class="export-card reveal reveal-d1">
@@ -1325,17 +1367,17 @@
             <div class="export-ext">.csv</div>
             <h4>CSV</h4>
             <p>
-              UTF&#8209;8 BOM encoded. Opens perfectly in Excel, Google Sheets,
-              Numbers, and any data tool.
+              بترميز UTF‑8 BOM. يُفتح بشكل مثالي في Excel وGoogle Sheets
+              وNumbers وأي أداة بيانات.
             </p>
           </div>
           <div class="export-card reveal reveal-d2">
             <div class="export-icon">🔷</div>
             <div class="export-ext">.json</div>
-            <h4>Typed JSON</h4>
+            <h4>JSON مُحدّد الأنواع</h4>
             <p>
-              Metadata envelope with product count, timestamp, schema version.
-              API&#8209;ready.
+              غلاف بيانات وصفية مع عدد المنتجات والطابع الزمني وإصدار المخطط.
+              جاهز للواجهات البرمجية.
             </p>
           </div>
           <div class="export-card reveal reveal-d3">
@@ -1343,8 +1385,8 @@
             <div class="export-ext">.tsv</div>
             <h4>Google Merchant</h4>
             <p>
-              GMC&#8209;compliant feed: id, title, price, availability, GTIN,
-              brand, category. Upload&#8209;ready.
+              خلاصة متوافقة مع GMC: المعرّف، العنوان، السعر، التوفر، GTIN،
+              العلامة التجارية، الفئة. جاهزة للرفع.
             </p>
           </div>
         </div>
@@ -1356,69 +1398,69 @@
     <!-- ═══ TECH STACK ═══ -->
     <section id="stack">
       <div class="section-inner">
-        <div class="section-label reveal">05 — Tech Stack</div>
+        <div class="section-label reveal">05 — المكدس التقني</div>
         <h2 class="section-title reveal">
-          Built with precision.<br />Runs on your machine.
+          بُني بدقة متناهية.<br />يعمل على جهازك.
         </h2>
         <p class="section-desc reveal">
-          Zero cloud costs. Zero monthly fees. Production&#8209;grade tooling,
-          all local.
+          تكاليف سحابية صفرية. رسوم شهرية صفرية. أدوات بمستوى الإنتاج، كلها
+          محلية.
         </p>
         <div class="stack-grid reveal">
           <div class="stack-item">
             <div class="stack-icon">🔷</div>
             <div>
               <h4>TypeScript 5.4</h4>
-              <p>Strict mode, zero errors. Types from CLI to export.</p>
+              <p>الوضع الصارم، صفر أخطاء. أنواع من CLI إلى التصدير.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">🐍</div>
             <div>
               <h4>Scrapling + Python 3.13</h4>
-              <p>Anti&#8209;bot engine with TLS fingerprinting.</p>
+              <p>محرك مضاد للبوتات مع بصمات TLS.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">⚡</div>
             <div>
               <h4>Vitest</h4>
-              <p>48 unit tests — validators, normalizers, store, errors.</p>
+              <p>48 اختبار وحدة — المدققات، المُطبّعات، المخزن، الأخطاء.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">📊</div>
             <div>
               <h4>ExcelJS</h4>
-              <p>Premium exports with formatting and summary sheets.</p>
+              <p>تصدير احترافي مع تنسيق وأوراق ملخص.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">🖥️</div>
             <div>
               <h4>Express.js</h4>
-              <p>REST API with search, filter, and pagination.</p>
+              <p>واجهة REST API مع بحث وفلتر وترقيم صفحات.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">🪵</div>
             <div>
               <h4>Pino Logger</h4>
-              <p>Structured JSON logging with module tags.</p>
+              <p>تسجيل مهيكل بصيغة JSON مع وسوم الوحدات.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">🛡️</div>
             <div>
-              <h4>Error Taxonomy</h4>
-              <p>Three&#8209;tier: transient, permanent, blocked.</p>
+              <h4>تصنيف الأخطاء</h4>
+              <p>ثلاثة مستويات: مؤقت، دائم، محظور.</p>
             </div>
           </div>
           <div class="stack-item">
             <div class="stack-icon">💾</div>
             <div>
-              <h4>Write&#8209;Ahead Store</h4>
-              <p>Atomic JSON persistence — crash&#8209;safe by design.</p>
+              <h4>مخزن الكتابة المسبقة</h4>
+              <p>تخزين JSON ذري — مقاوم للأعطال بالتصميم.</p>
             </div>
           </div>
         </div>
@@ -1430,19 +1472,17 @@
     <!-- ═══ QUICKSTART ═══ -->
     <section class="quickstart-section" id="quickstart">
       <div class="section-inner">
-        <div class="section-label reveal">06 — Quick Start</div>
-        <h2 class="section-title reveal">
-          Three minutes to<br />first harvest.
-        </h2>
+        <div class="section-label reveal">06 — البدء السريع</div>
+        <h2 class="section-title reveal">ثلاث دقائق حتى<br />أول حصاد.</h2>
         <p class="section-desc reveal">
-          No accounts. No API keys. No credit cards.
+          بدون حسابات. بدون مفاتيح API. بدون بطاقات ائتمان.
         </p>
         <div class="steps">
           <div class="step reveal">
             <div class="step-num">1</div>
             <div class="step-content">
-              <h4>Install Dependencies</h4>
-              <p>Node.js 18+ and Python 3.10+ required.</p>
+              <h4>تثبيت المتطلبات</h4>
+              <p>يتطلب Node.js 18+ و Python 3.10+ أو أحدث.</p>
               <div class="step-code" onclick="copyCode(this)">
                 npm install &amp;&amp; pip install scrapling orjson browserforge
                 curl_cffi
@@ -1452,8 +1492,8 @@
           <div class="step reveal reveal-d1">
             <div class="step-num">2</div>
             <div class="step-content">
-              <h4>Add Your URLs</h4>
-              <p>One product URL per line. Any e&#8209;commerce site.</p>
+              <h4>أضف الروابط</h4>
+              <p>رابط منتج واحد في كل سطر. أي موقع تجارة إلكترونية.</p>
               <div class="step-code" onclick="copyCode(this)">
                 echo
                 https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html
@@ -1464,8 +1504,8 @@
           <div class="step reveal reveal-d2">
             <div class="step-num">3</div>
             <div class="step-content">
-              <h4>Harvest</h4>
-              <p>Run the scraper. Watch it work. Get your data.</p>
+              <h4>ابدأ الحصاد</h4>
+              <p>شغّل المستخرج. راقب العمل. احصل على بياناتك.</p>
               <div class="step-code" onclick="copyCode(this)">
                 npx tsx src/cli/index.ts scrape --urls urls.txt --output
                 products.xlsx
@@ -1475,8 +1515,8 @@
           <div class="step reveal reveal-d3">
             <div class="step-num">4</div>
             <div class="step-content">
-              <h4>Launch Dashboard</h4>
-              <p>Explore, search, filter, and export from the web UI.</p>
+              <h4>شغّل لوحة التحكم</h4>
+              <p>استكشف، ابحث، فلتر، وصدّر من واجهة الويب.</p>
               <div class="step-code" onclick="copyCode(this)">
                 npx tsx src/cli/index.ts dashboard --port 4000
               </div>
@@ -1491,11 +1531,10 @@
     <!-- ═══ DASHBOARD PREVIEW ═══ -->
     <section id="dashboard">
       <div class="section-inner">
-        <div class="section-label reveal">07 — Dashboard</div>
-        <h2 class="section-title reveal">The $0 SaaS.</h2>
+        <div class="section-label reveal">07 — لوحة التحكم</div>
+        <h2 class="section-title reveal">خدمة SaaS بتكلفة $0.</h2>
         <p class="section-desc reveal">
-          Real&#8209;time product intelligence that looks like it cost six
-          figures. It didn't.
+          ذكاء منتجات فوري يبدو وكأنه كلّف ستة أرقام. لكنه لم يكلّف شيئاً.
         </p>
         <div class="preview-frame reveal">
           <div class="preview-chrome">
@@ -1506,7 +1545,7 @@
             <div class="url-bar">sufficientdaikon.github.io/harvesthub</div>
           </div>
           <iframe
-            src="index.html"
+            src="index-ar.html"
             class="preview-iframe"
             loading="lazy"
           ></iframe>
@@ -1520,16 +1559,16 @@
     <footer class="footer">
       <div class="footer-brand">🌾 HarvestHub</div>
       <p>
-        Adaptive web scraping platform — built with TypeScript, Scrapling, and
-        an unhealthy attention to detail.
+        منصة استخراج بيانات الويب التكيفية — بُنيت بـ TypeScript وScrapling
+        واهتمام مفرط بالتفاصيل.
       </p>
       <div class="footer-links">
-        <a href="#features">Features</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#cli">CLI</a>
-        <a href="#exports">Exports</a>
-        <a href="#quickstart">Setup</a>
-        <a href="index.html">Dashboard</a>
+        <a href="#features">المميزات</a>
+        <a href="#architecture">البنية</a>
+        <a href="#cli">سطر الأوامر</a>
+        <a href="#exports">التصدير</a>
+        <a href="#quickstart">الإعداد</a>
+        <a href="index-ar.html">لوحة التحكم</a>
       </div>
       <div class="footer-copy">© 2026 HarvestHub — MIT License</div>
     </footer>
@@ -1638,7 +1677,9 @@
 
       /* Copy code blocks */
       function copyCode(el) {
-        const text = el.textContent.replace(/COPY(ED ✓)?/g, "").trim();
+        const text = el.textContent
+          .replace(/(نسخ|تم النسخ ✓|COPY(ED ✓)?)/g, "")
+          .trim();
         navigator.clipboard.writeText(text).then(() => {
           el.classList.add("copied");
           setTimeout(() => el.classList.remove("copied"), 1500);
