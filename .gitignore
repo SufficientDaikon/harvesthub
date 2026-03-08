@@ -12,3 +12,5 @@ dashboard/.next/
 dashboard/node_modules/
 *.lock.json
 harvest.config.local.ts
+e2e/screenshots/
+e2e/test-results/

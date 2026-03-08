@@ -5,6 +5,7 @@ import type { Product, ScrapeJob } from "../types/index.js";
 import type { Schedule } from "../types/schedule.js";
 import { diffAndMerge } from "../core/price-differ.js";
 import { createChildLogger } from "../lib/logger.js";
+import { checkAlerts } from "../alerts/alert-checker.js";
 
 const log = createChildLogger("local-store");
 
@@ -67,8 +68,14 @@ export async function saveProducts(
   for (const p of products) {
     const existing = existingMap.get(p.id);
     if (existing) {
-      const { merged } = diffAndMerge(existing, p);
+      const { merged, change } = diffAndMerge(existing, p);
       existingMap.set(p.id, merged);
+      // Trigger alert checking if price changed
+      if (change) {
+        checkAlerts(merged, existing).catch((err) =>
+          log.error({ err }, "Alert check failed (non-fatal)"),
+        );
+      }
     } else {
       existingMap.set(p.id, p);
     }

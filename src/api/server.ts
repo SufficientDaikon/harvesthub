@@ -35,6 +35,17 @@ import {
 } from "../core/scheduler.js";
 import type { Schedule } from "../types/schedule.js";
 import { nanoid } from "nanoid";
+import multer from "multer";
+import { runScrapeJob } from "../core/job-runner.js";
+import { parseUrlString } from "../lib/url-parser.js";
+import { validateAndDeduplicateUrls } from "../lib/url-validator.js";
+import {
+  loadAlerts,
+  saveAlert,
+  deleteAlert as deleteAlertById,
+  loadAlertHistory,
+} from "../alerts/alert-manager.js";
+import type { Alert } from "../alerts/types.js";
 
 const log = createChildLogger("api");
 
@@ -1064,6 +1075,730 @@ export function createServer(port = 3000) {
       res.json({ ok: true });
     } catch (err) {
       res.status(500).json({ error: "Failed to delete schedule" });
+    }
+  });
+
+  // ── Analytics Endpoints (Price Intelligence) ───────────────────────────────
+
+  /**
+   * @openapi
+   * /api/analytics/price-distribution:
+   *   get:
+   *     summary: Price distribution across products
+   *     description: Returns product counts in price buckets for histogram visualization
+   *     tags: [Analytics]
+   *     responses:
+   *       200:
+   *         description: Price distribution buckets
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   bucket:
+   *                     type: string
+   *                     example: "$0–50"
+   *                   min:
+   *                     type: number
+   *                   max:
+   *                     type: number
+   *                   count:
+   *                     type: integer
+   *       500:
+   *         description: Failed to compute price distribution
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.get("/api/analytics/price-distribution", async (_req, res) => {
+    try {
+      const products = await loadProducts();
+      const boundaries = [
+        { bucket: "$0–50", min: 0, max: 50 },
+        { bucket: "$50–100", min: 50, max: 100 },
+        { bucket: "$100–200", min: 100, max: 200 },
+        { bucket: "$200–500", min: 200, max: 500 },
+        { bucket: "$500–1000", min: 500, max: 1000 },
+        { bucket: "$1000+", min: 1000, max: Infinity },
+      ];
+      const result = boundaries.map((b) => ({
+        bucket: b.bucket,
+        min: b.min,
+        max: b.max === Infinity ? null : b.max,
+        count: products.filter(
+          (p) => p.price >= b.min && (b.max === Infinity ? true : p.price < b.max),
+        ).length,
+      }));
+      res.json(result);
+    } catch (err) {
+      log.error({ err }, "Failed to compute price distribution");
+      res.status(500).json({ error: "Failed to compute price distribution" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /api/analytics/price-changes:
+   *   get:
+   *     summary: Biggest price drops and increases
+   *     description: Returns top 10 products with the largest price drops and increases based on price history
+   *     tags: [Analytics]
+   *     responses:
+   *       200:
+   *         description: Price changes
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 drops:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       productId:
+   *                         type: string
+   *                       title:
+   *                         type: string
+   *                       sourceUrl:
+   *                         type: string
+   *                       oldPrice:
+   *                         type: number
+   *                       newPrice:
+   *                         type: number
+   *                       changePercent:
+   *                         type: number
+   *                       currency:
+   *                         type: string
+   *                 increases:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       productId:
+   *                         type: string
+   *                       title:
+   *                         type: string
+   *                       sourceUrl:
+   *                         type: string
+   *                       oldPrice:
+   *                         type: number
+   *                       newPrice:
+   *                         type: number
+   *                       changePercent:
+   *                         type: number
+   *                       currency:
+   *                         type: string
+   *       500:
+   *         description: Failed to compute price changes
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.get("/api/analytics/price-changes", async (_req, res) => {
+    try {
+      const products = await loadProducts();
+      const changes: Array<{
+        productId: string;
+        title: string;
+        sourceUrl: string;
+        oldPrice: number;
+        newPrice: number;
+        changePercent: number;
+        currency: string;
+      }> = [];
+
+      for (const p of products) {
+        const history = p.priceHistory;
+        if (!history || history.length === 0) continue;
+        const earliest = history[0];
+        if (!earliest || earliest.price === 0) continue;
+        const pctChange =
+          ((p.price - earliest.price) / earliest.price) * 100;
+        if (pctChange === 0) continue;
+        changes.push({
+          productId: p.id,
+          title: p.title,
+          sourceUrl: p.sourceUrl,
+          oldPrice: earliest.price,
+          newPrice: p.price,
+          changePercent: Math.round(pctChange * 100) / 100,
+          currency: p.currency,
+        });
+      }
+
+      const drops = changes
+        .filter((c) => c.changePercent < 0)
+        .sort((a, b) => a.changePercent - b.changePercent)
+        .slice(0, 10);
+      const increases = changes
+        .filter((c) => c.changePercent > 0)
+        .sort((a, b) => b.changePercent - a.changePercent)
+        .slice(0, 10);
+
+      res.json({ drops, increases });
+    } catch (err) {
+      log.error({ err }, "Failed to compute price changes");
+      res.status(500).json({ error: "Failed to compute price changes" });
+    }
+  });
+
+  // ── Batch Import Endpoints ───────────────────────────────────────────────
+
+  // Batch types
+  interface BatchResult {
+    url: string;
+    status: "pending" | "scraping" | "success" | "failed";
+    productTitle: string | null;
+    error: string | null;
+  }
+
+  interface BatchJob {
+    jobId: string;
+    status: "queued" | "running" | "completed" | "failed";
+    createdAt: string;
+    totalUrls: number;
+    completedUrls: number;
+    failedUrls: number;
+    results: BatchResult[];
+  }
+
+  // In-memory batch job store (max 100 jobs)
+  const batchJobs = new Map<string, BatchJob>();
+
+  function evictOldBatchJobs() {
+    if (batchJobs.size > 100) {
+      const oldest = [...batchJobs.entries()]
+        .sort((a, b) => new Date(a[1].createdAt).getTime() - new Date(b[1].createdAt).getTime());
+      while (batchJobs.size > 100 && oldest.length > 0) {
+        const entry = oldest.shift();
+        if (entry) batchJobs.delete(entry[0]);
+      }
+    }
+  }
+
+  // Multer setup for file uploads
+  const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+
+  /**
+   * @openapi
+   * /api/batch:
+   *   post:
+   *     summary: Start a batch scraping job
+   *     description: Accepts a list of URLs and starts async scraping. Returns a jobId for polling.
+   *     tags: [Batch]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [urls]
+   *             properties:
+   *               urls:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                   format: uri
+   *     responses:
+   *       202:
+   *         description: Batch job accepted
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 jobId:
+   *                   type: string
+   *       400:
+   *         description: Invalid request
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.post("/api/batch", (req, res) => {
+    try {
+      const { urls } = req.body as { urls?: string[] };
+      if (!urls || !Array.isArray(urls) || urls.length === 0) {
+        res.status(400).json({ error: "At least one URL is required." });
+        return;
+      }
+      if (urls.length > 500) {
+        res.status(400).json({ error: "Maximum 500 URLs per batch." });
+        return;
+      }
+
+      // Validate and deduplicate
+      const validation = validateAndDeduplicateUrls(urls);
+      const validUrls = validation.valid;
+
+      if (validUrls.length === 0) {
+        res.status(400).json({ error: "No valid URLs provided." });
+        return;
+      }
+
+      const jobId = nanoid(12);
+      const job: BatchJob = {
+        jobId,
+        status: "running",
+        createdAt: new Date().toISOString(),
+        totalUrls: validUrls.length,
+        completedUrls: 0,
+        failedUrls: 0,
+        results: validUrls.map((url): BatchResult => ({
+          url,
+          status: "pending",
+          productTitle: null,
+          error: null,
+        })),
+      };
+
+      batchJobs.set(jobId, job);
+      evictOldBatchJobs();
+
+      // Start async processing
+      (async () => {
+        for (let i = 0; i < validUrls.length; i++) {
+          const url = validUrls[i]!;
+          const result = job.results[i]!;
+          result.status = "scraping";
+
+          try {
+            const jobResult = await runScrapeJob([url]);
+            if (jobResult.products.length > 0) {
+              const product = jobResult.products[0];
+              result.status = "success";
+              result.productTitle = product?.title ?? null;
+              job.completedUrls++;
+            } else if (jobResult.errors.length > 0) {
+              result.status = "failed";
+              result.error = jobResult.errors[0]?.error ?? "Unknown error";
+              job.failedUrls++;
+            } else {
+              result.status = "failed";
+              result.error = "No product data extracted";
+              job.failedUrls++;
+            }
+          } catch (err) {
+            result.status = "failed";
+            result.error = err instanceof Error ? err.message : String(err);
+            job.failedUrls++;
+          }
+        }
+        job.status = job.failedUrls === job.totalUrls ? "failed" : "completed";
+      })().catch((err) => {
+        log.error({ err }, "Batch job failed");
+        job.status = "failed";
+      });
+
+      res.status(202).json({ jobId });
+    } catch (err) {
+      log.error({ err }, "Failed to start batch job");
+      res.status(500).json({ error: "Failed to start batch job" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /api/batch/{jobId}:
+   *   get:
+   *     summary: Get batch job status
+   *     description: Returns the current status and per-URL results of a batch job
+   *     tags: [Batch]
+   *     parameters:
+   *       - in: path
+   *         name: jobId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Batch job ID
+   *     responses:
+   *       200:
+   *         description: Batch job status
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 jobId:
+   *                   type: string
+   *                 status:
+   *                   type: string
+   *                   enum: [queued, running, completed, failed]
+   *                 totalUrls:
+   *                   type: integer
+   *                 completedUrls:
+   *                   type: integer
+   *                 failedUrls:
+   *                   type: integer
+   *                 results:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       url:
+   *                         type: string
+   *                       status:
+   *                         type: string
+   *                         enum: [pending, scraping, success, failed]
+   *                       productTitle:
+   *                         type: string
+   *                         nullable: true
+   *                       error:
+   *                         type: string
+   *                         nullable: true
+   *       404:
+   *         description: Job not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.get("/api/batch/:jobId", (req, res) => {
+    const job = batchJobs.get(req.params["jobId"]!);
+    if (!job) {
+      res.status(404).json({ error: "Job not found. It may have expired." });
+      return;
+    }
+    res.json(job);
+  });
+
+  /**
+   * @openapi
+   * /api/batch/upload:
+   *   post:
+   *     summary: Upload a URL file for batch processing
+   *     description: Accepts a .txt or .csv file and parses URLs from it
+   *     tags: [Batch]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               file:
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: Parsed URLs
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 urls:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                 invalid:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *       400:
+   *         description: Invalid file
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.post("/api/batch/upload", upload.single("file"), (req, res) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ error: "No file uploaded." });
+        return;
+      }
+
+      const originalName = file.originalname.toLowerCase();
+      if (!originalName.endsWith(".txt") && !originalName.endsWith(".csv")) {
+        res.status(400).json({ error: "Only .txt and .csv files are supported." });
+        return;
+      }
+
+      const content = file.buffer.toString("utf-8");
+      const result = parseUrlString(content);
+
+      res.json({
+        urls: result.valid,
+        invalid: result.invalid.map((i) => i.url),
+      });
+    } catch (err) {
+      log.error({ err }, "Failed to parse uploaded file");
+      res.status(400).json({ error: "Could not parse file. Please use a plain text file." });
+    }
+  });
+
+  // ── Alert Endpoints ──────────────────────────────────────────────────────
+
+  /**
+   * @openapi
+   * /api/alerts:
+   *   get:
+   *     summary: List all alerts
+   *     description: Returns all configured price-drop alerts
+   *     tags: [Alerts]
+   *     responses:
+   *       200:
+   *         description: Alert list
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 alerts:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: string
+   *                       productUrl:
+   *                         type: string
+   *                         nullable: true
+   *                       domain:
+   *                         type: string
+   *                         nullable: true
+   *                       threshold:
+   *                         type: number
+   *                       webhookUrl:
+   *                         type: string
+   *                         nullable: true
+   *                       email:
+   *                         type: string
+   *                         nullable: true
+   *                       createdAt:
+   *                         type: string
+   *                         format: date-time
+   *       500:
+   *         description: Failed to load alerts
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.get("/api/alerts", async (_req, res) => {
+    try {
+      const alerts = await loadAlerts();
+      res.json({ alerts });
+    } catch (err) {
+      log.error({ err }, "Failed to load alerts");
+      res.status(500).json({ error: "Failed to load alerts" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /api/alerts:
+   *   post:
+   *     summary: Create an alert
+   *     description: Create a new price-drop alert with webhook and/or email notification
+   *     tags: [Alerts]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [threshold]
+   *             properties:
+   *               productUrl:
+   *                 type: string
+   *                 nullable: true
+   *               domain:
+   *                 type: string
+   *                 nullable: true
+   *               threshold:
+   *                 type: number
+   *                 minimum: 1
+   *                 maximum: 99
+   *               webhookUrl:
+   *                 type: string
+   *                 nullable: true
+   *               email:
+   *                 type: string
+   *                 nullable: true
+   *     responses:
+   *       201:
+   *         description: Alert created
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 alert:
+   *                   type: object
+   *       400:
+   *         description: Invalid request
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       500:
+   *         description: Failed to create alert
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.post("/api/alerts", async (req, res) => {
+    try {
+      const { productUrl, domain, threshold, webhookUrl, email } = req.body as {
+        productUrl?: string;
+        domain?: string;
+        threshold?: number;
+        webhookUrl?: string;
+        email?: string;
+      };
+
+      // Validation
+      if (!productUrl && !domain) {
+        res.status(400).json({ error: "At least one target (productUrl or domain) is required." });
+        return;
+      }
+      if (threshold === undefined || threshold < 1 || threshold > 99) {
+        res.status(400).json({ error: "Threshold must be between 1 and 99." });
+        return;
+      }
+      if (!webhookUrl && !email) {
+        res.status(400).json({ error: "At least one delivery method (webhookUrl or email) is required." });
+        return;
+      }
+
+      const alert: Alert = {
+        id: nanoid(12),
+        productUrl: productUrl || null,
+        domain: domain || null,
+        threshold,
+        webhookUrl: webhookUrl || null,
+        email: email || null,
+        createdAt: new Date().toISOString(),
+      };
+
+      await saveAlert(alert);
+      res.status(201).json({ alert });
+    } catch (err) {
+      log.error({ err }, "Failed to create alert");
+      res.status(500).json({ error: "Failed to create alert" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /api/alerts/{id}:
+   *   delete:
+   *     summary: Delete an alert
+   *     description: Remove an alert by ID
+   *     tags: [Alerts]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Alert ID
+   *     responses:
+   *       200:
+   *         description: Alert deleted
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 ok:
+   *                   type: boolean
+   *       404:
+   *         description: Alert not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       500:
+   *         description: Failed to delete alert
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.delete("/api/alerts/:id", async (req, res) => {
+    try {
+      const deleted = await deleteAlertById(req.params["id"]!);
+      if (!deleted) {
+        res.status(404).json({ error: "Alert not found." });
+        return;
+      }
+      res.json({ ok: true });
+    } catch (err) {
+      log.error({ err }, "Failed to delete alert");
+      res.status(500).json({ error: "Failed to delete alert" });
+    }
+  });
+
+  /**
+   * @openapi
+   * /api/alerts/history:
+   *   get:
+   *     summary: Alert history
+   *     description: Returns triggered alert history sorted by triggeredAt descending, limited to 100 entries
+   *     tags: [Alerts]
+   *     responses:
+   *       200:
+   *         description: Alert history
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 history:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: string
+   *                       alertId:
+   *                         type: string
+   *                       productTitle:
+   *                         type: string
+   *                       productUrl:
+   *                         type: string
+   *                       oldPrice:
+   *                         type: number
+   *                       newPrice:
+   *                         type: number
+   *                       changePercent:
+   *                         type: number
+   *                       currency:
+   *                         type: string
+   *                       triggeredAt:
+   *                         type: string
+   *                         format: date-time
+   *                       deliveryMethod:
+   *                         type: string
+   *                         enum: [webhook, email, both]
+   *                       deliveryStatus:
+   *                         type: string
+   *                         enum: [sent, partial, failed]
+   *       500:
+   *         description: Failed to load alert history
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  app.get("/api/alerts/history", async (_req, res) => {
+    try {
+      const history = await loadAlertHistory();
+      res.json({ history });
+    } catch (err) {
+      log.error({ err }, "Failed to load alert history");
+      res.status(500).json({ error: "Failed to load alert history" });
     }
   });
 

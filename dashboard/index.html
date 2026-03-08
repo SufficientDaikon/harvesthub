@@ -541,6 +541,7 @@
         border-color: rgba(255, 255, 255, 0.15);
       }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   </head>
   <body>
     <div class="app">
@@ -590,6 +591,18 @@
               <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
             </svg>
             Exports
+          </button>
+          <button class="nav-item" onclick="showPage('price-intel')">
+            <span style="font-size:16px;width:24px;text-align:center">📊</span>
+            Price Intelligence
+          </button>
+          <button class="nav-item" onclick="showPage('batch')">
+            <span style="font-size:16px;width:24px;text-align:center">📥</span>
+            Batch Import
+          </button>
+          <button class="nav-item" onclick="showPage('alerts')">
+            <span style="font-size:16px;width:24px;text-align:center">🔔</span>
+            Alerts
           </button>
           <button class="nav-item" onclick="showPage('live')">
             <svg
@@ -860,6 +873,218 @@
           </div>
         </div>
 
+        <!-- Price Intelligence Page -->
+        <div id="page-price-intel" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">📊 Price Intelligence</h2>
+              <p class="page-subtitle">Track price trends and discover deals</p>
+            </div>
+          </div>
+
+          <!-- Controls row -->
+          <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;align-items:end">
+            <div style="flex:1;min-width:220px">
+              <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Select Product</label>
+              <select id="priceIntelProduct" aria-label="Select product for price chart" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" onchange="loadPriceChart()">
+                <option value="">— Choose a product —</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Time Range</label>
+              <select id="priceIntelRange" aria-label="Select time range" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px" onchange="loadPriceChart()">
+                <option value="all" selected>All</option>
+                <option value="90d">90 days</option>
+                <option value="30d">30 days</option>
+                <option value="7d">7 days</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Current price display -->
+          <div id="priceIntelCurrent" style="display:none;margin-bottom:20px;padding:16px 20px;background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border)">
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">Current Price</div>
+            <div style="display:flex;align-items:baseline;gap:12px">
+              <span id="priceIntelCurrentValue" style="font-size:28px;font-weight:700;color:var(--text-primary)"></span>
+              <span id="priceIntelChange" style="font-size:14px;font-weight:600"></span>
+            </div>
+          </div>
+
+          <!-- Charts row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+            <div class="chart-card" style="padding:20px">
+              <div class="chart-title">Price History</div>
+              <div id="priceHistoryChartWrap" style="position:relative;height:300px">
+                <canvas id="priceHistoryChart"></canvas>
+                <div id="priceHistoryEmpty" style="display:flex;align-items:center;justify-content:center;position:absolute;inset:0;color:var(--text-muted);font-size:13px">Select a product to view price history</div>
+              </div>
+            </div>
+            <div class="chart-card" style="padding:20px">
+              <div class="chart-title">Price Distribution</div>
+              <div style="position:relative;height:300px">
+                <canvas id="priceDistChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Biggest changes row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="table-card">
+              <div class="table-header"><span class="table-title">📉 Biggest Drops</span></div>
+              <div id="biggestDrops" style="padding:16px;font-size:13px;color:var(--text-muted)">Loading…</div>
+            </div>
+            <div class="table-card">
+              <div class="table-header"><span class="table-title">📈 Biggest Increases</span></div>
+              <div id="biggestIncreases" style="padding:16px;font-size:13px;color:var(--text-muted)">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Batch Import Page -->
+        <div id="page-batch" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">📥 Batch Import</h2>
+              <p class="page-subtitle">Submit URLs in bulk for scraping</p>
+            </div>
+          </div>
+
+          <!-- Input Section -->
+          <div id="batchInputSection">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:16px;margin-bottom:16px">
+              <div>
+                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Paste URLs (one per line)</label>
+                <textarea id="batchUrlInput" aria-label="Paste product URLs" placeholder="Paste product URLs here, one per line…" style="width:100%;min-height:150px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text-primary);font-family:monospace;font-size:13px;resize:vertical" oninput="debounceBatchValidation()"></textarea>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-width:180px">
+                <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:2px">Or upload a file</label>
+                <input type="file" id="batchFileInput" accept=".txt,.csv" aria-label="Upload URL file" style="display:none" onchange="handleBatchFileUpload(event)">
+                <button class="btn" onclick="document.getElementById('batchFileInput').click()" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:10px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px">📁 Upload File</button>
+                <div id="batchFileStatus" style="font-size:11px;color:var(--text-muted)"></div>
+              </div>
+            </div>
+
+            <!-- Validation Results -->
+            <div id="batchValidation" style="margin-bottom:16px;display:none">
+              <div style="display:flex;gap:16px;margin-bottom:12px;font-size:13px">
+                <span style="color:var(--success)" id="batchValidCount">✓ 0 valid</span>
+                <span style="color:var(--danger)" id="batchInvalidCount">✗ 0 invalid</span>
+                <span style="color:var(--warning)" id="batchDupeCount" style="display:none"></span>
+              </div>
+              <div id="batchValidationDetails" style="max-height:120px;overflow-y:auto;font-size:12px;font-family:monospace"></div>
+            </div>
+
+            <!-- Large batch warning -->
+            <div id="batchLargeWarning" style="display:none;margin-bottom:12px;padding:10px 16px;background:rgba(255,170,0,0.1);border:1px solid var(--warning);border-radius:var(--radius-sm);font-size:12px;color:var(--warning)">⚠️ Large batch. This may take a while.</div>
+
+            <button id="batchStartBtn" class="btn btn-primary" onclick="startBatchScrape()" disabled aria-label="Start batch scraping" style="padding:10px 24px;font-size:14px;border-radius:var(--radius-sm)">Scrape 0 URLs</button>
+          </div>
+
+          <!-- Progress Section -->
+          <div id="batchProgressSection" style="display:none;margin-top:20px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:8px">
+              <span id="batchProgressLabel">Processing…</span>
+              <span id="batchProgressPct">0%</span>
+            </div>
+            <div style="height:8px;background:var(--bg-secondary);border-radius:4px;overflow:hidden;margin-bottom:16px">
+              <div id="batchProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--success));border-radius:4px;transition:width 0.3s"></div>
+            </div>
+
+            <!-- Per-URL results -->
+            <div class="table-card" style="margin-top:12px">
+              <div class="table-header"><span class="table-title">URL Results</span></div>
+              <div id="batchUrlResults" style="max-height:400px;overflow-y:auto;font-size:13px"></div>
+            </div>
+          </div>
+
+          <!-- Results Summary -->
+          <div id="batchResultsSummary" style="display:none;margin-top:20px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+              <div class="stat-card"><div class="stat-value" id="batchTotalProcessed">0</div><div class="stat-label">Total Processed</div></div>
+              <div class="stat-card"><div class="stat-value" id="batchSucceeded" style="color:var(--success)">0</div><div class="stat-label">Succeeded</div></div>
+              <div class="stat-card"><div class="stat-value" id="batchFailed" style="color:var(--danger)">0</div><div class="stat-label">Failed</div></div>
+            </div>
+            <button class="btn" onclick="resetBatchUI()" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:8px 20px;border-radius:var(--radius-sm);cursor:pointer">← New Batch</button>
+          </div>
+        </div>
+
+        <!-- Alerts Page -->
+        <div id="page-alerts" style="display: none">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">🔔 Alerts</h2>
+              <p class="page-subtitle">Configure price-drop notifications</p>
+            </div>
+          </div>
+
+          <!-- Alert Creation Form -->
+          <div class="table-card" style="margin-bottom:20px">
+            <div class="table-header"><span class="table-title">Create Alert</span></div>
+            <div style="padding:16px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+                <div>
+                  <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Product URL <span style="color:var(--text-muted)">(optional)</span></label>
+                  <input type="text" id="alertProductUrl" aria-label="Product URL" placeholder="https://example.com/product" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-primary);font-size:13px">
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Domain Filter <span style="color:var(--text-muted)">(optional)</span></label>
+                  <input type="text" id="alertDomain" aria-label="Domain filter" placeholder="e.g., amazon.com" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-primary);font-size:13px">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:100px 1fr 1fr;gap:16px;margin-bottom:16px">
+                <div>
+                  <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Threshold %</label>
+                  <input type="number" id="alertThreshold" aria-label="Threshold percentage" value="10" min="1" max="99" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-primary);font-size:13px">
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Webhook URL <span style="color:var(--text-muted)">(optional)</span></label>
+                  <input type="text" id="alertWebhookUrl" aria-label="Webhook URL" placeholder="https://hooks.slack.com/..." style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-primary);font-size:13px">
+                </div>
+                <div>
+                  <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px">Email <span style="color:var(--text-muted)">(optional)</span></label>
+                  <input type="text" id="alertEmail" aria-label="Email address" placeholder="user@example.com" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text-primary);font-size:13px">
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="createAlertUI()" aria-label="Create alert" style="padding:8px 20px;font-size:13px;border-radius:var(--radius-sm)">Create Alert</button>
+            </div>
+          </div>
+
+          <!-- Active Alerts Table -->
+          <div class="table-card" style="margin-bottom:20px">
+            <div class="table-header"><span class="table-title">Active Alerts</span></div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse">
+                <thead><tr style="border-bottom:1px solid var(--border)">
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Target</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Threshold</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Method</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Created</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Actions</th>
+                </tr></thead>
+                <tbody id="alertsTable"><tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-muted)">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Alert History Table -->
+          <div class="table-card">
+            <div class="table-header"><span class="table-title">Alert History</span></div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse">
+                <thead><tr style="border-bottom:1px solid var(--border)">
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Triggered</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Product</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Price Change</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Change %</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Method</th>
+                  <th style="text-align:left;padding:10px 16px;font-size:12px;color:var(--text-secondary);font-weight:600">Status</th>
+                </tr></thead>
+                <tbody id="alertHistoryTable"><tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-muted)">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- Live Feed Page -->
         <div id="page-live" style="display: none">
           <div class="page-header">
@@ -985,44 +1210,46 @@
         if (page === "products") loadProductsTable();
         if (page === "schedules") loadSchedulesPage();
         if (page === "dashboard") loadDashboard();
+        if (page === "price-intel") loadPriceIntelPage();
+        if (page === "alerts") loadAlertsPage();
       }
 
       // ── Static / Demo Mode ────────────────────────────────────────────
       const STATIC_MODE = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
 
       const MOCK_PRODUCTS = [
-        { id:"p1", sourceUrl:"https://apple.com/iphone-15-pro", scrapedAt:"2026-03-07T12:00:00Z", title:"iPhone 15 Pro 256GB", price:1199.00, currency:"USD", description:"Apple iPhone 15 Pro with A17 Pro chip", images:["https://placehold.co/200"], availability:"in_stock", brand:"Apple", sku:"IPH15P-256", category:"Electronics", rating:4.8, reviewCount:2340, overallConfidence:95, priceHistory:[{date:"2026-02-01",price:1199},{date:"2026-03-01",price:1149}] },
-        { id:"p2", sourceUrl:"https://samsung.com/galaxy-s24-ultra", scrapedAt:"2026-03-07T12:05:00Z", title:"Samsung Galaxy S24 Ultra", price:1299.99, currency:"USD", description:"Samsung Galaxy S24 Ultra 512GB", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-S928B", category:"Electronics", rating:4.7, reviewCount:1890, overallConfidence:92, priceHistory:[{date:"2026-02-01",price:1319.99},{date:"2026-03-01",price:1299.99}] },
-        { id:"p3", sourceUrl:"https://sony.com/wh-1000xm5", scrapedAt:"2026-03-07T11:30:00Z", title:"Sony WH-1000XM5 Wireless Headphones", price:348.00, currency:"USD", description:"Industry-leading noise canceling", images:[], availability:"in_stock", brand:"Sony", sku:"WH1000XM5B", category:"Electronics", rating:4.6, reviewCount:4520, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:348}] },
-        { id:"p4", sourceUrl:"https://nike.com/air-max-90", scrapedAt:"2026-03-07T10:00:00Z", title:"Nike Air Max 90", price:130.00, currency:"USD", description:"Classic Nike Air Max 90 sneakers", images:[], availability:"in_stock", brand:"Nike", sku:"CN8490-001", category:"Clothing", rating:4.5, reviewCount:3210, overallConfidence:85, priceHistory:[{date:"2026-02-15",price:130}] },
-        { id:"p5", sourceUrl:"https://apple.com/macbook-pro-14", scrapedAt:"2026-03-07T09:45:00Z", title:"MacBook Pro 14\" M3 Pro", price:1999.00, currency:"USD", description:"Apple MacBook Pro 14-inch with M3 Pro chip", images:[], availability:"in_stock", brand:"Apple", sku:"MBP14-M3P", category:"Electronics", rating:4.9, reviewCount:1560, overallConfidence:97, priceHistory:[{date:"2026-01-15",price:1999}] },
-        { id:"p6", sourceUrl:"https://apple.com/ipad-air", scrapedAt:"2026-03-07T09:30:00Z", title:"iPad Air M2 11-inch", price:599.00, currency:"USD", description:"iPad Air with M2 chip", images:[], availability:"in_stock", brand:"Apple", sku:"IPA-M2-11", category:"Electronics", rating:4.7, reviewCount:980, overallConfidence:90, priceHistory:[{date:"2026-02-01",price:649},{date:"2026-03-01",price:599}] },
-        { id:"p7", sourceUrl:"https://dyson.com/v15-detect", scrapedAt:"2026-03-06T18:00:00Z", title:"Dyson V15 Detect Absolute", price:749.99, currency:"USD", description:"Dyson V15 cordless vacuum with laser detection", images:[], availability:"in_stock", brand:"Dyson", sku:"DYS-V15-ABS", category:"Home & Garden", rating:4.4, reviewCount:2100, overallConfidence:82, priceHistory:[{date:"2026-02-01",price:749.99}] },
-        { id:"p8", sourceUrl:"https://kitchenaid.com/stand-mixer", scrapedAt:"2026-03-06T17:30:00Z", title:"KitchenAid Artisan Stand Mixer", price:449.99, currency:"USD", description:"5-quart tilt-head stand mixer", images:[], availability:"in_stock", brand:"KitchenAid", sku:"KSM150PS", category:"Home & Garden", rating:4.8, reviewCount:5600, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:479.99},{date:"2026-03-01",price:449.99}] },
-        { id:"p9", sourceUrl:"https://bose.com/qc-ultra", scrapedAt:"2026-03-06T16:00:00Z", title:"Bose QuietComfort Ultra Headphones", price:429.00, currency:"USD", description:"Premium noise cancelling headphones", images:[], availability:"in_stock", brand:"Bose", sku:"BOSE-QCU", category:"Electronics", rating:4.5, reviewCount:1240, overallConfidence:87, priceHistory:[{date:"2026-02-15",price:429}] },
-        { id:"p10", sourceUrl:"https://dell.com/xps-15", scrapedAt:"2026-03-06T15:00:00Z", title:"Dell XPS 15 Laptop", price:1549.99, currency:"USD", description:"Dell XPS 15 with Intel Core i7, 16GB RAM", images:[], availability:"in_stock", brand:"Dell", sku:"XPS9530", category:"Electronics", rating:4.3, reviewCount:870, overallConfidence:84, priceHistory:[{date:"2026-01-01",price:1649.99},{date:"2026-03-01",price:1549.99}] },
-        { id:"p11", sourceUrl:"https://adidas.com/ultraboost-23", scrapedAt:"2026-03-06T14:00:00Z", title:"Adidas Ultraboost Light", price:190.00, currency:"USD", description:"Adidas Ultraboost Light running shoes", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6339", category:"Clothing", rating:4.6, reviewCount:2780, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:190}] },
-        { id:"p12", sourceUrl:"https://samsung.com/65-qled", scrapedAt:"2026-03-06T13:00:00Z", title:"Samsung 65\" QLED 4K Smart TV", price:997.99, currency:"USD", description:"Samsung QLED 4K Smart TV Q80C", images:[], availability:"in_stock", brand:"Samsung", sku:"QN65Q80C", category:"Electronics", rating:4.5, reviewCount:3400, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:1197.99},{date:"2026-03-01",price:997.99}] },
-        { id:"p13", sourceUrl:"https://lg.com/oled-c3", scrapedAt:"2026-03-06T12:30:00Z", title:"LG C3 55\" OLED TV", price:1296.99, currency:"USD", description:"LG OLED evo C3 55-inch 4K Smart TV", images:[], availability:"in_stock", brand:"LG", sku:"OLED55C3", category:"Electronics", rating:4.7, reviewCount:2100, overallConfidence:93, priceHistory:[{date:"2026-01-01",price:1499.99},{date:"2026-03-01",price:1296.99}] },
-        { id:"p14", sourceUrl:"https://hp.com/spectre-x360", scrapedAt:"2026-03-06T11:00:00Z", title:"HP Spectre x360 14", price:1449.99, currency:"USD", description:"HP Spectre x360 2-in-1 laptop", images:[], availability:"out_of_stock", brand:"HP", sku:"HP-SPX360", category:"Electronics", rating:4.4, reviewCount:650, overallConfidence:81, priceHistory:[{date:"2026-02-01",price:1449.99}] },
-        { id:"p15", sourceUrl:"https://nike.com/air-jordan-1", scrapedAt:"2026-03-06T10:00:00Z", title:"Air Jordan 1 Retro High OG", price:180.00, currency:"USD", description:"Classic Air Jordan 1 Retro", images:[], availability:"out_of_stock", brand:"Nike", sku:"DZ5485-612", category:"Clothing", rating:4.8, reviewCount:8900, overallConfidence:79, priceHistory:[{date:"2026-02-01",price:180}] },
-        { id:"p16", sourceUrl:"https://sony.com/ps5", scrapedAt:"2026-03-06T09:00:00Z", title:"PlayStation 5 Console", price:499.99, currency:"USD", description:"Sony PS5 Disc Edition", images:[], availability:"in_stock", brand:"Sony", sku:"CFI-1215A", category:"Electronics", rating:4.8, reviewCount:12400, overallConfidence:96, priceHistory:[{date:"2026-01-01",price:499.99}] },
-        { id:"p17", sourceUrl:"https://amazon.com/kindle-paperwhite", scrapedAt:"2026-03-05T20:00:00Z", title:"Kindle Paperwhite (2024)", price:149.99, currency:"USD", description:"Amazon Kindle Paperwhite 6.8\" display", images:[], availability:"in_stock", brand:"Amazon", sku:"KPW-2024", category:"Books", rating:4.6, reviewCount:6700, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:149.99}] },
-        { id:"p18", sourceUrl:"https://lego.com/technic-porsche", scrapedAt:"2026-03-05T18:00:00Z", title:"LEGO Technic Porsche 911 GT3 RS", price:449.99, currency:"USD", description:"LEGO Technic 42156 Porsche 911 GT3 RS", images:[], availability:"in_stock", brand:"LEGO", sku:"42156", category:"Toys", rating:4.9, reviewCount:890, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:499.99},{date:"2026-03-01",price:449.99}] },
-        { id:"p19", sourceUrl:"https://dell.com/monitor-u2723qe", scrapedAt:"2026-03-05T16:00:00Z", title:"Dell UltraSharp U2723QE 27\" 4K Monitor", price:519.99, currency:"USD", description:"Dell 27-inch 4K USB-C Hub Monitor", images:[], availability:"in_stock", brand:"Dell", sku:"U2723QE", category:"Electronics", rating:4.5, reviewCount:1340, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:569.99},{date:"2026-03-01",price:519.99}] },
-        { id:"p20", sourceUrl:"https://adidas.com/stan-smith", scrapedAt:"2026-03-05T14:00:00Z", title:"Adidas Stan Smith Lux", price:120.00, currency:"USD", description:"Adidas Stan Smith Lux sneakers", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6785", category:"Clothing", rating:4.3, reviewCount:1900, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:130},{date:"2026-03-01",price:120}] },
-        { id:"p21", sourceUrl:"https://dyson.com/airwrap", scrapedAt:"2026-03-05T12:00:00Z", title:"Dyson Airwrap Multi-styler", price:599.99, currency:"USD", description:"Dyson Airwrap Complete Long", images:[], availability:"out_of_stock", brand:"Dyson", sku:"DYS-AW-CL", category:"Home & Garden", rating:4.3, reviewCount:3200, overallConfidence:80, priceHistory:[{date:"2026-02-01",price:599.99}] },
-        { id:"p22", sourceUrl:"https://apple.com/airpods-pro", scrapedAt:"2026-03-05T10:00:00Z", title:"AirPods Pro (2nd Gen) USB-C", price:249.00, currency:"USD", description:"Apple AirPods Pro with USB-C", images:[], availability:"in_stock", brand:"Apple", sku:"MTJV3AM", category:"Electronics", rating:4.7, reviewCount:7800, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:249}] },
-        { id:"p23", sourceUrl:"https://samsung.com/galaxy-watch6", scrapedAt:"2026-03-05T08:00:00Z", title:"Samsung Galaxy Watch6 Classic 47mm", price:349.99, currency:"USD", description:"Samsung Galaxy Watch6 Classic", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-R960", category:"Electronics", rating:4.4, reviewCount:1450, overallConfidence:85, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:349.99}] },
-        { id:"p24", sourceUrl:"https://nike.com/dunk-low", scrapedAt:"2026-03-05T06:00:00Z", title:"Nike Dunk Low Retro", price:110.00, currency:"USD", description:"Nike Dunk Low Retro casual shoes", images:[], availability:"out_of_stock", brand:"Nike", sku:"DD1391-100", category:"Clothing", rating:4.6, reviewCount:5400, overallConfidence:78, priceHistory:[{date:"2026-02-01",price:110}] },
-        { id:"p25", sourceUrl:"https://sonos.com/era-300", scrapedAt:"2026-03-04T22:00:00Z", title:"Sonos Era 300 Speaker", price:449.00, currency:"USD", description:"Sonos Era 300 spatial audio speaker", images:[], availability:"in_stock", brand:"Sonos", sku:"E30G1US1", category:"Electronics", rating:4.5, reviewCount:670, overallConfidence:87, priceHistory:[{date:"2026-02-01",price:449}] },
-        { id:"p26", sourceUrl:"https://logitech.com/mx-master-3s", scrapedAt:"2026-03-04T20:00:00Z", title:"Logitech MX Master 3S Mouse", price:99.99, currency:"USD", description:"Advanced wireless mouse for productivity", images:[], availability:"in_stock", brand:"Logitech", sku:"910-006556", category:"Electronics", rating:4.7, reviewCount:4300, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:99.99}] },
-        { id:"p27", sourceUrl:"https://fitbit.com/charge-6", scrapedAt:"2026-03-04T18:00:00Z", title:"Fitbit Charge 6 Fitness Tracker", price:159.95, currency:"USD", description:"Advanced health and fitness tracker", images:[], availability:"in_stock", brand:"Fitbit", sku:"FB423", category:"Sports", rating:4.2, reviewCount:2100, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:159.95}] },
-        { id:"p28", sourceUrl:"https://weber.com/genesis-e-335", scrapedAt:"2026-03-04T16:00:00Z", title:"Weber Genesis E-335 Gas Grill", price:1149.00, currency:"USD", description:"3-burner gas grill with side burner", images:[], availability:"out_of_stock", brand:"Weber", sku:"35410001", category:"Home & Garden", rating:4.6, reviewCount:890, overallConfidence:76, priceHistory:[{date:"2026-02-01",price:1149}] },
-        { id:"p29", sourceUrl:"https://garmin.com/fenix-7", scrapedAt:"2026-03-04T14:00:00Z", title:"Garmin Fenix 7X Solar", price:799.99, currency:"USD", description:"Premium multisport GPS watch", images:[], availability:"in_stock", brand:"Garmin", sku:"010-02541-01", category:"Sports", rating:4.7, reviewCount:1670, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:849.99},{date:"2026-03-01",price:799.99}] },
-        { id:"p30", sourceUrl:"https://amazon.com/echo-dot-5", scrapedAt:"2026-03-04T12:00:00Z", title:"Amazon Echo Dot (5th Gen)", price:49.99, currency:"USD", description:"Smart speaker with Alexa", images:[], availability:"in_stock", brand:"Amazon", sku:"B09B8V1LZ3", category:"Electronics", rating:4.4, reviewCount:15200, overallConfidence:90, priceHistory:[{date:"2026-01-01",price:49.99},{date:"2026-02-14",price:29.99},{date:"2026-03-01",price:49.99}] },
-        { id:"p31", sourceUrl:"https://cricut.com/maker-3", scrapedAt:"2026-03-04T10:00:00Z", title:"Cricut Maker 3", price:399.00, currency:"USD", description:"Ultimate smart cutting machine", images:[], availability:"in_stock", brand:"Cricut", sku:"2008338", category:"Home & Garden", rating:4.5, reviewCount:3400, overallConfidence:84, priceHistory:[{date:"2026-02-01",price:399}] },
-        { id:"p32", sourceUrl:"https://bosch.com/drill-set", scrapedAt:"2026-03-03T20:00:00Z", title:"Bosch 18V Drill/Driver Kit", price:3.99, currency:"USD", description:"Compact drill/driver combo kit (clearance)", images:[], availability:"in_stock", brand:"Bosch", sku:"GSR18V-190B22", category:"Automotive", rating:4.6, reviewCount:2100, overallConfidence:72, priceHistory:[{date:"2026-02-01",price:129.99},{date:"2026-03-01",price:3.99}] },
+        { id:"p1", sourceUrl:"https://apple.com/iphone-15-pro", scrapedAt:"2026-03-07T12:00:00Z", title:"iPhone 15 Pro 256GB", price:1199.00, currency:"USD", description:"Apple iPhone 15 Pro with A17 Pro chip", images:["https://placehold.co/200"], availability:"in_stock", brand:"Apple", sku:"IPH15P-256", category:"Electronics", rating:4.8, reviewCount:2340, overallConfidence:95, priceHistory:[{price:1249,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:1229,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:1199,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:1219,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:1149,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p2", sourceUrl:"https://samsung.com/galaxy-s24-ultra", scrapedAt:"2026-03-07T12:05:00Z", title:"Samsung Galaxy S24 Ultra", price:1299.99, currency:"USD", description:"Samsung Galaxy S24 Ultra 512GB", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-S928B", category:"Electronics", rating:4.7, reviewCount:1890, overallConfidence:92, priceHistory:[{price:1399.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:1349.99,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:1319.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:1299.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:1299.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p3", sourceUrl:"https://sony.com/wh-1000xm5", scrapedAt:"2026-03-07T11:30:00Z", title:"Sony WH-1000XM5 Wireless Headphones", price:348.00, currency:"USD", description:"Industry-leading noise canceling", images:[], availability:"in_stock", brand:"Sony", sku:"WH1000XM5B", category:"Electronics", rating:4.6, reviewCount:4520, overallConfidence:88, priceHistory:[{price:399.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:379.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:359.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:348,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:348,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p4", sourceUrl:"https://nike.com/air-max-90", scrapedAt:"2026-03-07T10:00:00Z", title:"Nike Air Max 90", price:130.00, currency:"USD", description:"Classic Nike Air Max 90 sneakers", images:[], availability:"in_stock", brand:"Nike", sku:"CN8490-001", category:"Clothing", rating:4.5, reviewCount:3210, overallConfidence:85, priceHistory:[{price:120,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:125,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:130,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:130,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"}] },
+        { id:"p5", sourceUrl:"https://apple.com/macbook-pro-14", scrapedAt:"2026-03-07T09:45:00Z", title:"MacBook Pro 14\" M3 Pro", price:1999.00, currency:"USD", description:"Apple MacBook Pro 14-inch with M3 Pro chip", images:[], availability:"in_stock", brand:"Apple", sku:"MBP14-M3P", category:"Electronics", rating:4.9, reviewCount:1560, overallConfidence:97, priceHistory:[{price:2199,currency:"USD",recordedAt:"2025-09-15T00:00:00Z"},{price:2099,currency:"USD",recordedAt:"2025-11-25T00:00:00Z"},{price:1999,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:1999,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"}] },
+        { id:"p6", sourceUrl:"https://apple.com/ipad-air", scrapedAt:"2026-03-07T09:30:00Z", title:"iPad Air M2 11-inch", price:599.00, currency:"USD", description:"iPad Air with M2 chip", images:[], availability:"in_stock", brand:"Apple", sku:"IPA-M2-11", category:"Electronics", rating:4.7, reviewCount:980, overallConfidence:90, priceHistory:[{price:699,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:669,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:649,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:619,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:599,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p7", sourceUrl:"https://dyson.com/v15-detect", scrapedAt:"2026-03-06T18:00:00Z", title:"Dyson V15 Detect Absolute", price:749.99, currency:"USD", description:"Dyson V15 cordless vacuum with laser detection", images:[], availability:"in_stock", brand:"Dyson", sku:"DYS-V15-ABS", category:"Home & Garden", rating:4.4, reviewCount:2100, overallConfidence:82, priceHistory:[{price:799.99,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:779.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:759.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:749.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p8", sourceUrl:"https://kitchenaid.com/stand-mixer", scrapedAt:"2026-03-06T17:30:00Z", title:"KitchenAid Artisan Stand Mixer", price:449.99, currency:"USD", description:"5-quart tilt-head stand mixer", images:[], availability:"in_stock", brand:"KitchenAid", sku:"KSM150PS", category:"Home & Garden", rating:4.8, reviewCount:5600, overallConfidence:91, priceHistory:[{price:499.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:489.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:479.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:459.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:449.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p9", sourceUrl:"https://bose.com/qc-ultra", scrapedAt:"2026-03-06T16:00:00Z", title:"Bose QuietComfort Ultra Headphones", price:429.00, currency:"USD", description:"Premium noise cancelling headphones", images:[], availability:"in_stock", brand:"Bose", sku:"BOSE-QCU", category:"Electronics", rating:4.5, reviewCount:1240, overallConfidence:87, priceHistory:[{price:449,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:439,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:429,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"},{price:429,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p10", sourceUrl:"https://dell.com/xps-15", scrapedAt:"2026-03-06T15:00:00Z", title:"Dell XPS 15 Laptop", price:1549.99, currency:"USD", description:"Dell XPS 15 with Intel Core i7, 16GB RAM", images:[], availability:"in_stock", brand:"Dell", sku:"XPS9530", category:"Electronics", rating:4.3, reviewCount:870, overallConfidence:84, priceHistory:[{price:1749.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:1699.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:1649.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:1599.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:1549.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p11", sourceUrl:"https://adidas.com/ultraboost-23", scrapedAt:"2026-03-06T14:00:00Z", title:"Adidas Ultraboost Light", price:190.00, currency:"USD", description:"Adidas Ultraboost Light running shoes", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6339", category:"Clothing", rating:4.6, reviewCount:2780, overallConfidence:86, priceHistory:[{price:180,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:185,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:190,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:190,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p12", sourceUrl:"https://samsung.com/65-qled", scrapedAt:"2026-03-06T13:00:00Z", title:"Samsung 65\" QLED 4K Smart TV", price:997.99, currency:"USD", description:"Samsung QLED 4K Smart TV Q80C", images:[], availability:"in_stock", brand:"Samsung", sku:"QN65Q80C", category:"Electronics", rating:4.5, reviewCount:3400, overallConfidence:89, priceHistory:[{price:1397.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:1297.99,currency:"USD",recordedAt:"2025-11-25T00:00:00Z"},{price:1197.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:1097.99,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"},{price:997.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p13", sourceUrl:"https://lg.com/oled-c3", scrapedAt:"2026-03-06T12:30:00Z", title:"LG C3 55\" OLED TV", price:1296.99, currency:"USD", description:"LG OLED evo C3 55-inch 4K Smart TV", images:[], availability:"in_stock", brand:"LG", sku:"OLED55C3", category:"Electronics", rating:4.7, reviewCount:2100, overallConfidence:93, priceHistory:[{price:1699.99,currency:"USD",recordedAt:"2025-09-15T00:00:00Z"},{price:1599.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:1499.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:1396.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:1296.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p14", sourceUrl:"https://hp.com/spectre-x360", scrapedAt:"2026-03-06T11:00:00Z", title:"HP Spectre x360 14", price:1449.99, currency:"USD", description:"HP Spectre x360 2-in-1 laptop", images:[], availability:"out_of_stock", brand:"HP", sku:"HP-SPX360", category:"Electronics", rating:4.4, reviewCount:650, overallConfidence:81, priceHistory:[{price:1549.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:1499.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:1449.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:1449.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p15", sourceUrl:"https://nike.com/air-jordan-1", scrapedAt:"2026-03-06T10:00:00Z", title:"Air Jordan 1 Retro High OG", price:180.00, currency:"USD", description:"Classic Air Jordan 1 Retro", images:[], availability:"out_of_stock", brand:"Nike", sku:"DZ5485-612", category:"Clothing", rating:4.8, reviewCount:8900, overallConfidence:79, priceHistory:[{price:170,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:175,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:180,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p16", sourceUrl:"https://sony.com/ps5", scrapedAt:"2026-03-06T09:00:00Z", title:"PlayStation 5 Console", price:499.99, currency:"USD", description:"Sony PS5 Disc Edition", images:[], availability:"in_stock", brand:"Sony", sku:"CFI-1215A", category:"Electronics", rating:4.8, reviewCount:12400, overallConfidence:96, priceHistory:[{price:549.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:529.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:499.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:499.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p17", sourceUrl:"https://amazon.com/kindle-paperwhite", scrapedAt:"2026-03-05T20:00:00Z", title:"Kindle Paperwhite (2024)", price:149.99, currency:"USD", description:"Amazon Kindle Paperwhite 6.8\" display", images:[], availability:"in_stock", brand:"Amazon", sku:"KPW-2024", category:"Books", rating:4.6, reviewCount:6700, overallConfidence:88, priceHistory:[{price:159.99,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:154.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:149.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:149.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p18", sourceUrl:"https://lego.com/technic-porsche", scrapedAt:"2026-03-05T18:00:00Z", title:"LEGO Technic Porsche 911 GT3 RS", price:449.99, currency:"USD", description:"LEGO Technic 42156 Porsche 911 GT3 RS", images:[], availability:"in_stock", brand:"LEGO", sku:"42156", category:"Toys", rating:4.9, reviewCount:890, overallConfidence:94, priceHistory:[{price:529.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:509.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:499.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:469.99,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"},{price:449.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p19", sourceUrl:"https://dell.com/monitor-u2723qe", scrapedAt:"2026-03-05T16:00:00Z", title:"Dell UltraSharp U2723QE 27\" 4K Monitor", price:519.99, currency:"USD", description:"Dell 27-inch 4K USB-C Hub Monitor", images:[], availability:"in_stock", brand:"Dell", sku:"U2723QE", category:"Electronics", rating:4.5, reviewCount:1340, overallConfidence:86, priceHistory:[{price:619.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:589.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:569.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:539.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:519.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p20", sourceUrl:"https://adidas.com/stan-smith", scrapedAt:"2026-03-05T14:00:00Z", title:"Adidas Stan Smith Lux", price:120.00, currency:"USD", description:"Adidas Stan Smith Lux sneakers", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6785", category:"Clothing", rating:4.3, reviewCount:1900, overallConfidence:83, priceHistory:[{price:140,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:135,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:130,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:125,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:120,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p21", sourceUrl:"https://dyson.com/airwrap", scrapedAt:"2026-03-05T12:00:00Z", title:"Dyson Airwrap Multi-styler", price:599.99, currency:"USD", description:"Dyson Airwrap Complete Long", images:[], availability:"out_of_stock", brand:"Dyson", sku:"DYS-AW-CL", category:"Home & Garden", rating:4.3, reviewCount:3200, overallConfidence:80, priceHistory:[{price:649.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:629.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:599.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p22", sourceUrl:"https://apple.com/airpods-pro", scrapedAt:"2026-03-05T10:00:00Z", title:"AirPods Pro (2nd Gen) USB-C", price:249.00, currency:"USD", description:"Apple AirPods Pro with USB-C", images:[], availability:"in_stock", brand:"Apple", sku:"MTJV3AM", category:"Electronics", rating:4.7, reviewCount:7800, overallConfidence:94, priceHistory:[{price:269,currency:"USD",recordedAt:"2025-09-15T00:00:00Z"},{price:259,currency:"USD",recordedAt:"2025-11-25T00:00:00Z"},{price:249,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:249,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p23", sourceUrl:"https://samsung.com/galaxy-watch6", scrapedAt:"2026-03-05T08:00:00Z", title:"Samsung Galaxy Watch6 Classic 47mm", price:349.99, currency:"USD", description:"Samsung Galaxy Watch6 Classic", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-R960", category:"Electronics", rating:4.4, reviewCount:1450, overallConfidence:85, priceHistory:[{price:429.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:409.99,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:399.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:379.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:349.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p24", sourceUrl:"https://nike.com/dunk-low", scrapedAt:"2026-03-05T06:00:00Z", title:"Nike Dunk Low Retro", price:110.00, currency:"USD", description:"Nike Dunk Low Retro casual shoes", images:[], availability:"out_of_stock", brand:"Nike", sku:"DD1391-100", category:"Clothing", rating:4.6, reviewCount:5400, overallConfidence:78, priceHistory:[{price:100,currency:"USD",recordedAt:"2025-10-15T00:00:00Z"},{price:105,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:110,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p25", sourceUrl:"https://sonos.com/era-300", scrapedAt:"2026-03-04T22:00:00Z", title:"Sonos Era 300 Speaker", price:449.00, currency:"USD", description:"Sonos Era 300 spatial audio speaker", images:[], availability:"in_stock", brand:"Sonos", sku:"E30G1US1", category:"Electronics", rating:4.5, reviewCount:670, overallConfidence:87, priceHistory:[{price:479,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:469,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:459,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:449,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p26", sourceUrl:"https://logitech.com/mx-master-3s", scrapedAt:"2026-03-04T20:00:00Z", title:"Logitech MX Master 3S Mouse", price:99.99, currency:"USD", description:"Advanced wireless mouse for productivity", images:[], availability:"in_stock", brand:"Logitech", sku:"910-006556", category:"Electronics", rating:4.7, reviewCount:4300, overallConfidence:91, priceHistory:[{price:99.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:89.99,currency:"USD",recordedAt:"2025-11-25T00:00:00Z"},{price:94.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:99.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p27", sourceUrl:"https://fitbit.com/charge-6", scrapedAt:"2026-03-04T18:00:00Z", title:"Fitbit Charge 6 Fitness Tracker", price:159.95, currency:"USD", description:"Advanced health and fitness tracker", images:[], availability:"in_stock", brand:"Fitbit", sku:"FB423", category:"Sports", rating:4.2, reviewCount:2100, overallConfidence:83, priceHistory:[{price:179.95,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:169.95,currency:"USD",recordedAt:"2025-12-15T00:00:00Z"},{price:159.95,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p28", sourceUrl:"https://weber.com/genesis-e-335", scrapedAt:"2026-03-04T16:00:00Z", title:"Weber Genesis E-335 Gas Grill", price:1149.00, currency:"USD", description:"3-burner gas grill with side burner", images:[], availability:"out_of_stock", brand:"Weber", sku:"35410001", category:"Home & Garden", rating:4.6, reviewCount:890, overallConfidence:76, priceHistory:[{price:1249,currency:"USD",recordedAt:"2025-09-15T00:00:00Z"},{price:1199,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:1149,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p29", sourceUrl:"https://garmin.com/fenix-7", scrapedAt:"2026-03-04T14:00:00Z", title:"Garmin Fenix 7X Solar", price:799.99, currency:"USD", description:"Premium multisport GPS watch", images:[], availability:"in_stock", brand:"Garmin", sku:"010-02541-01", category:"Sports", rating:4.7, reviewCount:1670, overallConfidence:89, priceHistory:[{price:899.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:879.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:849.99,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:819.99,currency:"USD",recordedAt:"2026-02-15T00:00:00Z"},{price:799.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p30", sourceUrl:"https://amazon.com/echo-dot-5", scrapedAt:"2026-03-04T12:00:00Z", title:"Amazon Echo Dot (5th Gen)", price:49.99, currency:"USD", description:"Smart speaker with Alexa", images:[], availability:"in_stock", brand:"Amazon", sku:"B09B8V1LZ3", category:"Electronics", rating:4.4, reviewCount:15200, overallConfidence:90, priceHistory:[{price:49.99,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:39.99,currency:"USD",recordedAt:"2025-11-25T00:00:00Z"},{price:29.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:34.99,currency:"USD",recordedAt:"2026-02-14T00:00:00Z"},{price:49.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
+        { id:"p31", sourceUrl:"https://cricut.com/maker-3", scrapedAt:"2026-03-04T10:00:00Z", title:"Cricut Maker 3", price:399.00, currency:"USD", description:"Ultimate smart cutting machine", images:[], availability:"in_stock", brand:"Cricut", sku:"2008338", category:"Home & Garden", rating:4.5, reviewCount:3400, overallConfidence:84, priceHistory:[{price:429,currency:"USD",recordedAt:"2025-10-01T00:00:00Z"},{price:419,currency:"USD",recordedAt:"2025-12-01T00:00:00Z"},{price:409,currency:"USD",recordedAt:"2026-01-15T00:00:00Z"},{price:399,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"}] },
+        { id:"p32", sourceUrl:"https://bosch.com/drill-set", scrapedAt:"2026-03-03T20:00:00Z", title:"Bosch 18V Drill/Driver Kit", price:3.99, currency:"USD", description:"Compact drill/driver combo kit (clearance)", images:[], availability:"in_stock", brand:"Bosch", sku:"GSR18V-190B22", category:"Automotive", rating:4.6, reviewCount:2100, overallConfidence:72, priceHistory:[{price:159.99,currency:"USD",recordedAt:"2025-09-01T00:00:00Z"},{price:149.99,currency:"USD",recordedAt:"2025-11-01T00:00:00Z"},{price:129.99,currency:"USD",recordedAt:"2026-01-01T00:00:00Z"},{price:49.99,currency:"USD",recordedAt:"2026-02-01T00:00:00Z"},{price:3.99,currency:"USD",recordedAt:"2026-03-01T00:00:00Z"}] },
       ];
 
       const MOCK_DATA = {
@@ -1033,7 +1260,22 @@
           { id:"sch_2", name:"Weekly Fashion", cronExpression:"0 6 * * 1", urlSource:"fashion-urls.txt", enabled:true, running:false, lastRunAt:"2026-03-04T06:00:00Z", lastRunStatus:"completed" },
           { id:"sch_3", name:"Price Monitor", cronExpression:"*/30 * * * *", urlSource:"watchlist.txt", enabled:false, running:false, lastRunAt:null, lastRunStatus:null }
         ]},
-        jobs: { jobs:[] }
+        jobs: { jobs:[] },
+        alerts: { alerts:[
+          { id:"alr_1", productUrl:"https://apple.com/iphone-15-pro", domain:null, threshold:10, webhookUrl:"https://hooks.slack.com/services/T00/B00/xxx", email:null, createdAt:"2026-03-01T10:00:00Z" },
+          { id:"alr_2", productUrl:null, domain:"amazon.com", threshold:15, webhookUrl:null, email:"deals@example.com", createdAt:"2026-03-02T14:30:00Z" },
+          { id:"alr_3", productUrl:"https://samsung.com/galaxy-s24-ultra", domain:null, threshold:5, webhookUrl:"https://hooks.slack.com/services/T00/B00/yyy", email:"alerts@example.com", createdAt:"2026-03-03T09:15:00Z" },
+          { id:"alr_4", productUrl:null, domain:"sony.com", threshold:20, webhookUrl:"https://discord.com/api/webhooks/123/abc", email:null, createdAt:"2026-03-05T16:45:00Z" }
+        ]},
+        alertHistory: { history:[
+          { id:"ah_1", alertId:"alr_1", productTitle:"iPhone 15 Pro 256GB", productUrl:"https://apple.com/iphone-15-pro", oldPrice:1249, newPrice:1199, changePercent:-4.0, currency:"USD", triggeredAt:"2026-03-06T08:00:00Z", deliveryMethod:"webhook", deliveryStatus:"sent" },
+          { id:"ah_2", alertId:"alr_2", productTitle:"Kindle Paperwhite (2024)", productUrl:"https://amazon.com/kindle-paperwhite", oldPrice:159.99, newPrice:149.99, changePercent:-6.25, currency:"USD", triggeredAt:"2026-03-05T22:15:00Z", deliveryMethod:"email", deliveryStatus:"sent" },
+          { id:"ah_3", alertId:"alr_3", productTitle:"Samsung Galaxy S24 Ultra", productUrl:"https://samsung.com/galaxy-s24-ultra", oldPrice:1399.99, newPrice:1299.99, changePercent:-7.14, currency:"USD", triggeredAt:"2026-03-05T14:30:00Z", deliveryMethod:"both", deliveryStatus:"sent" },
+          { id:"ah_4", alertId:"alr_4", productTitle:"Sony WH-1000XM5 Wireless Headphones", productUrl:"https://sony.com/wh-1000xm5", oldPrice:399.99, newPrice:348.00, changePercent:-13.0, currency:"USD", triggeredAt:"2026-03-04T11:00:00Z", deliveryMethod:"webhook", deliveryStatus:"sent" },
+          { id:"ah_5", alertId:"alr_2", productTitle:"Amazon Echo Dot (5th Gen)", productUrl:"https://amazon.com/echo-dot-5", oldPrice:49.99, newPrice:29.99, changePercent:-40.01, currency:"USD", triggeredAt:"2026-03-03T19:45:00Z", deliveryMethod:"email", deliveryStatus:"sent" },
+          { id:"ah_6", alertId:"alr_1", productTitle:"iPhone 15 Pro 256GB", productUrl:"https://apple.com/iphone-15-pro", oldPrice:1199, newPrice:1149, changePercent:-4.17, currency:"USD", triggeredAt:"2026-03-02T07:30:00Z", deliveryMethod:"webhook", deliveryStatus:"failed" },
+          { id:"ah_7", alertId:"alr_3", productTitle:"Samsung Galaxy S24 Ultra", productUrl:"https://samsung.com/galaxy-s24-ultra", oldPrice:1349.99, newPrice:1319.99, changePercent:-2.22, currency:"USD", triggeredAt:"2026-03-01T20:00:00Z", deliveryMethod:"both", deliveryStatus:"partial" }
+        ]}
       };
 
       function getMockData(path) {
@@ -1043,6 +1285,20 @@
         if (p === "/api/status") return MOCK_DATA.status;
         if (p === "/api/schedules") return MOCK_DATA.schedules;
         if (p === "/api/jobs") return MOCK_DATA.jobs;
+        if (p === "/api/analytics/price-distribution") {
+          const boundaries = [{bucket:"$0–50",min:0,max:50},{bucket:"$50–100",min:50,max:100},{bucket:"$100–200",min:100,max:200},{bucket:"$200–500",min:200,max:500},{bucket:"$500–1000",min:500,max:1000},{bucket:"$1000+",min:1000,max:Infinity}];
+          return boundaries.map(b => ({bucket:b.bucket,min:b.min,max:b.max===Infinity?null:b.max,count:MOCK_PRODUCTS.filter(pr=>pr.price>=b.min&&(b.max===Infinity?true:pr.price<b.max)).length}));
+        }
+        if (p === "/api/analytics/price-changes") {
+          const changes = MOCK_PRODUCTS.filter(pr=>pr.priceHistory&&pr.priceHistory.length>0).map(pr=>{const oldest=pr.priceHistory[0];if(!oldest||oldest.price===0)return null;const pct=((pr.price-oldest.price)/oldest.price)*100;if(pct===0)return null;return{productId:pr.id,title:pr.title,sourceUrl:pr.sourceUrl,oldPrice:oldest.price,newPrice:pr.price,changePercent:Math.round(pct*100)/100,currency:pr.currency};}).filter(Boolean);
+          return {drops:changes.filter(c=>c.changePercent<0).sort((a,b)=>a.changePercent-b.changePercent).slice(0,10),increases:changes.filter(c=>c.changePercent>0).sort((a,b)=>b.changePercent-a.changePercent).slice(0,10)};
+        }
+        if (p.match(/^\/api\/products\/[^/]+\/history$/)) {
+          const id = p.split("/")[3];
+          const prod = MOCK_PRODUCTS.find(pr=>pr.id===id);
+          if (!prod) return {error:"Product not found"};
+          return {id:prod.id,title:prod.title,currentPrice:prod.price,currency:prod.currency,priceHistory:prod.priceHistory||[]};
+        }
         if (p === "/api/products") {
           const page = parseInt(url.searchParams.get("page")) || 1;
           const limit = parseInt(url.searchParams.get("limit")) || 25;
@@ -1058,6 +1314,8 @@
           const start = (page - 1) * limit;
           return { products: filtered.slice(start, start + limit), total, page, totalPages };
         }
+        if (p === "/api/alerts") return MOCK_DATA.alerts;
+        if (p === "/api/alerts/history") return MOCK_DATA.alertHistory;
         return {};
       }
 
@@ -1239,8 +1497,11 @@
         if (!h || h.length === 0) return "";
         const last = h[h.length - 1];
         if (!last) return "";
-        if (p.price > last.price) return '<span title="Price increased" style="color:var(--danger);font-size:14px">↑</span>';
-        if (p.price < last.price) return '<span title="Price decreased" style="color:var(--success);font-size:14px">↓</span>';
+        const oldPrice = last.price;
+        if (oldPrice === 0) return "";
+        const pctChange = ((p.price - oldPrice) / oldPrice * 100).toFixed(1);
+        if (p.price > oldPrice) return `<span title="Price increased +${pctChange}%" style="color:var(--danger);font-size:12px;white-space:nowrap">↑ +${pctChange}%</span>`;
+        if (p.price < oldPrice) return `<span title="Price decreased ${pctChange}%" style="color:var(--success);font-size:12px;white-space:nowrap">↓ ${pctChange}%</span>`;
         return '<span title="Price stable" style="color:var(--text-muted);font-size:14px">→</span>';
       }
 
@@ -1502,6 +1763,541 @@
         if (!confirm("Delete this schedule?")) return;
         await fetch(`/api/schedules/${id}`, { method: "DELETE" });
         await loadSchedulesPage();
+      }
+
+      // ── Price Intelligence ─────────────────────────────────────────────────
+      let priceHistoryChartInstance = null;
+      let priceDistChartInstance = null;
+
+      async function loadPriceIntelPage() {
+        // Populate product selector
+        try {
+          const data = await api("/api/products?limit=200");
+          const select = document.getElementById("priceIntelProduct");
+          const currentVal = select.value;
+          select.innerHTML = '<option value="">— Choose a product —</option>';
+          (data.products || []).forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = `${p.title} (${p.currency} ${p.price.toFixed(2)})`;
+            select.appendChild(opt);
+          });
+          if (currentVal) select.value = currentVal;
+        } catch (err) { console.error("Failed to load products for price intel:", err); }
+
+        // Load distribution chart
+        loadPriceDistribution();
+        // Load biggest changes
+        loadPriceChanges();
+      }
+
+      async function loadPriceChart() {
+        const productId = document.getElementById("priceIntelProduct").value;
+        const range = document.getElementById("priceIntelRange").value;
+        const emptyMsg = document.getElementById("priceHistoryEmpty");
+        const currentDisplay = document.getElementById("priceIntelCurrent");
+
+        if (!productId) {
+          if (priceHistoryChartInstance) { priceHistoryChartInstance.destroy(); priceHistoryChartInstance = null; }
+          emptyMsg.style.display = "flex";
+          currentDisplay.style.display = "none";
+          return;
+        }
+
+        try {
+          const data = await api(`/api/products/${productId}/history`);
+          const history = data.priceHistory || [];
+          // Build data points: history entries + current price
+          let points = history.map(h => ({
+            date: new Date(h.recordedAt || h.date),
+            price: h.price
+          }));
+          points.push({ date: new Date(data.currentPrice ? Date.now() : Date.now()), price: data.currentPrice });
+
+          // Filter by time range
+          if (range !== "all") {
+            const days = parseInt(range);
+            const cutoff = new Date(Date.now() - days * 86400000);
+            points = points.filter(p => p.date >= cutoff);
+          }
+
+          points.sort((a, b) => a.date - b.date);
+
+          // Show current price + change indicator
+          currentDisplay.style.display = "block";
+          document.getElementById("priceIntelCurrentValue").textContent = `${data.currency} ${data.currentPrice.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+          const changeEl = document.getElementById("priceIntelChange");
+          if (points.length > 1) {
+            const oldest = points[0].price;
+            if (oldest > 0) {
+              const delta = data.currentPrice - oldest;
+              const pct = ((delta / oldest) * 100).toFixed(1);
+              if (delta < 0) {
+                changeEl.innerHTML = `<span style="color:var(--success)">↓ ${delta.toFixed(2)} (${pct}%)</span>`;
+              } else if (delta > 0) {
+                changeEl.innerHTML = `<span style="color:var(--danger)">↑ +${delta.toFixed(2)} (+${pct}%)</span>`;
+              } else {
+                changeEl.innerHTML = `<span style="color:var(--text-muted)">→ No change</span>`;
+              }
+            } else { changeEl.textContent = ""; }
+          } else { changeEl.textContent = ""; }
+
+          // Render chart
+          emptyMsg.style.display = "none";
+          const canvas = document.getElementById("priceHistoryChart");
+          if (priceHistoryChartInstance) priceHistoryChartInstance.destroy();
+          priceHistoryChartInstance = new Chart(canvas, {
+            type: "line",
+            data: {
+              labels: points.map(p => p.date.toLocaleDateString()),
+              datasets: [{
+                label: data.title,
+                data: points.map(p => p.price),
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e94560',
+                backgroundColor: "rgba(233, 69, 96, 0.1)",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: ctx => `${data.currency} ${ctx.parsed.y.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`
+                  }
+                }
+              },
+              scales: {
+                x: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#8892b0" } },
+                y: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#8892b0", callback: v => "$" + v.toLocaleString() } }
+              }
+            }
+          });
+        } catch (err) {
+          console.error("Failed to load price chart:", err);
+          emptyMsg.textContent = "Failed to load price data";
+          emptyMsg.style.display = "flex";
+        }
+      }
+
+      async function loadPriceDistribution() {
+        try {
+          const data = await api("/api/analytics/price-distribution");
+          const canvas = document.getElementById("priceDistChart");
+          if (priceDistChartInstance) priceDistChartInstance.destroy();
+          priceDistChartInstance = new Chart(canvas, {
+            type: "bar",
+            data: {
+              labels: data.map(b => b.bucket),
+              datasets: [{
+                label: "Products",
+                data: data.map(b => b.count),
+                backgroundColor: ["#00d68f", "#4ecdc4", "#45b7d1", "#e94560", "#f093fb", "#ffaa00"],
+                borderRadius: 4,
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#8892b0" } },
+                y: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#8892b0", stepSize: 1 } }
+              }
+            }
+          });
+        } catch (err) { console.error("Failed to load price distribution:", err); }
+      }
+
+      async function loadPriceChanges() {
+        try {
+          const data = await api("/api/analytics/price-changes");
+          renderPriceChangeCard("biggestDrops", data.drops, true);
+          renderPriceChangeCard("biggestIncreases", data.increases, false);
+        } catch (err) { console.error("Failed to load price changes:", err); }
+      }
+
+      function renderPriceChangeCard(containerId, items, isDrop) {
+        const el = document.getElementById(containerId);
+        if (!items || items.length === 0) {
+          el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px">No data</div>';
+          return;
+        }
+        el.innerHTML = items.slice(0, 5).map(c => {
+          const color = isDrop ? "var(--success)" : "var(--danger)";
+          const arrow = isDrop ? "↓" : "↑";
+          const sign = c.changePercent > 0 ? "+" : "";
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(c.title)}">${esc(c.title)}</div>
+              <div style="font-size:11px;color:var(--text-muted)">$${c.oldPrice.toFixed(2)} → $${c.newPrice.toFixed(2)}</div>
+            </div>
+            <div style="font-size:14px;font-weight:600;color:${color};margin-left:12px;white-space:nowrap">${arrow} ${sign}${c.changePercent.toFixed(1)}%</div>
+          </div>`;
+        }).join("");
+      }
+
+      // ── Batch Import ──────────────────────────────────────────────────────
+      let batchValidationTimeout;
+      let batchValidUrls = [];
+      let batchPollingInterval = null;
+
+      function debounceBatchValidation() {
+        clearTimeout(batchValidationTimeout);
+        batchValidationTimeout = setTimeout(validateBatchUrls, 500);
+      }
+
+      function validateBatchUrls() {
+        const textarea = document.getElementById("batchUrlInput");
+        const input = textarea.value.trim();
+        const validationDiv = document.getElementById("batchValidation");
+        const detailsDiv = document.getElementById("batchValidationDetails");
+        const startBtn = document.getElementById("batchStartBtn");
+        const largeWarning = document.getElementById("batchLargeWarning");
+
+        if (!input) {
+          validationDiv.style.display = "none";
+          startBtn.disabled = true;
+          startBtn.textContent = "Scrape 0 URLs";
+          batchValidUrls = [];
+          return;
+        }
+
+        const lines = input.split(/[\r\n]+/).map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+        const valid = [];
+        const invalid = [];
+        const seen = new Set();
+        let dupes = 0;
+
+        lines.forEach(line => {
+          try {
+            const u = new URL(line);
+            if (u.protocol !== "http:" && u.protocol !== "https:") {
+              invalid.push({ url: line, reason: "Invalid scheme: " + u.protocol });
+            } else if (!u.hostname.includes(".")) {
+              invalid.push({ url: line, reason: "Invalid hostname" });
+            } else if (seen.has(u.href)) {
+              dupes++;
+            } else {
+              seen.add(u.href);
+              valid.push(u.href);
+            }
+          } catch {
+            invalid.push({ url: line, reason: "Invalid URL format" });
+          }
+        });
+
+        batchValidUrls = valid;
+        validationDiv.style.display = "block";
+        document.getElementById("batchValidCount").textContent = `✓ ${valid.length} valid`;
+        document.getElementById("batchInvalidCount").textContent = `✗ ${invalid.length} invalid`;
+        const dupeEl = document.getElementById("batchDupeCount");
+        if (dupes > 0) { dupeEl.style.display = "inline"; dupeEl.textContent = `⚠ ${dupes} duplicates`; }
+        else dupeEl.style.display = "none";
+
+        // Show per-line validation
+        let html = "";
+        valid.slice(0, 20).forEach(u => {
+          html += `<div style="color:var(--success);padding:2px 0">✓ ${esc(u)}</div>`;
+        });
+        if (valid.length > 20) html += `<div style="color:var(--text-muted);padding:2px 0">… and ${valid.length - 20} more valid URLs</div>`;
+        invalid.forEach(i => {
+          html += `<div style="color:var(--danger);padding:2px 0">✗ ${esc(i.url)} — ${esc(i.reason)}</div>`;
+        });
+        detailsDiv.innerHTML = html;
+
+        startBtn.disabled = valid.length === 0;
+        startBtn.textContent = `Scrape ${valid.length} URL${valid.length !== 1 ? "s" : ""}`;
+
+        largeWarning.style.display = valid.length > 1000 ? "block" : "none";
+      }
+
+      function handleBatchFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const statusEl = document.getElementById("batchFileStatus");
+
+        const ext = file.name.toLowerCase().split(".").pop();
+        if (ext !== "txt" && ext !== "csv") {
+          statusEl.innerHTML = '<span style="color:var(--danger)">Only .txt and .csv files are supported</span>';
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          const lines = content.split(/[\r\n]+/).map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+          // For CSV, extract first column
+          const urls = lines.map(l => l.split(",")[0].trim()).filter(Boolean);
+
+          if (urls.length === 0) {
+            statusEl.innerHTML = '<span style="color:var(--warning)">No URLs found in file.</span>';
+            return;
+          }
+
+          document.getElementById("batchUrlInput").value = urls.join("\n");
+          statusEl.innerHTML = `<span style="color:var(--success)">✓ ${urls.length} lines loaded from ${esc(file.name)}</span>`;
+          validateBatchUrls();
+        };
+        reader.onerror = () => {
+          statusEl.innerHTML = '<span style="color:var(--danger)">Could not parse file. Please use a plain text file.</span>';
+        };
+        reader.readAsText(file);
+      }
+
+      async function startBatchScrape() {
+        if (batchValidUrls.length === 0) return;
+
+        const inputSection = document.getElementById("batchInputSection");
+        const progressSection = document.getElementById("batchProgressSection");
+        const resultsSection = document.getElementById("batchResultsSummary");
+
+        inputSection.style.display = "none";
+        progressSection.style.display = "block";
+        resultsSection.style.display = "none";
+
+        const urlResults = document.getElementById("batchUrlResults");
+        urlResults.innerHTML = batchValidUrls.map((u, i) => `<div id="batchRow${i}" style="display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);font-size:12px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%" title="${esc(u)}">${esc(u)}</span><span class="badge" style="background:var(--bg-card);color:var(--text-muted)">pending</span></div>`).join("");
+
+        if (STATIC_MODE) {
+          // Simulate batch processing
+          for (let i = 0; i < batchValidUrls.length; i++) {
+            const row = document.getElementById(`batchRow${i}`);
+            if (row) row.querySelector(".badge").outerHTML = '<span class="badge badge-warning">scraping</span>';
+            const pct = Math.round(((i + 0.5) / batchValidUrls.length) * 100);
+            document.getElementById("batchProgressBar").style.width = pct + "%";
+            document.getElementById("batchProgressPct").textContent = pct + "%";
+            document.getElementById("batchProgressLabel").textContent = `Processing ${i + 1} of ${batchValidUrls.length}…`;
+            await new Promise(r => setTimeout(r, 300));
+
+            const success = Math.random() > 0.15;
+            if (row) {
+              if (success) {
+                row.querySelector(".badge").outerHTML = '<span class="badge badge-success">success</span>';
+              } else {
+                row.querySelector(".badge").outerHTML = '<span class="badge badge-danger">failed</span>';
+              }
+            }
+          }
+          document.getElementById("batchProgressBar").style.width = "100%";
+          document.getElementById("batchProgressPct").textContent = "100%";
+          document.getElementById("batchProgressLabel").textContent = "Complete!";
+
+          const succeeded = document.querySelectorAll("#batchUrlResults .badge-success").length;
+          const failed = batchValidUrls.length - succeeded;
+          showBatchSummary(batchValidUrls.length, succeeded, failed);
+          return;
+        }
+
+        // Real API call
+        try {
+          const resp = await fetch("/api/batch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ urls: batchValidUrls }),
+          });
+          const data = await resp.json();
+          if (!resp.ok) { alert(data.error || "Failed to start batch job"); resetBatchUI(); return; }
+
+          // Poll for status
+          const jobId = data.jobId;
+          batchPollingInterval = setInterval(async () => {
+            try {
+              const statusResp = await fetch(`/api/batch/${jobId}`);
+              if (!statusResp.ok) {
+                clearInterval(batchPollingInterval);
+                batchPollingInterval = null;
+                alert("Job not found. The server may have restarted.");
+                resetBatchUI();
+                return;
+              }
+              const job = await statusResp.json();
+              updateBatchProgress(job);
+
+              if (job.status === "completed" || job.status === "failed") {
+                clearInterval(batchPollingInterval);
+                batchPollingInterval = null;
+                showBatchSummary(job.totalUrls, job.completedUrls, job.failedUrls);
+              }
+            } catch (e) {
+              console.error("Batch poll error:", e);
+            }
+          }, 2000);
+        } catch (err) {
+          alert("Failed to start batch job: " + err.message);
+          resetBatchUI();
+        }
+      }
+
+      function updateBatchProgress(job) {
+        const done = job.completedUrls + job.failedUrls;
+        const pct = job.totalUrls > 0 ? Math.round((done / job.totalUrls) * 100) : 0;
+        document.getElementById("batchProgressBar").style.width = pct + "%";
+        document.getElementById("batchProgressPct").textContent = pct + "%";
+        document.getElementById("batchProgressLabel").textContent = `Processing ${done} of ${job.totalUrls}…`;
+
+        const urlResults = document.getElementById("batchUrlResults");
+        urlResults.innerHTML = job.results.map((r, i) => {
+          let badge;
+          if (r.status === "pending") badge = '<span class="badge" style="background:var(--bg-card);color:var(--text-muted)">pending</span>';
+          else if (r.status === "scraping") badge = '<span class="badge badge-warning">scraping</span>';
+          else if (r.status === "success") badge = `<span class="badge badge-success">✓ ${esc(r.productTitle || "success")}</span>`;
+          else badge = `<span class="badge badge-danger" title="${esc(r.error || "")}">✗ failed</span>`;
+          return `<div style="display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);font-size:12px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%" title="${esc(r.url)}">${esc(r.url)}</span>${badge}</div>`;
+        }).join("");
+      }
+
+      function showBatchSummary(total, succeeded, failed) {
+        document.getElementById("batchResultsSummary").style.display = "block";
+        document.getElementById("batchTotalProcessed").textContent = total;
+        document.getElementById("batchSucceeded").textContent = succeeded;
+        document.getElementById("batchFailed").textContent = failed;
+      }
+
+      function resetBatchUI() {
+        if (batchPollingInterval) { clearInterval(batchPollingInterval); batchPollingInterval = null; }
+        document.getElementById("batchInputSection").style.display = "block";
+        document.getElementById("batchProgressSection").style.display = "none";
+        document.getElementById("batchResultsSummary").style.display = "none";
+        document.getElementById("batchUrlInput").value = "";
+        document.getElementById("batchValidation").style.display = "none";
+        document.getElementById("batchStartBtn").disabled = true;
+        document.getElementById("batchStartBtn").textContent = "Scrape 0 URLs";
+        document.getElementById("batchFileInput").value = "";
+        document.getElementById("batchFileStatus").textContent = "";
+        batchValidUrls = [];
+      }
+
+      // ── Alerts ────────────────────────────────────────────────────────────
+      async function loadAlertsPage() {
+        loadActiveAlerts();
+        loadAlertHistory();
+      }
+
+      async function loadActiveAlerts() {
+        const tbody = document.getElementById("alertsTable");
+        try {
+          const data = await api("/api/alerts");
+          if (!data.alerts || data.alerts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-muted)">No alerts configured yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.alerts.map(a => {
+            const target = a.productUrl ? `<span title="${esc(a.productUrl)}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block">${esc(a.productUrl)}</span>` : `<span style="color:var(--accent)">domain: ${esc(a.domain)}</span>`;
+            const method = [a.webhookUrl ? "webhook" : "", a.email ? "email" : ""].filter(Boolean).join(" + ");
+            const created = new Date(a.createdAt).toLocaleDateString();
+            return `<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 16px;font-size:13px">${target}</td>
+              <td style="padding:10px 16px;font-size:13px">≥ ${a.threshold}%</td>
+              <td style="padding:10px 16px;font-size:13px">${esc(method)}</td>
+              <td style="padding:10px 16px;font-size:13px">${created}</td>
+              <td style="padding:10px 16px"><button class="btn btn-sm" style="color:var(--danger);font-size:11px" onclick="deleteAlertUI('${a.id}')">Delete</button></td>
+            </tr>`;
+          }).join("");
+        } catch (err) {
+          tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--danger)">Failed to load alerts</td></tr>';
+        }
+      }
+
+      async function loadAlertHistory() {
+        const tbody = document.getElementById("alertHistoryTable");
+        try {
+          const data = await api("/api/alerts/history");
+          if (!data.history || data.history.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-muted)">No alerts triggered yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.history.map(h => {
+            const time = new Date(h.triggeredAt).toLocaleString();
+            const statusBadge = h.deliveryStatus === "sent" ? '<span class="badge badge-success">sent</span>'
+              : h.deliveryStatus === "partial" ? '<span class="badge badge-warning">partial</span>'
+              : '<span class="badge badge-danger">failed</span>';
+            return `<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 16px;font-size:12px">${time}</td>
+              <td style="padding:10px 16px;font-size:13px" title="${esc(h.productUrl)}">${esc(h.productTitle)}</td>
+              <td style="padding:10px 16px;font-size:13px">$${h.oldPrice.toFixed(2)} → $${h.newPrice.toFixed(2)}</td>
+              <td style="padding:10px 16px;font-size:13px;color:var(--success)">${h.changePercent.toFixed(1)}%</td>
+              <td style="padding:10px 16px;font-size:13px">${h.deliveryMethod}</td>
+              <td style="padding:10px 16px">${statusBadge}</td>
+            </tr>`;
+          }).join("");
+        } catch (err) {
+          tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--danger)">Failed to load alert history</td></tr>';
+        }
+      }
+
+      async function createAlertUI() {
+        if (STATIC_MODE) {
+          alert("Alert management requires the local server.\nRun: npx tsx src/cli/index.ts dashboard -p 4000");
+          return;
+        }
+        const productUrl = document.getElementById("alertProductUrl").value.trim();
+        const domain = document.getElementById("alertDomain").value.trim();
+        const threshold = parseInt(document.getElementById("alertThreshold").value);
+        const webhookUrl = document.getElementById("alertWebhookUrl").value.trim();
+        const email = document.getElementById("alertEmail").value.trim();
+
+        if (!productUrl && !domain) {
+          alert("Please provide a product URL or domain filter.");
+          return;
+        }
+        if (!webhookUrl && !email) {
+          alert("Please provide a webhook URL or email address.");
+          return;
+        }
+        if (isNaN(threshold) || threshold < 1 || threshold > 99) {
+          alert("Threshold must be between 1 and 99.");
+          return;
+        }
+
+        try {
+          const resp = await fetch("/api/alerts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              productUrl: productUrl || undefined,
+              domain: domain || undefined,
+              threshold,
+              webhookUrl: webhookUrl || undefined,
+              email: email || undefined
+            }),
+          });
+          if (!resp.ok) {
+            const data = await resp.json();
+            alert(data.error || "Failed to create alert");
+            return;
+          }
+          // Clear form
+          document.getElementById("alertProductUrl").value = "";
+          document.getElementById("alertDomain").value = "";
+          document.getElementById("alertThreshold").value = "10";
+          document.getElementById("alertWebhookUrl").value = "";
+          document.getElementById("alertEmail").value = "";
+          alert("Alert created successfully!");
+          loadActiveAlerts();
+        } catch (err) {
+          alert("Failed to create alert: " + err.message);
+        }
+      }
+
+      async function deleteAlertUI(id) {
+        if (STATIC_MODE) {
+          alert("Alert management requires the local server.\nRun: npx tsx src/cli/index.ts dashboard -p 4000");
+          return;
+        }
+        if (!confirm("Delete this alert?")) return;
+        try {
+          await fetch(`/api/alerts/${id}`, { method: "DELETE" });
+          loadActiveAlerts();
+        } catch (err) {
+          alert("Failed to delete alert: " + err.message);
+        }
       }
 
       // ── Theme Toggle ─────────────────────────────────────────────────────
