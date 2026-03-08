@@ -5,6 +5,7 @@ import { exportCommand } from "./commands/export.js";
 import { statusCommand } from "./commands/status.js";
 import { migrateCommand } from "./commands/migrate.js";
 import { dashboardCommand } from "./commands/dashboard.js";
+import { scheduleCommand } from "./commands/schedule.js";
 
 const program = new Command();
 
@@ -18,5 +19,6 @@ program.addCommand(exportCommand);
 program.addCommand(statusCommand);
 program.addCommand(migrateCommand);
 program.addCommand(dashboardCommand);
+program.addCommand(scheduleCommand);
 
 program.parse();
