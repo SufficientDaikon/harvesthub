@@ -7,8 +7,10 @@
 **Extract product data from any e-commerce site. Export to XLSX, CSV, JSON, or Google Merchant Center feeds.**
 
 [![Tests](https://img.shields.io/badge/tests-111%20passing-brightgreen)](#testing)
+[![CI](https://github.com/SufficientDaikon/harvesthub/actions/workflows/ci.yml/badge.svg)](https://github.com/SufficientDaikon/harvesthub/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](#tech-stack)
 [![Python](https://img.shields.io/badge/Python-Scrapling-3776AB?logo=python&logoColor=white)](#tech-stack)
+[![API Docs](https://img.shields.io/badge/API_Docs-Swagger-85EA2D?logo=swagger&logoColor=black)](#api-endpoints)
 [![License](https://img.shields.io/badge/license-MIT-10B981)](#license)
 [![Cost](https://img.shields.io/badge/cost-%240-10B981)](#)
 
@@ -352,6 +354,27 @@ The project includes a `vercel.json` and serverless handler at `api/index.ts`. D
 ```bash
 vercel deploy
 ```
+
+### Docker
+
+Run the entire platform in a container — no Node.js or Python installation required.
+
+```bash
+# Build and start with Docker Compose
+docker compose up --build
+
+# Or build and run standalone
+docker build -t harvesthub .
+docker run -p 4000:4000 -v ./data:/app/data harvesthub
+```
+
+The `./data` directory is mounted as a volume so scraped products persist across container restarts.
+
+**Environment variables:**
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | `production` | Node environment |
+| `PORT` | `4000` | API server port |
 
 ---
 

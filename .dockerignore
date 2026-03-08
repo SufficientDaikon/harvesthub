@@ -1,0 +1,16 @@
+node_modules
+.git
+.github
+dist
+output
+*.xlsx
+*.log
+.env
+.env.*
+processed-products*.xlsx
+urls*.txt
+test-urls.txt
+sample-urls.txt
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
