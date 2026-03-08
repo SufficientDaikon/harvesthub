@@ -41,7 +41,7 @@ HarvestHub is a **TypeScript-first web scraping platform** that uses Python's [S
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/yourusername/harvesthub.git
+git clone https://github.com/SufficientDaikon/harvesthub.git
 cd harvesthub
 npm install
 pip install -r engine/requirements.txt
@@ -396,6 +396,6 @@ MIT — use it however you want.
 
 <div align="center">
 
-**Built with 🌾 by [HarvestHub](https://github.com/yourusername/harvesthub)**
+**Built with 🌾 by [HarvestHub](https://github.com/SufficientDaikon/harvesthub)**
 
 </div>

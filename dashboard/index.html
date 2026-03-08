@@ -619,7 +619,20 @@
             </svg>
             Schedules
           </button>
+          <a href="docs.html" class="nav-item" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
+            <span style="font-size:16px">📄</span>
+            Documentation
+          </a>
+          <a href="marketing.html" class="nav-item" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
+            <span style="font-size:16px">🚀</span>
+            Marketing
+          </a>
         </nav>
+
+        <a href="https://github.com/SufficientDaikon/harvesthub" target="_blank" class="nav-item" style="margin-top:auto;text-decoration:none;color:var(--text-secondary);display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;transition:var(--transition)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
 
         <div class="status-pill" id="engineStatus">
           <span class="status-dot" id="statusDot"></span>
@@ -639,7 +652,8 @@
       </aside>
 
       <!-- Main Content -->
-      <main class="main">
+      <main class="main" style="position:relative">
+        <div id="demoBadge" style="display:none;position:fixed;top:12px;right:20px;background:linear-gradient(135deg,#e94560,#d4a853);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;z-index:1000;letter-spacing:0.5px;box-shadow:0 2px 12px rgba(233,69,96,0.3)">⚡ DEMO MODE</div>
         <!-- Dashboard Page -->
         <div id="page-dashboard">
           <div class="page-header">
@@ -966,8 +980,83 @@
         if (page === "dashboard") loadDashboard();
       }
 
+      // ── Static / Demo Mode ────────────────────────────────────────────
+      const STATIC_MODE = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
+
+      const MOCK_PRODUCTS = [
+        { id:"p1", sourceUrl:"https://apple.com/iphone-15-pro", scrapedAt:"2026-03-07T12:00:00Z", title:"iPhone 15 Pro 256GB", price:1199.00, currency:"USD", description:"Apple iPhone 15 Pro with A17 Pro chip", images:["https://placehold.co/200"], availability:"in_stock", brand:"Apple", sku:"IPH15P-256", category:"Electronics", rating:4.8, reviewCount:2340, overallConfidence:95, priceHistory:[{date:"2026-02-01",price:1199},{date:"2026-03-01",price:1149}] },
+        { id:"p2", sourceUrl:"https://samsung.com/galaxy-s24-ultra", scrapedAt:"2026-03-07T12:05:00Z", title:"Samsung Galaxy S24 Ultra", price:1299.99, currency:"USD", description:"Samsung Galaxy S24 Ultra 512GB", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-S928B", category:"Electronics", rating:4.7, reviewCount:1890, overallConfidence:92, priceHistory:[{date:"2026-02-01",price:1319.99},{date:"2026-03-01",price:1299.99}] },
+        { id:"p3", sourceUrl:"https://sony.com/wh-1000xm5", scrapedAt:"2026-03-07T11:30:00Z", title:"Sony WH-1000XM5 Wireless Headphones", price:348.00, currency:"USD", description:"Industry-leading noise canceling", images:[], availability:"in_stock", brand:"Sony", sku:"WH1000XM5B", category:"Electronics", rating:4.6, reviewCount:4520, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:348}] },
+        { id:"p4", sourceUrl:"https://nike.com/air-max-90", scrapedAt:"2026-03-07T10:00:00Z", title:"Nike Air Max 90", price:130.00, currency:"USD", description:"Classic Nike Air Max 90 sneakers", images:[], availability:"in_stock", brand:"Nike", sku:"CN8490-001", category:"Clothing", rating:4.5, reviewCount:3210, overallConfidence:85, priceHistory:[{date:"2026-02-15",price:130}] },
+        { id:"p5", sourceUrl:"https://apple.com/macbook-pro-14", scrapedAt:"2026-03-07T09:45:00Z", title:"MacBook Pro 14\" M3 Pro", price:1999.00, currency:"USD", description:"Apple MacBook Pro 14-inch with M3 Pro chip", images:[], availability:"in_stock", brand:"Apple", sku:"MBP14-M3P", category:"Electronics", rating:4.9, reviewCount:1560, overallConfidence:97, priceHistory:[{date:"2026-01-15",price:1999}] },
+        { id:"p6", sourceUrl:"https://apple.com/ipad-air", scrapedAt:"2026-03-07T09:30:00Z", title:"iPad Air M2 11-inch", price:599.00, currency:"USD", description:"iPad Air with M2 chip", images:[], availability:"in_stock", brand:"Apple", sku:"IPA-M2-11", category:"Electronics", rating:4.7, reviewCount:980, overallConfidence:90, priceHistory:[{date:"2026-02-01",price:649},{date:"2026-03-01",price:599}] },
+        { id:"p7", sourceUrl:"https://dyson.com/v15-detect", scrapedAt:"2026-03-06T18:00:00Z", title:"Dyson V15 Detect Absolute", price:749.99, currency:"USD", description:"Dyson V15 cordless vacuum with laser detection", images:[], availability:"in_stock", brand:"Dyson", sku:"DYS-V15-ABS", category:"Home & Garden", rating:4.4, reviewCount:2100, overallConfidence:82, priceHistory:[{date:"2026-02-01",price:749.99}] },
+        { id:"p8", sourceUrl:"https://kitchenaid.com/stand-mixer", scrapedAt:"2026-03-06T17:30:00Z", title:"KitchenAid Artisan Stand Mixer", price:449.99, currency:"USD", description:"5-quart tilt-head stand mixer", images:[], availability:"in_stock", brand:"KitchenAid", sku:"KSM150PS", category:"Home & Garden", rating:4.8, reviewCount:5600, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:479.99},{date:"2026-03-01",price:449.99}] },
+        { id:"p9", sourceUrl:"https://bose.com/qc-ultra", scrapedAt:"2026-03-06T16:00:00Z", title:"Bose QuietComfort Ultra Headphones", price:429.00, currency:"USD", description:"Premium noise cancelling headphones", images:[], availability:"in_stock", brand:"Bose", sku:"BOSE-QCU", category:"Electronics", rating:4.5, reviewCount:1240, overallConfidence:87, priceHistory:[{date:"2026-02-15",price:429}] },
+        { id:"p10", sourceUrl:"https://dell.com/xps-15", scrapedAt:"2026-03-06T15:00:00Z", title:"Dell XPS 15 Laptop", price:1549.99, currency:"USD", description:"Dell XPS 15 with Intel Core i7, 16GB RAM", images:[], availability:"in_stock", brand:"Dell", sku:"XPS9530", category:"Electronics", rating:4.3, reviewCount:870, overallConfidence:84, priceHistory:[{date:"2026-01-01",price:1649.99},{date:"2026-03-01",price:1549.99}] },
+        { id:"p11", sourceUrl:"https://adidas.com/ultraboost-23", scrapedAt:"2026-03-06T14:00:00Z", title:"Adidas Ultraboost Light", price:190.00, currency:"USD", description:"Adidas Ultraboost Light running shoes", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6339", category:"Clothing", rating:4.6, reviewCount:2780, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:190}] },
+        { id:"p12", sourceUrl:"https://samsung.com/65-qled", scrapedAt:"2026-03-06T13:00:00Z", title:"Samsung 65\" QLED 4K Smart TV", price:997.99, currency:"USD", description:"Samsung QLED 4K Smart TV Q80C", images:[], availability:"in_stock", brand:"Samsung", sku:"QN65Q80C", category:"Electronics", rating:4.5, reviewCount:3400, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:1197.99},{date:"2026-03-01",price:997.99}] },
+        { id:"p13", sourceUrl:"https://lg.com/oled-c3", scrapedAt:"2026-03-06T12:30:00Z", title:"LG C3 55\" OLED TV", price:1296.99, currency:"USD", description:"LG OLED evo C3 55-inch 4K Smart TV", images:[], availability:"in_stock", brand:"LG", sku:"OLED55C3", category:"Electronics", rating:4.7, reviewCount:2100, overallConfidence:93, priceHistory:[{date:"2026-01-01",price:1499.99},{date:"2026-03-01",price:1296.99}] },
+        { id:"p14", sourceUrl:"https://hp.com/spectre-x360", scrapedAt:"2026-03-06T11:00:00Z", title:"HP Spectre x360 14", price:1449.99, currency:"USD", description:"HP Spectre x360 2-in-1 laptop", images:[], availability:"out_of_stock", brand:"HP", sku:"HP-SPX360", category:"Electronics", rating:4.4, reviewCount:650, overallConfidence:81, priceHistory:[{date:"2026-02-01",price:1449.99}] },
+        { id:"p15", sourceUrl:"https://nike.com/air-jordan-1", scrapedAt:"2026-03-06T10:00:00Z", title:"Air Jordan 1 Retro High OG", price:180.00, currency:"USD", description:"Classic Air Jordan 1 Retro", images:[], availability:"out_of_stock", brand:"Nike", sku:"DZ5485-612", category:"Clothing", rating:4.8, reviewCount:8900, overallConfidence:79, priceHistory:[{date:"2026-02-01",price:180}] },
+        { id:"p16", sourceUrl:"https://sony.com/ps5", scrapedAt:"2026-03-06T09:00:00Z", title:"PlayStation 5 Console", price:499.99, currency:"USD", description:"Sony PS5 Disc Edition", images:[], availability:"in_stock", brand:"Sony", sku:"CFI-1215A", category:"Electronics", rating:4.8, reviewCount:12400, overallConfidence:96, priceHistory:[{date:"2026-01-01",price:499.99}] },
+        { id:"p17", sourceUrl:"https://amazon.com/kindle-paperwhite", scrapedAt:"2026-03-05T20:00:00Z", title:"Kindle Paperwhite (2024)", price:149.99, currency:"USD", description:"Amazon Kindle Paperwhite 6.8\" display", images:[], availability:"in_stock", brand:"Amazon", sku:"KPW-2024", category:"Books", rating:4.6, reviewCount:6700, overallConfidence:88, priceHistory:[{date:"2026-02-01",price:149.99}] },
+        { id:"p18", sourceUrl:"https://lego.com/technic-porsche", scrapedAt:"2026-03-05T18:00:00Z", title:"LEGO Technic Porsche 911 GT3 RS", price:449.99, currency:"USD", description:"LEGO Technic 42156 Porsche 911 GT3 RS", images:[], availability:"in_stock", brand:"LEGO", sku:"42156", category:"Toys", rating:4.9, reviewCount:890, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:499.99},{date:"2026-03-01",price:449.99}] },
+        { id:"p19", sourceUrl:"https://dell.com/monitor-u2723qe", scrapedAt:"2026-03-05T16:00:00Z", title:"Dell UltraSharp U2723QE 27\" 4K Monitor", price:519.99, currency:"USD", description:"Dell 27-inch 4K USB-C Hub Monitor", images:[], availability:"in_stock", brand:"Dell", sku:"U2723QE", category:"Electronics", rating:4.5, reviewCount:1340, overallConfidence:86, priceHistory:[{date:"2026-02-01",price:569.99},{date:"2026-03-01",price:519.99}] },
+        { id:"p20", sourceUrl:"https://adidas.com/stan-smith", scrapedAt:"2026-03-05T14:00:00Z", title:"Adidas Stan Smith Lux", price:120.00, currency:"USD", description:"Adidas Stan Smith Lux sneakers", images:[], availability:"in_stock", brand:"Adidas", sku:"HQ6785", category:"Clothing", rating:4.3, reviewCount:1900, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:130},{date:"2026-03-01",price:120}] },
+        { id:"p21", sourceUrl:"https://dyson.com/airwrap", scrapedAt:"2026-03-05T12:00:00Z", title:"Dyson Airwrap Multi-styler", price:599.99, currency:"USD", description:"Dyson Airwrap Complete Long", images:[], availability:"out_of_stock", brand:"Dyson", sku:"DYS-AW-CL", category:"Home & Garden", rating:4.3, reviewCount:3200, overallConfidence:80, priceHistory:[{date:"2026-02-01",price:599.99}] },
+        { id:"p22", sourceUrl:"https://apple.com/airpods-pro", scrapedAt:"2026-03-05T10:00:00Z", title:"AirPods Pro (2nd Gen) USB-C", price:249.00, currency:"USD", description:"Apple AirPods Pro with USB-C", images:[], availability:"in_stock", brand:"Apple", sku:"MTJV3AM", category:"Electronics", rating:4.7, reviewCount:7800, overallConfidence:94, priceHistory:[{date:"2026-01-15",price:249}] },
+        { id:"p23", sourceUrl:"https://samsung.com/galaxy-watch6", scrapedAt:"2026-03-05T08:00:00Z", title:"Samsung Galaxy Watch6 Classic 47mm", price:349.99, currency:"USD", description:"Samsung Galaxy Watch6 Classic", images:[], availability:"in_stock", brand:"Samsung", sku:"SM-R960", category:"Electronics", rating:4.4, reviewCount:1450, overallConfidence:85, priceHistory:[{date:"2026-02-01",price:399.99},{date:"2026-03-01",price:349.99}] },
+        { id:"p24", sourceUrl:"https://nike.com/dunk-low", scrapedAt:"2026-03-05T06:00:00Z", title:"Nike Dunk Low Retro", price:110.00, currency:"USD", description:"Nike Dunk Low Retro casual shoes", images:[], availability:"out_of_stock", brand:"Nike", sku:"DD1391-100", category:"Clothing", rating:4.6, reviewCount:5400, overallConfidence:78, priceHistory:[{date:"2026-02-01",price:110}] },
+        { id:"p25", sourceUrl:"https://sonos.com/era-300", scrapedAt:"2026-03-04T22:00:00Z", title:"Sonos Era 300 Speaker", price:449.00, currency:"USD", description:"Sonos Era 300 spatial audio speaker", images:[], availability:"in_stock", brand:"Sonos", sku:"E30G1US1", category:"Electronics", rating:4.5, reviewCount:670, overallConfidence:87, priceHistory:[{date:"2026-02-01",price:449}] },
+        { id:"p26", sourceUrl:"https://logitech.com/mx-master-3s", scrapedAt:"2026-03-04T20:00:00Z", title:"Logitech MX Master 3S Mouse", price:99.99, currency:"USD", description:"Advanced wireless mouse for productivity", images:[], availability:"in_stock", brand:"Logitech", sku:"910-006556", category:"Electronics", rating:4.7, reviewCount:4300, overallConfidence:91, priceHistory:[{date:"2026-01-01",price:99.99}] },
+        { id:"p27", sourceUrl:"https://fitbit.com/charge-6", scrapedAt:"2026-03-04T18:00:00Z", title:"Fitbit Charge 6 Fitness Tracker", price:159.95, currency:"USD", description:"Advanced health and fitness tracker", images:[], availability:"in_stock", brand:"Fitbit", sku:"FB423", category:"Sports", rating:4.2, reviewCount:2100, overallConfidence:83, priceHistory:[{date:"2026-02-01",price:159.95}] },
+        { id:"p28", sourceUrl:"https://weber.com/genesis-e-335", scrapedAt:"2026-03-04T16:00:00Z", title:"Weber Genesis E-335 Gas Grill", price:1149.00, currency:"USD", description:"3-burner gas grill with side burner", images:[], availability:"out_of_stock", brand:"Weber", sku:"35410001", category:"Home & Garden", rating:4.6, reviewCount:890, overallConfidence:76, priceHistory:[{date:"2026-02-01",price:1149}] },
+        { id:"p29", sourceUrl:"https://garmin.com/fenix-7", scrapedAt:"2026-03-04T14:00:00Z", title:"Garmin Fenix 7X Solar", price:799.99, currency:"USD", description:"Premium multisport GPS watch", images:[], availability:"in_stock", brand:"Garmin", sku:"010-02541-01", category:"Sports", rating:4.7, reviewCount:1670, overallConfidence:89, priceHistory:[{date:"2026-01-15",price:849.99},{date:"2026-03-01",price:799.99}] },
+        { id:"p30", sourceUrl:"https://amazon.com/echo-dot-5", scrapedAt:"2026-03-04T12:00:00Z", title:"Amazon Echo Dot (5th Gen)", price:49.99, currency:"USD", description:"Smart speaker with Alexa", images:[], availability:"in_stock", brand:"Amazon", sku:"B09B8V1LZ3", category:"Electronics", rating:4.4, reviewCount:15200, overallConfidence:90, priceHistory:[{date:"2026-01-01",price:49.99},{date:"2026-02-14",price:29.99},{date:"2026-03-01",price:49.99}] },
+        { id:"p31", sourceUrl:"https://cricut.com/maker-3", scrapedAt:"2026-03-04T10:00:00Z", title:"Cricut Maker 3", price:399.00, currency:"USD", description:"Ultimate smart cutting machine", images:[], availability:"in_stock", brand:"Cricut", sku:"2008338", category:"Home & Garden", rating:4.5, reviewCount:3400, overallConfidence:84, priceHistory:[{date:"2026-02-01",price:399}] },
+        { id:"p32", sourceUrl:"https://bosch.com/drill-set", scrapedAt:"2026-03-03T20:00:00Z", title:"Bosch 18V Drill/Driver Kit", price:3.99, currency:"USD", description:"Compact drill/driver combo kit (clearance)", images:[], availability:"in_stock", brand:"Bosch", sku:"GSR18V-190B22", category:"Automotive", rating:4.6, reviewCount:2100, overallConfidence:72, priceHistory:[{date:"2026-02-01",price:129.99},{date:"2026-03-01",price:3.99}] },
+      ];
+
+      const MOCK_DATA = {
+        stats: { totalProducts:147, inStock:112, outOfStock:35, avgPrice:89.50, avgConfidence:82, priceRange:{min:3.99,max:1299.99}, topBrands:[{name:"Apple",count:23},{name:"Samsung",count:18},{name:"Sony",count:15},{name:"Nike",count:12},{name:"Adidas",count:10},{name:"LG",count:9},{name:"Dell",count:8},{name:"HP",count:7}], topCategories:[{name:"Electronics",count:45},{name:"Clothing",count:28},{name:"Home & Garden",count:22},{name:"Sports",count:18},{name:"Books",count:15},{name:"Toys",count:12},{name:"Automotive",count:7}] },
+        status: { engine:"ready", userAgents:20, proxies:0, productCount:147, totalJobs:12, lastJob:{id:"job_abc123",status:"completed",completedUrls:25,totalUrls:25,completedAt:"2026-03-07T18:30:00Z"}, uptime:86400 },
+        schedules: { schedules:[
+          { id:"sch_1", name:"Daily Electronics", cronExpression:"0 9 * * *", urlSource:"electronics-urls.txt", enabled:true, running:true, lastRunAt:"2026-03-07T09:00:00Z", lastRunStatus:"completed" },
+          { id:"sch_2", name:"Weekly Fashion", cronExpression:"0 6 * * 1", urlSource:"fashion-urls.txt", enabled:true, running:false, lastRunAt:"2026-03-04T06:00:00Z", lastRunStatus:"completed" },
+          { id:"sch_3", name:"Price Monitor", cronExpression:"*/30 * * * *", urlSource:"watchlist.txt", enabled:false, running:false, lastRunAt:null, lastRunStatus:null }
+        ]},
+        jobs: { jobs:[] }
+      };
+
+      function getMockData(path) {
+        const url = new URL(path, window.location.origin);
+        const p = url.pathname;
+        if (p === "/api/stats") return MOCK_DATA.stats;
+        if (p === "/api/status") return MOCK_DATA.status;
+        if (p === "/api/schedules") return MOCK_DATA.schedules;
+        if (p === "/api/jobs") return MOCK_DATA.jobs;
+        if (p === "/api/products") {
+          const page = parseInt(url.searchParams.get("page")) || 1;
+          const limit = parseInt(url.searchParams.get("limit")) || 25;
+          const search = (url.searchParams.get("search") || "").toLowerCase();
+          const brand = url.searchParams.get("brand") || "";
+          const availability = url.searchParams.get("availability") || "";
+          let filtered = MOCK_PRODUCTS;
+          if (search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || (p.brand||"").toLowerCase().includes(search) || (p.category||"").toLowerCase().includes(search));
+          if (brand) filtered = filtered.filter(p => p.brand === brand);
+          if (availability) filtered = filtered.filter(p => p.availability === availability);
+          const total = filtered.length;
+          const totalPages = Math.max(1, Math.ceil(total / limit));
+          const start = (page - 1) * limit;
+          return { products: filtered.slice(start, start + limit), total, page, totalPages };
+        }
+        return {};
+      }
+
       // Fetch helpers
       async function api(path) {
+        if (STATIC_MODE) return getMockData(path);
         const res = await fetch(path);
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
@@ -1150,6 +1239,10 @@
 
       // Exports
       function downloadExport(format) {
+        if (STATIC_MODE) {
+          alert("Export is available when running locally:\nnpx tsx src/cli/index.ts dashboard -p 4000");
+          return;
+        }
         const log = document.getElementById("exportLog");
         const time = new Date().toLocaleTimeString();
         window.open(`/api/export/${format}`, "_blank");
@@ -1362,6 +1455,7 @@
       }
 
       async function createSchedule() {
+        if (STATIC_MODE) { alert("Schedule management requires the local server.\nRun: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
         const name = document.getElementById("sName").value.trim();
         const cronExpression = document.getElementById("sCron").value.trim();
         const urlSource = document.getElementById("sSource").value.trim();
@@ -1387,6 +1481,7 @@
       }
 
       async function toggleSchedule(id, enabled) {
+        if (STATIC_MODE) { alert("Schedule management requires the local server.\nRun: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
         await fetch(`/api/schedules/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -1396,6 +1491,7 @@
       }
 
       async function deleteScheduleUI(id) {
+        if (STATIC_MODE) { alert("Schedule management requires the local server.\nRun: npx tsx src/cli/index.ts dashboard -p 4000"); return; }
         if (!confirm("Delete this schedule?")) return;
         await fetch(`/api/schedules/${id}`, { method: "DELETE" });
         await loadSchedulesPage();
@@ -1424,7 +1520,11 @@
       // Init
       applyTheme(localStorage.getItem("hh-theme") || "dark");
       loadDashboard();
-      connectWs();
+      if (STATIC_MODE) {
+        document.getElementById("demoBadge").style.display = "block";
+      } else {
+        connectWs();
+      }
     </script>
   </body>
 </html>
