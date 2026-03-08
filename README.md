@@ -1,145 +1,401 @@
-# HarvestHub 🌾
+<div align="center">
 
-**Adaptive product scraping platform with premium exports**
+# 🌾 HarvestHub
 
-A TypeScript-first scraping platform that uses Python's [Scrapling](https://scrapling.readthedocs.io/) library for adaptive, anti-bot web scraping. Designed to extract product data from any e-commerce site and export to premium-styled Excel, CSV, JSON, or Google Merchant Center feeds.
+### Adaptive Product Scraping Platform
+
+**Extract product data from any e-commerce site. Export to XLSX, CSV, JSON, or Google Merchant Center feeds.**
+
+[![Tests](https://img.shields.io/badge/tests-111%20passing-brightgreen)](#testing)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](#tech-stack)
+[![Python](https://img.shields.io/badge/Python-Scrapling-3776AB?logo=python&logoColor=white)](#tech-stack)
+[![License](https://img.shields.io/badge/license-MIT-10B981)](#license)
+[![Cost](https://img.shields.io/badge/cost-%240-10B981)](#)
+
+[**Getting Started**](#quick-start) · [**Features**](#features) · [**Dashboard**](#dashboard) · [**CLI Reference**](#cli-commands) · [**API Docs**](#api-endpoints) · [**Architecture**](#architecture)
+
+</div>
+
+---
+
+## What is HarvestHub?
+
+HarvestHub is a **TypeScript-first web scraping platform** that uses Python's [Scrapling](https://scrapling.readthedocs.io/) library for adaptive, anti-bot product data extraction. It intelligently extracts product information from **any e-commerce site** using a 3-tier strategy with confidence scoring.
+
+**Who is this for?**
+- 🛒 **E-commerce professionals** monitoring competitor pricing
+- 📊 **Data analysts** building product datasets
+- 🔄 **Developers** automating product data pipelines
+- 📈 **Marketers** generating Google Merchant Center feeds
+
+**Why HarvestHub?**
+- Works on **any** e-commerce site — no site-specific templates needed
+- **Confidence scoring** tells you how reliable each data point is
+- **Premium exports** — not just data dumps, but styled XLSX with summary sheets
+- **Zero cost** — no paid APIs, proxies, or services required
+- **111 tests passing** — production-grade reliability
+
+---
+
+## Quick Start
+
+```bash
+# 1. Clone & install
+git clone https://github.com/yourusername/harvesthub.git
+cd harvesthub
+npm install
+pip install -r engine/requirements.txt
+
+# 2. Verify everything works
+npx tsx src/cli/index.ts status
+
+# 3. Scrape some products
+npx tsx src/cli/index.ts scrape --input "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+
+# 4. Export your data
+npx tsx src/cli/index.ts export -f xlsx -o products.xlsx
+
+# 5. Launch the dashboard
+npx tsx src/cli/index.ts dashboard -p 4000
+# Open http://localhost:4000
+```
+
+Or use the one-command bootstrap on Windows:
+
+```powershell
+.\setup.ps1
+```
 
 ---
 
 ## Features
 
-- **Adaptive Extraction** — JSON-LD → Microdata → CSS heuristics with confidence scoring
-- **Anti-Bot Bypass** — Scrapling's StealthyFetcher handles Cloudflare, DataDome, etc.
-- **Premium Excel Export** — Dark-themed headers, conditional formatting, hyperlinks, summary sheet
-- **Multi-Format Export** — XLSX, CSV, JSON, Google Merchant Center TSV
-- **Smart Rate Limiting** — Per-domain token-bucket rate limiter
+### 🎯 Adaptive 3-Tier Extraction
+
+HarvestHub doesn't rely on brittle CSS selectors. It uses an intelligent extraction pipeline:
+
+| Tier | Method | Confidence | Speed |
+|------|--------|------------|-------|
+| 1️⃣ | **JSON-LD** — Structured data from `<script type="application/ld+json">` | Highest (90-100%) | Fastest |
+| 2️⃣ | **Microdata** — Schema.org attributes (`itemprop`, `itemtype`) | High (70-90%) | Fast |
+| 3️⃣ | **CSS Heuristics** — Intelligent DOM analysis with scoring | Medium (40-70%) | Moderate |
+
+Each extracted field gets an individual confidence score so you know exactly how reliable your data is.
+
+### 📦 Premium Export Formats
+
+| Format | Description |
+|--------|-------------|
+| **XLSX** | Dark-themed headers, conditional formatting, hyperlinks, summary sheet, auto-filters |
+| **CSV** | UTF-8 with BOM for Excel compatibility |
+| **JSON** | Structured export with metadata header |
+| **GMC** | Google Merchant Center compliant TSV feed with field validation |
+
+### 🖥️ Real-Time Dashboard
+
+A premium SaaS-style web dashboard with:
+- 🔍 Full-text search across products
+- 📊 Charts and aggregated statistics
+- 🌓 Dark/light theme toggle
+- 📅 Schedule management UI
+- 📈 Price change history and trends
+- 💾 One-click export downloads
+- 🔌 WebSocket live updates during scrapes
+
+### ⏰ Cron Scheduling
+
+Schedule recurring scrapes with standard cron expressions:
+
+```bash
+# Scrape every day at 9 AM
+npx tsx src/cli/index.ts schedule add --name "Daily scrape" --cron "0 9 * * *" --urls products.txt
+
+# List all schedules
+npx tsx src/cli/index.ts schedule list
+
+# Start the scheduler (runs in foreground)
+npx tsx src/cli/index.ts schedule start
+```
+
+### 📉 Price Change Tracking
+
+When products are re-scraped, HarvestHub automatically:
+- Detects price changes with delta and percentage calculations
+- Maintains full price history per product
+- Provides trend indicators (up/down/stable)
+- Exposes history via API: `GET /api/products/:id/history`
+
+### 🛡️ Resilient Scraping Engine
+
+- **Rate Limiting** — Per-domain token bucket prevents blocking
 - **Retry Engine** — Exponential backoff with jitter, error classification (transient/permanent/blocked)
-- **User Agent Rotation** — 20 real browser user agents
-- **Legacy Migration** — Import existing `export_all.py` data
-- **Type-Safe** — Strict TypeScript end-to-end
+- **User Agent Rotation** — 20 real browser user agents, round-robin
+- **Proxy Rotation** — Optional proxy pool with file or env-var configuration
+- **Stealth Mode** — Scrapling's StealthyFetcher for protected sites
 
-## Quick Start
+---
 
-```powershell
-# 1. Bootstrap everything
-.\setup.ps1
-
-# 2. Check system status
-npx tsx src/cli/index.ts status
-
-# 3. Scrape products from a URL file
-npx tsx src/cli/index.ts scrape --urls urls.txt --output products.xlsx
-
-# 4. Export stored products
-npx tsx src/cli/index.ts export -f xlsx -o report.xlsx
-npx tsx src/cli/index.ts export -f gmc -o feed.tsv
-npx tsx src/cli/index.ts export -f csv -o data.csv
-npx tsx src/cli/index.ts export -f json -o data.json
-```
-
-## URL File Format
-
-Create a `.txt` file with one URL per line:
+## CLI Commands
 
 ```
-# Product URLs (lines starting with # are ignored)
+harvest status                          Show system health & store stats
+harvest scrape --urls file.txt          Scrape from URL file
+harvest scrape --input url1,url2        Scrape specific URLs
+harvest scrape --stealth                Use stealth mode for protected sites
+harvest scrape --dry-run                Validate URLs without scraping
+harvest scrape --proxies proxies.txt    Use proxy rotation
+harvest export -f xlsx -o report.xlsx   Export to premium Excel
+harvest export -f csv -o data.csv       Export to CSV
+harvest export -f json -o data.json     Export to JSON
+harvest export -f gmc -o feed.tsv       Export Google Merchant Center feed
+harvest migrate                         Import legacy export_all.py data
+harvest dashboard -p 4000              Start web dashboard
+harvest schedule list                   List all schedules
+harvest schedule add --name "..." ...   Create a new schedule
+harvest schedule remove <id>            Delete a schedule
+harvest schedule enable <id>            Enable a schedule
+harvest schedule disable <id>           Disable a schedule
+harvest schedule start                  Start all enabled schedules
+```
+
+### Scrape Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--urls <file>` | — | Path to URL file (one per line) |
+| `--input <urls>` | — | Comma-separated URLs |
+| `--output <path>` | `data/exports/products.xlsx` | Output file path |
+| `--format <fmt>` | `xlsx` | Export format (xlsx, csv, json, gmc) |
+| `--retries <n>` | `3` | Max retries per URL |
+| `--concurrency <n>` | `3` | Concurrent domain limit |
+| `--timeout <ms>` | `30000` | Request timeout |
+| `--stealth` | `false` | Bypass bot protection (slower) |
+| `--no-export` | — | Scrape and store only |
+| `--dry-run` | — | Validate URLs without scraping |
+| `--proxies <file>` | — | Proxy list file |
+
+### URL File Format
+
+```text
+# Lines starting with # are ignored
+# One URL per line, blank lines are skipped
 https://example.com/product/widget-pro
 https://store.example.com/items/gadget-x
 https://shop.example.org/p/thingamajig
 ```
 
-## CLI Commands
+---
 
-| Command                            | Description                                    |
-| ---------------------------------- | ---------------------------------------------- |
-| `harvest status`                   | Show system status, store stats, engine health |
-| `harvest scrape --urls file.txt`   | Scrape products from URL file                  |
-| `harvest scrape --input url1,url2` | Scrape specific URLs                           |
-| `harvest scrape --stealth`         | Use stealth mode for protected sites           |
-| `harvest scrape --dry-run`         | Validate URLs without scraping                 |
-| `harvest export -f xlsx`           | Export stored products to Excel                |
-| `harvest export -f gmc`            | Export Google Merchant Center feed             |
-| `harvest migrate`                  | Import legacy export_all.py data               |
+## Dashboard
+
+Launch with `npx tsx src/cli/index.ts dashboard -p 4000` and open **http://localhost:4000**
+
+| Page | URL | Description |
+|------|-----|-------------|
+| Dashboard | `/` or `/dashboard` | Product explorer, stats, charts |
+| Documentation | `/docs` | Full documentation & API reference |
+| Marketing | `/marketing` | Product landing page |
+
+---
+
+## API Endpoints
+
+All endpoints available at `http://localhost:4000` when the dashboard is running.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/status` | System health, engine status, product count |
+| `GET` | `/api/products` | Paginated products with search/filter |
+| `GET` | `/api/products/:id/history` | Price history for a product |
+| `GET` | `/api/stats` | Aggregated statistics, top brands/categories |
+| `GET` | `/api/export/:format` | Download export file |
+| `GET` | `/api/jobs` | Last 20 scrape jobs |
+| `GET` | `/api/schedules` | List all schedules |
+| `POST` | `/api/schedules` | Create a schedule |
+| `PATCH` | `/api/schedules/:id` | Update a schedule |
+| `DELETE` | `/api/schedules/:id` | Delete a schedule |
+| `WS` | `/ws` | WebSocket for real-time scrape events |
+
+### Query Parameters for `/api/products`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `page` | number | Page number (default: 1) |
+| `limit` | number | Items per page (default: 50, max: 200) |
+| `search` | string | Search title, description, SKU |
+| `brand` | string | Filter by brand |
+| `availability` | string | Filter by availability status |
+
+---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│                TypeScript CLI                     │
-│  ┌───────┐ ┌──────────┐ ┌────────┐ ┌──────────┐ │
-│  │ Parse │→│ Rate Limit│→│ Retry  │→│ Bridge   │ │
-│  │ URLs  │ │ (domain)  │ │ Engine │ │ (stdin/  │ │
-│  └───────┘ └──────────┘ └────────┘ │  stdout)  │ │
-│                                     └────┬─────┘ │
-│  ┌───────┐ ┌──────────┐ ┌────────┐      │       │
-│  │Export │←│ Store    │←│Normalize│←─────┘       │
-│  │ XLSX  │ │ (JSON)   │ │ Price  │               │
-│  └───────┘ └──────────┘ └────────┘               │
-└─────────────────────────────────────────────────┘
-                      │
-           ┌──────────▼──────────┐
-           │   Python Engine     │
-           │   (Scrapling)       │
-           │                     │
-           │  JSON-LD → Micro →  │
-           │  CSS → Heuristic    │
-           └─────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                      TypeScript Layer                         │
+│                                                              │
+│  CLI ──→ URL Parser ──→ Rate Limiter ──→ Retry Engine       │
+│                                              │               │
+│                                         Scrape Bridge        │
+│                                         (JSON IPC)           │
+│                                              │               │
+│  Dashboard ←── API Server ←── Store ←── Normalizer           │
+│  (Express)     (REST+WS)     (JSON)    (prices,              │
+│                                         currency)            │
+│                                              │               │
+│  Exporters: XLSX │ CSV │ JSON │ GMC          │               │
+│  Scheduler: Cron jobs (croner)               │               │
+│  Price Differ: Change detection              │               │
+└──────────────────────────────────────────────┼───────────────┘
+                                               │
+                              ┌─────────────────▼──────────────┐
+                              │        Python Engine           │
+                              │        (Scrapling)             │
+                              │                                │
+                              │  Tier 1: JSON-LD extraction    │
+                              │  Tier 2: Microdata extraction  │
+                              │  Tier 3: CSS heuristics        │
+                              │                                │
+                              │  Confidence scoring per field  │
+                              └────────────────────────────────┘
 ```
+
+---
 
 ## Project Structure
 
 ```
-h:\scraper\
+harvesthub/
 ├── engine/
-│   ├── scraper.py          # Python Scrapling engine
-│   └── requirements.txt    # Python dependencies
+│   ├── scraper.py              # Python Scrapling engine (380 lines)
+│   └── requirements.txt        # Python dependencies
 ├── src/
-│   ├── types/              # TypeScript interfaces
-│   ├── lib/                # Utilities (errors, logger, validators)
-│   ├── core/               # Engine (UA pool, rate limiter, retry, bridge)
-│   ├── pipeline/           # Data normalization
-│   ├── store/              # JSON persistence
-│   ├── export/             # XLSX, CSV, JSON, GMC exporters
-│   └── cli/                # Commander.js CLI
+│   ├── types/                  # TypeScript interfaces (Product, Job, Schedule)
+│   ├── lib/                    # Errors, logger, URL parser/validator
+│   ├── core/                   # Scrape bridge, rate limiter, retry engine,
+│   │                           # UA pool, proxy pool, scheduler, WS broadcast,
+│   │                           # price differ, job runner
+│   ├── pipeline/               # Data normalization
+│   ├── store/                  # JSON file persistence (atomic writes)
+│   ├── export/                 # XLSX, CSV, JSON, GMC exporters
+│   ├── api/                    # Express server + Vercel handler
+│   ├── cli/                    # Commander.js CLI (6 commands)
+│   └── __tests__/              # 14 test files, 111 tests
+├── dashboard/
+│   ├── index.html              # SaaS dashboard
+│   ├── docs.html               # Documentation page
+│   └── marketing.html          # Landing page
+├── api/
+│   └── index.ts                # Vercel serverless entry
 ├── data/
-│   ├── store/              # Product database (JSON)
-│   ├── logs/               # Application logs
-│   └── exports/            # Generated files
+│   ├── store/                  # Product database
+│   ├── exports/                # Generated files
+│   └── logs/                   # Application logs
 ├── package.json
 ├── tsconfig.json
-├── setup.ps1               # One-command bootstrap
-└── export_all.py           # Legacy file (preserved)
+├── vercel.json                 # Vercel deployment config
+└── setup.ps1                   # One-command bootstrap
 ```
+
+---
+
+## Tech Stack
+
+| Technology | Role |
+|------------|------|
+| **TypeScript** | Core application (strict mode) |
+| **Python + Scrapling** | HTTP fetching + HTML parsing engine |
+| **Node.js** | Runtime |
+| **Express** | API server + static file serving |
+| **ExcelJS** | Premium XLSX export |
+| **Commander.js** | CLI framework |
+| **Croner** | Cron job scheduling |
+| **WebSocket (ws)** | Real-time scrape event broadcasting |
+| **Pino** | Structured JSON logging |
+| **Zod** | Runtime type validation |
+| **Vitest** | Testing framework |
+| **Nanoid** | Unique ID generation |
+
+---
+
+## Testing
+
+```bash
+# Run all 111 tests
+npx vitest run
+
+# Run with watch mode
+npx vitest
+
+# Type check
+npx tsc --noEmit
+```
+
+**Test coverage:**
+- Unit tests: errors, normalizer, URL parser/validator, UA pool, proxy pool, rate limiter, retry engine, price differ, WS broadcast, store, scheduler
+- Integration tests: API endpoints (products, stats, jobs, schedules, export, price history), export pipeline (all 4 formats)
+
+---
+
+## Deployment
+
+### Local
+
+```bash
+npx tsx src/cli/index.ts dashboard -p 4000
+```
+
+### Vercel
+
+The project includes a `vercel.json` and serverless handler at `api/index.ts`. Dashboard runs in read-only mode on Vercel (Python scraper unavailable in serverless).
+
+```bash
+vercel deploy
+```
+
+---
 
 ## Requirements
 
 - **Node.js** ≥ 18
 - **Python** ≥ 3.9
-- **pip packages**: scrapling, orjson
+- **pip packages**: `scrapling`, `orjson`, `browserforge`
 
-## Export Formats
+---
 
-### Excel (XLSX)
+## Extracted Data Fields
 
-Premium-styled workbook with:
+HarvestHub extracts 16+ fields per product, each with individual confidence scores:
 
-- Summary sheet with aggregated stats
-- Products sheet with frozen headers, auto-filter
-- Conditional formatting (availability, confidence scores)
-- Clickable hyperlinks to source URLs
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Product title |
+| `price` | number | Current price |
+| `currency` | string | ISO currency code |
+| `description` | string | Product description |
+| `images` | string[] | Image URLs |
+| `availability` | enum | in_stock, out_of_stock, pre_order, unknown |
+| `brand` | string | Brand name |
+| `sku` | string | Stock keeping unit |
+| `mpn` | string | Manufacturer part number |
+| `gtin` | string | Global trade item number |
+| `category` | string | Product category |
+| `rating` | number | Average rating |
+| `reviewCount` | number | Number of reviews |
+| `specifications` | object | Key-value specifications |
+| `seller` | string | Seller name |
+| `shipping` | string | Shipping info |
 
-### Google Merchant Center (GMC)
-
-Tab-separated feed compliant with [Google's product data specification](https://support.google.com/merchants/answer/7052112). Includes validation warnings for missing required fields.
-
-### CSV
-
-UTF-8 with BOM for Excel compatibility.
-
-### JSON
-
-Structured export with metadata header.
+---
 
 ## License
 
-MIT
+MIT — use it however you want.
+
+---
+
+<div align="center">
+
+**Built with 🌾 by [HarvestHub](https://github.com/yourusername/harvesthub)**
+
+</div>

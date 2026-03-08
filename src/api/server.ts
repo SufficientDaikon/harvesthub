@@ -51,6 +51,9 @@ export function createServer(port = 3000) {
   app.get("/dashboard", (_req, res) => {
     res.sendFile(resolve(dashboardPath, "index.html"));
   });
+  app.get("/marketing", (_req, res) => {
+    res.sendFile(resolve(dashboardPath, "marketing.html"));
+  });
 
   // Load proxies from env on startup
   loadProxiesFromEnv();
